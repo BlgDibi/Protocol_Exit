@@ -38208,8 +38208,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 3372220416
-  m_fontColor: {r: 0, g: 0, b: 0, a: 0.7882353}
+    rgba: 1124073472
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.2627451}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -67213,7 +67213,6 @@ MonoBehaviour:
   gameOverUI: {fileID: 1330457291}
   crosshair: {fileID: 1601288710}
   scriptsToDisable:
-  - {fileID: 0}
   - {fileID: 1301822274}
   - {fileID: 2055820872}
 --- !u!1001 &1162721035
