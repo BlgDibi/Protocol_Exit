@@ -31,27 +31,27 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6167205224435712
-    m_Localized: Open Door
+    m_Localized: Open door (F)
     m_Metadata:
       m_Items: []
   - m_Id: 6167293099298816
-    m_Localized: Close Door
+    m_Localized: Close door (F)
     m_Metadata:
       m_Items: []
   - m_Id: 6167350590623744
-    m_Localized: Pick up Key
+    m_Localized: Pick up Key (F)
     m_Metadata:
       m_Items: []
   - m_Id: 6167441502162944
-    m_Localized: Turn Valve
+    m_Localized: Turn Valve (F)
     m_Metadata:
       m_Items: []
   - m_Id: 6183305790148608
-    m_Localized: Talk
+    m_Localized: Talk (T)
     m_Metadata:
       m_Items: []
   - m_Id: 6183365286350848
-    m_Localized: Read Book
+    m_Localized: Read Book (F)
     m_Metadata:
       m_Items: []
   references:
