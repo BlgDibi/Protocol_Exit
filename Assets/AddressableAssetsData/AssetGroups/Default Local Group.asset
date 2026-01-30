@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Default Local Group
+  m_GUID: 90bf9463b87b94f43b7c0df0eba6b09d
+  m_SerializeEntries:
+  - m_GUID: 11b1ce3c72458af4caf977bc8b40e769
+    m_Address: Assets/Localisation/Tables/Game_PauseMenu Shared Data.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ae80c132bcf5c94a952740d659f8a24
+    m_Address: Assets/Localisation/Tables/GAME_UI.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 83f0395a8b4841d478d0a57f77d20195
+    m_Address: Assets/Localisation/Tables/ControlMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ac377189a949b34687addf02b3b2345
+    m_Address: Assets/Localisation/Tables/TimeMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aca4b0b57b52e2440a29963fd35016b9
+    m_Address: Assets/Localisation/Tables/Game_PauseMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1cb4797cb590b84582bf13270ccefff
+    m_Address: Assets/Localisation/Tables/MainMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d50025aa416180440b07c8c85f3b5002
+    m_Address: Assets/Localisation/Tables/GAME_UI Shared Data.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e1d659f5e71a0c74bbefd99c48299616
+    m_Address: Assets/Localisation/Tables/OptionsMenu.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Preload
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: bd76d0b2db60c9c4d82258e92a4dbaf7, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 77d4ec31c24b3844b80d84ef624a4258, type: 2}
+    - {fileID: 11400000, guid: 3b5afd8c723aafd4ba7c9e0ae8204ff8, type: 2}

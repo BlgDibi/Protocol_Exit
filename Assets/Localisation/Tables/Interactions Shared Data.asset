@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Interactions Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Interactions
+  m_TableCollectionNameGuidString: 877de6e70d13d9c4c985824d48735096
+  m_Entries:
+  - m_Id: 6013112320
+    m_Key: Prompt_talk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 94340960256
+    m_Key: Prompt_read
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1453379342336
+    m_Key: Prompt_firstdoor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6167205224435712
+    m_Key: "Action_OpenDoor\t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6167293099298816
+    m_Key: "Action_CloseDoor\t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6167350590623744
+    m_Key: "Action_PickUpKey\t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6167441502162944
+    m_Key: "Action_TurnValve\t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6183305790148608
+    m_Key: Action_Talk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6183365286350848
+    m_Key: Action_ReadBook
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 2160084355101753428
+  references:
+    version: 2
+    RefIds:
+    - rid: 2160084355101753428
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1768300609474
