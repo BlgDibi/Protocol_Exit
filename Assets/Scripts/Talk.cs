@@ -36,6 +36,8 @@ public class Talk : MonoBehaviour, InterfaceInteractable
     public event Action OnDialogueFinished;
     public bool HasTalked = false;
 
+    [SerializeField] private KeyCode interactkey=KeyCode.T;
+
     private void Start()
     {
         if (speakerTrans != null)
@@ -154,4 +156,10 @@ public class Talk : MonoBehaviour, InterfaceInteractable
 
         infoText.gameObject.SetActive(false);
     }
+
+    public KeyCode GetInteracKey()
+    {
+        return interactkey;
+    }
+
 }

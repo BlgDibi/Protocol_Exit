@@ -10,6 +10,8 @@ public class KeyCollectable : MonoBehaviour,InterfaceInteractable
     [Header("Localization")]
     public LocalizedString textPickup;
 
+    [SerializeField] private KeyCode interactionkey = KeyCode.E;
+
     public void Interact() 
     {
         if (key != null)
@@ -35,7 +37,7 @@ public class KeyCollectable : MonoBehaviour,InterfaceInteractable
 
     public KeyCode GetInteractKey()
     {
-        return KeyCode.F;
+        return interactionkey;
     }
 
 }

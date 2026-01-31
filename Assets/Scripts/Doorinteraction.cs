@@ -1,17 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Ez kell a szöveg kiíráshoz!
+using TMPro;
 
 public class DoorInteraction : MonoBehaviour
 {
     [Header("Raycast")]
     [SerializeField] private float rayDistance = 5;
-    [SerializeField] private KeyCode interactionKey = KeyCode.F;
     [SerializeField] private Image crosshair;
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI interactionText;
-
     [SerializeField] private GameObject interactionPanel;
 
     private Camera _camera;
@@ -38,44 +36,22 @@ public class DoorInteraction : MonoBehaviour
         {
             InterfaceInteractable interactable = hit.collider.GetComponent<InterfaceInteractable>();
 
-            if (interactable != null)
+            if (interactionText != null)
             {
-                HighlightCrosshair(true);
+                string textToShow = interactable.GetInteractText();
+                KeyCode keyNeeded = interactable.GetInteractKey();
 
-                if (interactionText != null)
+                interactionText.text = textToShow;
+
+                if (textToShow != "")
                 {
-                    string textToShow = interactable.GetInteractText();
-                    KeyCode keyNeeded = interactable.GetInteractKey();
-                    if (Input.GetKeyDown(keyNeeded))
-                    {
-                        interactable.Interact();
-                        if (interactionText != null) interactionText.text = interactable.GetInteractText();
-                    }
-                    if (textToShow != "")
-                    {
-                        interactionText.text = textToShow;
-                        interactionText.gameObject.SetActive(true);
-
-                        if (interactionPanel != null)
-                        {
-                            interactionPanel.SetActive(true);
-                        }
-                    }
-                    else
-                    {
-                        interactionText.gameObject.SetActive(false);
-                        if (interactionPanel != null) interactionPanel.SetActive(false);
-                    }
+                    interactionText.gameObject.SetActive(true);
+                    if (interactionPanel != null) interactionPanel.SetActive(true);
                 }
 
-                if (Input.GetKeyDown(interactionKey))
+                if (Input.GetKeyDown(keyNeeded))
                 {
                     interactable.Interact();
-
-                    if (interactionText != null)
-                    {
-                        interactionText.text = interactable.GetInteractText();
-                    }
                 }
             }
             else
@@ -91,7 +67,6 @@ public class DoorInteraction : MonoBehaviour
 
     void ClearTarget()
     {
-        
         if (KeyPadTrigger.IsPlayerInZone) return;
 
         HighlightCrosshair(false);

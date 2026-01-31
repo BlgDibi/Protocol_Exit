@@ -1,35 +1,46 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Localization;
 
-public class KeyPadTrigger : MonoBehaviour
+
+public class KeyPadTrigger : MonoBehaviour, InterfaceInteractable
 {
- 
     public static bool IsPlayerInZone = false;
 
     [Header("Settings")]
     public KeyPadSystem uiKeypad;
     [SerializeField] private Image crosshair;
 
-    private bool playerInRange = false;
+    [Header("Localization")]
+    public LocalizedString interactionPrompt;
 
-    void Update()
+    [SerializeField] private KeyCode interactkey = KeyCode.F;
+
+    public string GetInteractText()
     {
-        if (playerInRange && Input.GetKeyUp(KeyCode.F))
+        return interactionPrompt.GetLocalizedString();
+    }
+
+    public KeyCode GetInteractKey()
+    {
+        return interactkey;
+    }
+
+    public void Interact()
+    {
+        if (uiKeypad != null && !uiKeypad.keypadCanvas.activeSelf)
         {
-            if (!uiKeypad.keypadCanvas.activeSelf)
-            {
-                HighlightCrosshair(false);
-                uiKeypad.ShowKeypad();
-            }
+            HighlightCrosshair(false);
+            uiKeypad.ShowKeypad();
         }
     }
+
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            playerInRange = true;
-            IsPlayerInZone = true; 
+            IsPlayerInZone = true;
             HighlightCrosshair(true);
         }
     }
@@ -38,10 +49,9 @@ public class KeyPadTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            playerInRange = false;
             IsPlayerInZone = false;
             HighlightCrosshair(false);
-            uiKeypad.CloseKeypad();
+            if (uiKeypad != null) uiKeypad.CloseKeypad();
         }
     }
 

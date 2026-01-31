@@ -18,40 +18,36 @@ MonoBehaviour:
   m_Metadata:
     m_Items: []
   m_TableData:
-  - m_Id: 6013112320
-    m_Localized: "Nyomd meg a (T) gombot a besz\xE9dhez"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 94340960256
-    m_Localized: "Nyomd meg az (F) gombot az olvas\xE1shoz"
-    m_Metadata:
-      m_Items: []
   - m_Id: 1453379342336
     m_Localized: Meg kell keresned valamit!
     m_Metadata:
       m_Items: []
   - m_Id: 6167205224435712
-    m_Localized: "Ajt\xF3 kinyit\xE1sa (F)"
+    m_Localized: "Ajt\xF3 kinyit\xE1sa"
     m_Metadata:
       m_Items: []
   - m_Id: 6167293099298816
-    m_Localized: "Ajt\xF3 bez\xE1r\xE1sa (F)"
+    m_Localized: "Ajt\xF3 bez\xE1r\xE1sa"
     m_Metadata:
       m_Items: []
   - m_Id: 6167350590623744
-    m_Localized: "Kulcs felv\xE9tele (F)"
+    m_Localized: "Kulcs felv\xE9tele"
     m_Metadata:
       m_Items: []
   - m_Id: 6167441502162944
-    m_Localized: "Szelep elteker\xE9se (F)"
+    m_Localized: "Szelep elteker\xE9se"
     m_Metadata:
       m_Items: []
   - m_Id: 6183305790148608
-    m_Localized: "Besz\xE9lget\xE9s (T)"
+    m_Localized: "Besz\xE9lget\xE9s"
     m_Metadata:
       m_Items: []
   - m_Id: 6183365286350848
-    m_Localized: "K\xF6nyv elovas\xE1sa (F)"
+    m_Localized: "K\xF6nyv elovas\xE1sa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6504506668404736
+    m_Localized: "K\xF3d be\xEDr\xE1sa"
     m_Metadata:
       m_Items: []
   references:

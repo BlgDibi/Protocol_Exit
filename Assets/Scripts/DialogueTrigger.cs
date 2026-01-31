@@ -13,15 +13,14 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     [Header("Settings")]
     [Tooltip("Button to Use")]
-    public KeyCode interactKey = KeyCode.F;
+    [SerializeField] private KeyCode interactionKey = KeyCode.T;
     public KeyCode GetInteractKey()
     {
-        return interactKey;
+        return interactionKey;
     }
 
     public string GetInteractText()
     {
-        if (interactionPrompt.IsEmpty) return "Interact";
         return interactionPrompt.GetLocalizedString();
     }
 

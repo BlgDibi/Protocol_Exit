@@ -43,6 +43,9 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     public LocalizedString textCloseDoor;
 
 
+    [SerializeField] private KeyCode interactionKey = KeyCode.F;
+
+
     private bool isDoorOpen = false;
     private bool isAnimating = false;
     private Quaternion targetRotation;
@@ -195,7 +198,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     public KeyCode GetInteractKey()
     {
-        return KeyCode.E;
+        return interactionKey;
     }
 
 }

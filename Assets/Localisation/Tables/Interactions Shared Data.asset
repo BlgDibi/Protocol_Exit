@@ -15,14 +15,6 @@ MonoBehaviour:
   m_TableCollectionName: Interactions
   m_TableCollectionNameGuidString: 877de6e70d13d9c4c985824d48735096
   m_Entries:
-  - m_Id: 6013112320
-    m_Key: Prompt_talk
-    m_Metadata:
-      m_Items: []
-  - m_Id: 94340960256
-    m_Key: Prompt_read
-    m_Metadata:
-      m_Items: []
   - m_Id: 1453379342336
     m_Key: Prompt_firstdoor
     m_Metadata:
@@ -49,6 +41,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 6183365286350848
     m_Key: Action_ReadBook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6504506668404736
+    m_Key: Action_KeyPad
     m_Metadata:
       m_Items: []
   m_Metadata:
