@@ -11,7 +11,6 @@ public class KeyPadSystem : MonoBehaviour
     public UniversalDoor doorToOpen;
 
     [Header("Feedback Colors")]
-
     public Color successColor = Color.green;
     public Color errorColor = Color.red;
 
@@ -20,8 +19,6 @@ public class KeyPadSystem : MonoBehaviour
 
     private string currentInput = "";
     private Color originalColor;
-
-    private bool isProcessing = false;
 
     void Awake()
     {
@@ -33,18 +30,14 @@ public class KeyPadSystem : MonoBehaviour
 
     void Start()
     {
-        keypadCanvas.SetActive(false);
+        if (keypadCanvas != null) keypadCanvas.SetActive(false);
     }
 
     public void ShowKeypad()
     {
-        if (playerController != null)
-        {
-            playerController.enabled = false;
-        }
+        if (playerController != null) playerController.enabled = false;
 
         keypadCanvas.SetActive(true);
-        Canvas.ForceUpdateCanvases();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -84,7 +77,6 @@ public class KeyPadSystem : MonoBehaviour
         {
             display.text = "GRANTED";
             display.color = successColor;
-
             if (doorToOpen != null) doorToOpen.KeypadSuccess();
             Invoke("CloseKeypad", 1f);
         }
@@ -92,7 +84,6 @@ public class KeyPadSystem : MonoBehaviour
         {
             display.text = "DENIED";
             display.color = errorColor;
-
             currentInput = "";
             Invoke("UpdateDisplay", 1f);
         }
@@ -100,8 +91,10 @@ public class KeyPadSystem : MonoBehaviour
 
     void UpdateDisplay()
     {
-        display.text = currentInput;
-
-        display.color = originalColor;
+        if (display != null)
+        {
+            display.text = currentInput;
+            display.color = originalColor;
+        }
     }
 }
