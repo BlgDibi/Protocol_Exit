@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class DoorInteraction : MonoBehaviour
+public class Interaction : MonoBehaviour
 {
     [Header("Raycast")]
     [SerializeField] private float rayDistance = 5;
@@ -36,22 +36,31 @@ public class DoorInteraction : MonoBehaviour
         {
             InterfaceInteractable interactable = hit.collider.GetComponent<InterfaceInteractable>();
 
-            if (interactionText != null)
+            if (interactable != null)
             {
-                string textToShow = interactable.GetInteractText();
-                KeyCode keyNeeded = interactable.GetInteractKey();
+                HighlightCrosshair(true);
 
-                interactionText.text = textToShow;
-
-                if (textToShow != "")
+                if (interactionText != null)
                 {
-                    interactionText.gameObject.SetActive(true);
-                    if (interactionPanel != null) interactionPanel.SetActive(true);
-                }
+                    string textToShow = interactable.GetInteractText();
+                    KeyCode keyNeeded = interactable.GetInteractKey();
 
-                if (Input.GetKeyDown(keyNeeded))
-                {
-                    interactable.Interact();
+                    interactionText.text = textToShow;
+
+                    if (!string.IsNullOrEmpty(textToShow))
+                    {
+                        interactionText.gameObject.SetActive(true);
+                        if (interactionPanel != null) interactionPanel.SetActive(true);
+                    }
+                    else
+                    {
+                        if (interactionPanel != null) interactionPanel.SetActive(false);
+                    }
+
+                    if (Input.GetKeyDown(keyNeeded))
+                    {
+                        interactable.Interact();
+                    }
                 }
             }
             else

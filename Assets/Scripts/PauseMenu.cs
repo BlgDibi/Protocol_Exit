@@ -11,7 +11,7 @@ public class PauseMenu : MonoBehaviour
     public MonoBehaviour[] scriptsToDisable;
 
     private NPCLookPrompt _npcLookPrompt;
-    private DoorInteraction _doorInteraction;
+    private Interaction _doorInteraction;
 
 
     private DialogueManager _dm;
@@ -19,7 +19,7 @@ public class PauseMenu : MonoBehaviour
     void Start()
     {
         _npcLookPrompt = FindObjectOfType<NPCLookPrompt>();
-        _doorInteraction = FindObjectOfType<DoorInteraction>();
+        _doorInteraction = FindObjectOfType<Interaction>();
 
         _dm = FindObjectOfType<DialogueManager>();
     }

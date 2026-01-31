@@ -21,6 +21,8 @@ public class KeyPadSystem : MonoBehaviour
     private string currentInput = "";
     private Color originalColor;
 
+    private bool isProcessing = false;
+
     void Awake()
     {
         if (display != null)
