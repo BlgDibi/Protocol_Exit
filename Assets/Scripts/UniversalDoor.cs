@@ -141,7 +141,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
         if (isKeyMissing && requiredKey != null)
         {
-            ShowTemporaryMessage($"Locked! Key required: {requiredKey.keyName}");
+            ShowTemporaryMessage($"Locked!");
             return;
         }
 
