@@ -20,6 +20,12 @@ public class KeyPadSystem : MonoBehaviour
     private string currentInput = "";
     private Color originalColor;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip buttonClickSound;
+    public AudioClip grantedSound;
+    public AudioClip deniedSound;
+
     void Awake()
     {
         if (display != null)
@@ -60,6 +66,8 @@ public class KeyPadSystem : MonoBehaviour
     {
         if (currentInput.Length < 4)
         {
+            PlayButtonSound();
+
             currentInput += digit;
             UpdateDisplay();
         }
@@ -75,6 +83,9 @@ public class KeyPadSystem : MonoBehaviour
     {
         if (currentInput == correctCode)
         {
+            if (audioSource != null && grantedSound != null)
+                audioSource.PlayOneShot(grantedSound);
+
             display.text = "GRANTED";
             display.color = successColor;
             if (doorToOpen != null) doorToOpen.KeypadSuccess();
@@ -82,6 +93,9 @@ public class KeyPadSystem : MonoBehaviour
         }
         else
         {
+            if (audioSource != null && deniedSound != null)
+                audioSource.PlayOneShot(deniedSound);
+
             display.text = "DENIED";
             display.color = errorColor;
             currentInput = "";
@@ -97,4 +111,13 @@ public class KeyPadSystem : MonoBehaviour
             display.color = originalColor;
         }
     }
+
+    private void PlayButtonSound()
+    {
+        if (audioSource != null && buttonClickSound != null)
+        {
+            audioSource.PlayOneShot(buttonClickSound);
+        }
+    }
+
 }
