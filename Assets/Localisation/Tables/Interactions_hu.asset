@@ -19,23 +19,23 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 1453379342336
-    m_Localized: Meg kell keresned valamit!
+    m_Localized: "Z\xE1rva!"
     m_Metadata:
       m_Items: []
   - m_Id: 6167205224435712
-    m_Localized: "Ajt\xF3 kinyit\xE1sa"
+    m_Localized: "Nyit\xE1s"
     m_Metadata:
       m_Items: []
   - m_Id: 6167293099298816
-    m_Localized: "Ajt\xF3 bez\xE1r\xE1sa"
+    m_Localized: "Z\xE1r\xE1s"
     m_Metadata:
       m_Items: []
   - m_Id: 6167350590623744
-    m_Localized: "Kulcs felv\xE9tele"
+    m_Localized: "Felv\xE9tel"
     m_Metadata:
       m_Items: []
   - m_Id: 6167441502162944
-    m_Localized: "Szelep elteker\xE9se"
+    m_Localized: "Elteker\xE9s"
     m_Metadata:
       m_Items: []
   - m_Id: 6183305790148608
@@ -43,7 +43,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6183365286350848
-    m_Localized: "K\xF6nyv elovas\xE1sa"
+    m_Localized: "Olvas\xE1s"
     m_Metadata:
       m_Items: []
   - m_Id: 6504506668404736

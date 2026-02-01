@@ -19,23 +19,23 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 1453379342336
-    m_Localized: You have to find something!
+    m_Localized: Locked!
     m_Metadata:
       m_Items: []
   - m_Id: 6167205224435712
-    m_Localized: Open door
+    m_Localized: Open
     m_Metadata:
       m_Items: []
   - m_Id: 6167293099298816
-    m_Localized: Close door
+    m_Localized: Close
     m_Metadata:
       m_Items: []
   - m_Id: 6167350590623744
-    m_Localized: Pick up Key
+    m_Localized: Pick up
     m_Metadata:
       m_Items: []
   - m_Id: 6167441502162944
-    m_Localized: Turn Valve
+    m_Localized: Turn
     m_Metadata:
       m_Items: []
   - m_Id: 6183305790148608
@@ -43,7 +43,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6183365286350848
-    m_Localized: Read Book
+    m_Localized: Read
     m_Metadata:
       m_Items: []
   - m_Id: 6504506668404736
