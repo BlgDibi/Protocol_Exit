@@ -12,9 +12,9 @@ public class FirstDoor : MonoBehaviour
 
     [Header("Message Settings")]
     [SerializeField] private GameObject subtitlePanel;
-    [SerializeField] private TextMeshProUGUI subtitleText; 
-    [SerializeField] private string lockedMessage = "You have to find something...";
-    [SerializeField] private float messageDuration = 3f; 
+    [SerializeField] private TextMeshProUGUI subtitleText;
+    [SerializeField] private string lockedMessage = "You have to find something"; 
+    [SerializeField] private float messageDuration = 3f;
 
     [Header("Interaction UI")]
     [SerializeField] private GameObject promptCanvas;
@@ -25,6 +25,7 @@ public class FirstDoor : MonoBehaviour
     [SerializeField] private AudioClip lockedSound;
 
     private bool isDoorOpen = false;
+    private bool isUnlocked = false; 
     private bool isAnimating = false;
     private bool playerInRange = false;
     private Quaternion targetRotation;
@@ -49,16 +50,44 @@ public class FirstDoor : MonoBehaviour
                 isAnimating = false;
             }
         }
-
+   
+   
         if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
             if (!isDoorOpen)
             {
-                if (lockedSound != null) audioSource.PlayOneShot(lockedSound);
-
-                StartCoroutine(ShowSubtitle());
+                if (isUnlocked)
+                {
+                    OpenDoor();
+                }
+                else
+                {
+                    if (lockedSound != null) audioSource.PlayOneShot(lockedSound);
+                    StartCoroutine(ShowSubtitle());
+                }
             }
         }
+    }
+
+    public void KeypadSuccess()
+    {
+        if (!isUnlocked)
+        {
+            isUnlocked = true;
+
+          
+        }
+    }
+
+    private void OpenDoor()
+    {
+        isDoorOpen = true;
+        targetRotation = Quaternion.Euler(0f, openAngle, 0f);
+        isAnimating = true;
+
+        if (openSound != null) audioSource.PlayOneShot(openSound);
+
+        if (promptCanvas != null) promptCanvas.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -76,21 +105,7 @@ public class FirstDoor : MonoBehaviour
         {
             playerInRange = false;
             if (promptCanvas != null) promptCanvas.SetActive(false);
-            if (subtitlePanel != null) subtitlePanel.SetActive(false); 
-        }
-    }
-
-    public void KeypadSuccess()
-    {
-        if (!isDoorOpen)
-        {
-            isDoorOpen = true;
-            targetRotation = Quaternion.Euler(0f, openAngle, 0f);
-            isAnimating = true;
-
-            if (openSound != null) audioSource.PlayOneShot(openSound);
-
-            if (promptCanvas != null) promptCanvas.SetActive(false);
+            if (subtitlePanel != null) subtitlePanel.SetActive(false);
         }
     }
 
@@ -98,10 +113,10 @@ public class FirstDoor : MonoBehaviour
     {
         if (subtitlePanel != null && subtitleText != null)
         {
-            subtitleText.text = lockedMessage; 
-            subtitlePanel.SetActive(true);  
-            yield return new WaitForSeconds(messageDuration); 
-            subtitlePanel.SetActive(false);   
+            subtitleText.text = lockedMessage;
+            subtitlePanel.SetActive(true);
+            yield return new WaitForSeconds(messageDuration);
+            subtitlePanel.SetActive(false);
         }
     }
 }

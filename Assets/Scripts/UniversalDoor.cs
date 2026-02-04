@@ -26,6 +26,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     [SerializeField] private AudioClip closeSound;
     [SerializeField] private AudioClip lockedSound;
 
+
     [Header("UI Message")]
     [Tooltip("Doormessage Canvas")]
     public GameObject messagePanel;
@@ -75,14 +76,13 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
-
-
         if (!isLocked)
         {
             ToggleDoor();
             return;
         }
 
+    
         if (!string.IsNullOrEmpty(requiredCondition))
         {
             if (ConditionManager.Instance.CheckCondition(requiredCondition))
@@ -117,8 +117,6 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        
-
         if (isDoorOpen)
         {
             return textCloseDoor.GetLocalizedString();
@@ -131,12 +129,17 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     public void KeypadSuccess()
     {
-        if (isLocked || !isDoorOpen)
+        if (isLocked)
         {
-            UnlockAndOpen();
+            isLocked = false;
+
+           
             if (messagePanel != null) messagePanel.SetActive(false);
+
+    
         }
     }
+
 
     private void HandleLockedDoor(bool isKeyMissing = false)
     {
@@ -200,5 +203,4 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     {
         return interactionKey;
     }
-
 }

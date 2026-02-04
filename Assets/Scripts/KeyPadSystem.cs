@@ -8,7 +8,8 @@ public class KeyPadSystem : MonoBehaviour
     public string correctCode = "5821";
     public GameObject keypadCanvas;
     public TMP_Text display;
-    public UniversalDoor doorToOpen;
+
+    public A1_Door doorToOpen;
 
     [Header("Feedback Colors")]
     public Color successColor = Color.green;
@@ -28,10 +29,7 @@ public class KeyPadSystem : MonoBehaviour
 
     void Awake()
     {
-        if (display != null)
-        {
-            originalColor = display.color;
-        }
+        if (display != null) originalColor = display.color;
     }
 
     void Start()
@@ -42,12 +40,9 @@ public class KeyPadSystem : MonoBehaviour
     public void ShowKeypad()
     {
         if (playerController != null) playerController.enabled = false;
-
         keypadCanvas.SetActive(true);
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
         currentInput = "";
         UpdateDisplay();
     }
@@ -55,9 +50,7 @@ public class KeyPadSystem : MonoBehaviour
     public void CloseKeypad()
     {
         keypadCanvas.SetActive(false);
-
         if (playerController != null) playerController.enabled = true;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -67,7 +60,6 @@ public class KeyPadSystem : MonoBehaviour
         if (currentInput.Length < 4)
         {
             PlayButtonSound();
-
             currentInput += digit;
             UpdateDisplay();
         }
@@ -88,7 +80,12 @@ public class KeyPadSystem : MonoBehaviour
 
             display.text = "GRANTED";
             display.color = successColor;
-            if (doorToOpen != null) doorToOpen.KeypadSuccess();
+
+            if (doorToOpen != null)
+            {
+                doorToOpen.Unlock(); 
+            }
+
             Invoke("CloseKeypad", 1f);
         }
         else
@@ -115,9 +112,6 @@ public class KeyPadSystem : MonoBehaviour
     private void PlayButtonSound()
     {
         if (audioSource != null && buttonClickSound != null)
-        {
             audioSource.PlayOneShot(buttonClickSound);
-        }
     }
-
 }

@@ -9,8 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MENU.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/GAME.unity
+    path: Assets/Scenes/firstroom.unity
     guid: f5bb98d28d17440449b7567db25de19b
+  - enabled: 1
+    path: Assets/Scenes/DoorTransition.unity
+    guid: 31b473cc782dd874786045200b38ade1
+  - enabled: 1
+    path: Assets/Scenes/Main.unity
+    guid: cdf75acaf752f3441a3a9381a69e414d
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 24a1831a5dc358c4b8d6108ab6891d8e, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}

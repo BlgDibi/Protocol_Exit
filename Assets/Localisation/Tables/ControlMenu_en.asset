@@ -27,7 +27,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21521605644288
-    m_Localized: "Move:\t\tWASD\nSprint:\tShift\nJump:\t\tSpace\nLook:          \tMouse\nTalk:\t\tT\nInteract:\tF"
+    m_Localized: "Move:\t\tWASD\nSprint:\tShift\nJump:\t\tSpace\nLook:          \tMouse\nTalk:\t\tT\nInteract:\tF\nPick
+      up:       E"
     m_Metadata:
       m_Items: []
   references:

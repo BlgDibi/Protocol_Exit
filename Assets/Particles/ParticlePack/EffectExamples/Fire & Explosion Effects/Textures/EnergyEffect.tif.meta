@@ -87,6 +87,5 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/EffectExamples/Fire & Explosion
-    Effects/Textures/EnergyEffect.tif
+  assetPath: Assets/Particles/ParticlePack/EffectExamples/Fire & Explosion Effects/Textures/EnergyEffect.tif
   uploadId: 691001
