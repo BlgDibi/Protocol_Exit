@@ -24539,6 +24539,51 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4599276410211144, guid: d4d70dc6cb1efda42a2b784fcdf5749b, type: 3}
   m_PrefabInstance: {fileID: 433614479}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &433886105
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 433886107}
+  - component: {fileID: 433886106}
+  m_Layer: 0
+  m_Name: SceneData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &433886106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433886105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 776d9353241c08244bd622352f16daa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneData
+  Data: {fileID: 11400000, guid: 925264e7730e5a24fba60879dbfcfa1f, type: 2}
+--- !u!4 &433886107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433886105}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -231.8561, y: -34.75171, z: 140.40086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &436333255
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77980,7 +78025,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShadowPuzzle
   solutionRotation: {x: -5.1, y: 104.38, z: 272.16}
-  marginOfError: 5
+  marginOfError: 10
   sensitivity: 100
   puzzleCameraObj: {fileID: 1984621434}
   playerObj: {fileID: 1538765454}
@@ -127044,3 +127089,4 @@ SceneRoots:
   - {fileID: 381583754}
   - {fileID: 841392124}
   - {fileID: 1294417136}
+  - {fileID: 433886107}

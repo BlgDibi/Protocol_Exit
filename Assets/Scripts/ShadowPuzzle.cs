@@ -59,10 +59,10 @@ public class ShadowPuzzleFinal : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             float rotX = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
-            float rotY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+       
 
             transform.Rotate(Vector3.up, -rotX, Space.World);
-            transform.Rotate(Vector3.right, rotY, Space.World);
+
 
             CheckIfSolved();
         }
