@@ -131,7 +131,6 @@ public class ShadowPuzzleFinal : MonoBehaviour
         isSolved = true;
         puzzleActive = false; 
 
-        // 1. VISSZAJELZÉS: Lámpa felgyullad
         if (successLight != null)
         {
             successLight.color = solvedColor;
@@ -153,7 +152,7 @@ public class ShadowPuzzleFinal : MonoBehaviour
         if (playerObj != null)
         {
             playerObj.GetComponent<MonoBehaviour>().enabled = true;
-            if (playerVisuals != null) playerVisuals.SetActive(true); // Modell vissza
+            if (playerVisuals != null) playerVisuals.SetActive(true); 
         }
 
         Cursor.lockState = CursorLockMode.Locked;
