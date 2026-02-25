@@ -28,6 +28,9 @@ namespace StarterAssets
         [Header("Movement Control")]
         public bool canMove = true;
 
+        [Header("Flashlight")]
+        public bool isFlashlightMode = false;
+        public GameObject flashlightObject;
 
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
@@ -265,10 +268,19 @@ namespace StarterAssets
 
             if (_input.move != Vector2.zero)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
+                if (isFlashlightMode && flashlightObject != null && flashlightObject.activeInHierarchy)
+                {
+                    _targetRotation = _mainCamera.transform.eulerAngles.y;
+                }
+                else
+                {
+                    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                      _mainCamera.transform.eulerAngles.y;
+                }
+
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
+
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 

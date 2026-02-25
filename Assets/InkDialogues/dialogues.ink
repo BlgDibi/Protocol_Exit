@@ -1,15 +1,14 @@
 VAR read_diary = false
 
 === book_interaction ===
-It is a dusty journal left on the shelf. 
-It looks old.
+// Ha először nézel rá, ezt írja, ha már olvastad, akkor csak visszatér ide
+{not read_diary: It is a dusty journal left on the shelf. It looks old. | What do you want to do?}
 
 + {not read_diary} [Read it] 
     -> read_entry
 
 + {read_diary} [Move it aside]
     You push the book slightly to the left.
-    There is a writing on the wall!
     #move_book
     -> DONE
 
@@ -25,9 +24,8 @@ Keep your eyes open.
 
 ~ read_diary = true 
 
-+ [Close the book]
- I need to look around.
-    -> DONE
++ [Continue...] 
+    -> book_interaction
     
     
-===Npc1===
+    

@@ -34,7 +34,7 @@ public class Ending2 : MonoBehaviour
         if (KeyInventory.Instance != null)
             KeyInventory.Instance.ResetKeys();
 
-        HP playerHP = FindObjectOfType<HP>();
+        HP playerHP = FindFirstObjectByType<HP>();
         if (playerHP != null)
         {
             playerHP.Hp = 100;

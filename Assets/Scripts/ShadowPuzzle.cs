@@ -115,10 +115,16 @@ public class ShadowPuzzleFinal : MonoBehaviour
         Cursor.visible = false;
     }
 
-  
+
     void CheckIfSolved()
     {
-        float angleDiff = Quaternion.Angle(transform.rotation, Quaternion.Euler(solutionRotation));
+        
+        float currentY = transform.eulerAngles.y;
+        float targetY = solutionRotation.y;
+
+        float angleDiff = Mathf.Abs(Mathf.DeltaAngle(currentY, targetY));
+
+     
 
         if (angleDiff < marginOfError && !isSolved)
         {

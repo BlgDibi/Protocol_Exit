@@ -14,7 +14,7 @@ public class TimeMenu : MonoBehaviour
 
     void Start()
     {
-        stopwatch = FindObjectOfType<Stopwatch>();
+        stopwatch = FindFirstObjectByType<Stopwatch>();
         gameLineFormat.StringChanged += UpdateTextOnLanguageChange;
         DisplaySavedTime();
     }

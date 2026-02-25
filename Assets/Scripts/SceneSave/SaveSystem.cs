@@ -38,7 +38,7 @@ public class SaveSystem
         _savedata.sceneIndex = SceneManager.GetActiveScene().buildIndex;
 
         // Játékos adatok mentése
-        PlayerSave playerScript = GameObject.FindObjectOfType<PlayerSave>();
+        PlayerSave playerScript = GameObject.FindFirstObjectByType<PlayerSave>();
         if (playerScript != null)
         {
             playerScript.Save(ref _savedata.playerdata);
@@ -49,7 +49,7 @@ public class SaveSystem
         }
 
         // SceneData mentése
-        SceneData sceneScript = GameObject.FindObjectOfType<SceneData>();
+        SceneData sceneScript = GameObject.FindFirstObjectByType<SceneData>();
         if (sceneScript != null)
         {
             sceneScript.Save(ref _savedata.scenedata);

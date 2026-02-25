@@ -9,7 +9,7 @@ public class Steam : MonoBehaviour
 
     private void Start()
     {
-        ending3 = FindObjectOfType<Ending3>();
+        ending3 = FindFirstObjectByType<Ending3>();
     }
 
     private void OnTriggerEnter(Collider other)

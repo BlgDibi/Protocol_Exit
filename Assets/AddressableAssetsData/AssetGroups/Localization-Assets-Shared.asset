@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Localization-Assets-Shared
   m_GUID: 84feefaa8e04e494f8cb7c9cded11419
   m_SerializeEntries:
+  - m_GUID: 11b1ce3c72458af4caf977bc8b40e769
+    m_Address: Assets/Localisation/Tables/Game_PauseMenu Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1d7bbd818b37b6b4ebefe59038a80330
     m_Address: Assets/Localisation/Tables/OptionsMenu Shared Data.asset
     m_ReadOnly: 1
@@ -34,6 +39,12 @@ MonoBehaviour:
     m_Address: Assets/Localisation/Tables/ControlMenu Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d50025aa416180440b07c8c85f3b5002
+    m_Address: Assets/Localisation/Tables/GAME_UI Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ffaf61bebfa3537498d16188a5f03553
     m_Address: Assets/Localisation/Tables/MainMenu Shared Data.asset

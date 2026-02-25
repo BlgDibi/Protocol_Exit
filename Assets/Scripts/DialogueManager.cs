@@ -1,5 +1,6 @@
 using Ink.Runtime;
 using StarterAssets;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,8 +23,16 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private ThirdPersonController playerController;
     [SerializeField] private StarterAssetsInputs playerInputs;
 
+    [Header("Typing Settings")]
+    [SerializeField] private float typingSpeed = 0.04f;
+    private Coroutine typingCoroutine;
+
+
     private Story currentStory;
     public bool isDialoguePlaying { get; private set; }
+
+
+
 
     private void Start()
     {
@@ -71,8 +80,9 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentStory.canContinue)
         {
-            string nextLine = currentStory.Continue();
+            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
+            string nextLine = currentStory.Continue();
             HandleTags(currentStory.currentTags);
 
             if (string.IsNullOrWhiteSpace(nextLine))
@@ -81,8 +91,7 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                dialogueText.text = nextLine;
-                DisplayChoices();
+                typingCoroutine = StartCoroutine(TypeText(nextLine));
             }
         }
         else if (currentStory.currentChoices.Count > 0)
@@ -94,14 +103,13 @@ public class DialogueManager : MonoBehaviour
             ExitDialogueMode();
         }
     }
-
     private void HandleTags(List<string> tags)
     {
         foreach (string tag in tags)
         {
             if (tag == "move_book")
             {
-                SecretRevealer revealer = FindObjectOfType<SecretRevealer>();
+                SecretRevealer revealer = FindFirstObjectByType<SecretRevealer>();
                 if (revealer != null)
                 {
                     revealer.ActivateSecret();
@@ -181,4 +189,20 @@ public class DialogueManager : MonoBehaviour
     {
         return string.IsNullOrWhiteSpace(dialogueLine) || dialogueLine.Trim().Equals("\n");
     }
+
+    private IEnumerator TypeText(string text)
+    {
+        dialogueText.text = "";
+
+        foreach (Transform child in choicesContainer) child.gameObject.SetActive(false);
+
+        foreach (char letter in text.ToCharArray())
+        {
+            dialogueText.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        DisplayChoices();
+    }
+
 }

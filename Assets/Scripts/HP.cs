@@ -21,7 +21,7 @@ public class HP : MonoBehaviour
 
     private void Start()
     {
-        stopwatch = FindObjectOfType<Stopwatch>();
+        stopwatch = FindFirstObjectByType<Stopwatch>();
         if (stopwatch != null)
             stopwatch.StartStopwatch();
 
