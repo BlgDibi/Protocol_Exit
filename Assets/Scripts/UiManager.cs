@@ -7,12 +7,20 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Transform keyPanel;
     [SerializeField] private GameObject keyImagePrefab;
 
+    [SerializeField] private Transform boxPanel;
+    [SerializeField] private GameObject boxImagePrefab;
+    private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
+
 
     private Dictionary<Key,GameObject> keyImages = new Dictionary<Key,GameObject>();
 
     public static UiManager Instance { get; private set; }
 
     public Transform keysParent;
+
+
+
+
     private void Awake()
     {
         if (Instance == null) 
@@ -24,6 +32,25 @@ public class UiManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+
+    public void AddBoxToUI(SulyDobozData doboz)
+    {
+        GameObject boxImage = Instantiate(keyImagePrefab, keyPanel);
+
+        boxImage.GetComponent<UnityEngine.UI.Image>().sprite = doboz.boxpicture;
+
+        boxImages[doboz] = boxImage;
+    }
+
+    public void RemoveBoxFromUI(SulyDobozData doboz)
+    {
+        if (boxImages.ContainsKey(doboz))
+        {
+            Destroy(boxImages[doboz]);
+            boxImages.Remove(doboz);
         }
     }
 
@@ -41,6 +68,9 @@ public class UiManager : MonoBehaviour
         }
 
     }
+
+
+
 
     public void RemoveKeyFromUI(Key key)
     {
@@ -63,5 +93,7 @@ public class UiManager : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+
 
 }
