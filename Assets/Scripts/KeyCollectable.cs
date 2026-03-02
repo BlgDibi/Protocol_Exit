@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization;
+using System.Collections;
 
 public class KeyCollectable : MonoBehaviour,InterfaceInteractable
 {
@@ -11,6 +13,25 @@ public class KeyCollectable : MonoBehaviour,InterfaceInteractable
     public LocalizedString textPickup;
 
     [SerializeField] private KeyCode interactionkey = KeyCode.E;
+
+
+    void Start()
+    {
+        StartCoroutine(CheckIfAlreadyCollected());
+    }
+
+    IEnumerator CheckIfAlreadyCollected()
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (key == null) yield break;
+
+        List<int> mentettKeys = SaveSystem.GetInventoryKeys();
+        if (mentettKeys != null && mentettKeys.Contains(key.id))
+        {
+            gameObject.SetActive(false);
+        }
+    }
 
     public void Interact() 
     {

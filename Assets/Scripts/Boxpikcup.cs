@@ -24,34 +24,28 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     IEnumerator CheckIfAlreadyCollected()
     {
+
+        if (gameObject.name.Contains("_Placed")) yield break;
+
         yield return new WaitForEndOfFrame();
 
         if (Boxdata == null) yield break;
 
-        List<string> mentettInventory = SaveSystem.GetInventoryBoxes();
-        if (mentettInventory != null && mentettInventory.Contains(Boxdata.boxname))
-        {
-            gameObject.SetActive(false);
-            yield break;
-        }
 
         List<SaveSystem.PlacedBoxData> placedBoxes = SaveSystem.GetSavedPlacedBoxes();
         foreach (var placed in placedBoxes)
         {
             if (placed.boxname == Boxdata.boxname)
             {
-                gameObject.SetActive(false);
+                gameObject.SetActive(false); 
 
                 GameObject newBox = Instantiate(Boxdata.boxprefab, placed.position, Quaternion.identity);
 
-                newBox.name = Boxdata.boxname;
+                newBox.name = Boxdata.boxname + "_Placed";
                 newBox.tag = "Boxes";
 
                 Rigidbody rb = newBox.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.mass = Boxdata.weight;
-                }
+                if (rb != null) rb.mass = Boxdata.weight;
 
                 yield break;
             }
@@ -83,13 +77,9 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
            
             Invoke(nameof(DisableBox), 0.1f);
         }
-        else
-        {
-            Debug.LogError("Nincs Boxdata a dobozon!");
-        }
+       
     }
 
-    // Ezt a függvényt adja hozzá az Invoke
     private void DisableBox()
     {
         gameObject.SetActive(false);

@@ -20357,31 +20357,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTrans: {fileID: 1538765386}
   speakerTrans: {fileID: 335160747}
-  speakerLook: {fileID: 1538765452}
-  textTalkPrompt:
-    m_TableReference:
-      m_TableCollectionName: GUID:877de6e70d13d9c4c985824d48735096
-    m_TableEntryReference:
-      m_KeyId: 6183305790148608
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  dialogueClip: {fileID: 8300000, guid: dc223ad9e0f30c145a418b2bc4d244db, type: 3}
-  dialogueText: 'Lily: Three colors, three paths, one truth. Green grows where nothing
-    should live. Blue shines like a mirror, yet it lies. Red bleeds, but every birth
-    needs blood.'
   dialogueSource: {fileID: 335160749}
-  subtitleText: {fileID: 338246109}
-  playerController: {fileID: 1538765384}
-  infoText: {fileID: 0}
-  doorColor: red
-  messageDuration: 5
-  HasTalked: 0
-  interactkey: 116
-  references:
-    version: 2
-    RefIds: []
+  defaultTalkClip: {fileID: 0}
 --- !u!54 &335160751
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -22782,15 +22759,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 252629911600637343, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -64.282
+      value: -30.203
       objectReference: {fileID: 0}
     - target: {fileID: 252629911600637343, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 51.338844
+      value: 42.738
       objectReference: {fileID: 0}
     - target: {fileID: 252629911600637343, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 21.742249
+      value: -29.453
       objectReference: {fileID: 0}
     - target: {fileID: 252629911600637343, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
       propertyPath: m_LocalRotation.w
@@ -22826,7 +22803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3874798687770068871, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -51618,6 +51595,7 @@ MonoBehaviour:
   playerController: {fileID: 1538765384}
   playerInputs: {fileID: 1538765457}
   typingSpeed: 0.045
+  greenKey: {fileID: 1451905444}
 --- !u!114 &805306967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54717,6 +54695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 263ca0f3b7d7deb4493258cc4b682bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
+  inkJSON: {fileID: 4900000, guid: f6197a459cc7a5d419594b40132cc077, type: 3}
   inkKnotName: story_intro
   interactionPrompt:
     m_TableReference:
@@ -76136,7 +76115,7 @@ MonoBehaviour:
     m_Top: 25
     m_Bottom: 10
   m_ChildAlignment: 4
-  m_Spacing: 20
+  m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -85663,6 +85642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 263ca0f3b7d7deb4493258cc4b682bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
+  inkJSON: {fileID: 0}
   inkKnotName: book_interaction
   interactionPrompt:
     m_TableReference:
@@ -95276,6 +95256,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4679131730076474, guid: 5840c9fb41fa33a4fbeb2563285bfb24, type: 3}
   m_PrefabInstance: {fileID: 1450820549}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1451905444 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3874798687770068871, guid: 2d678e3e202b1344d999c6e60927f9ab, type: 3}
+  m_PrefabInstance: {fileID: 389977158}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1452806302
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -100940,11 +100925,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1108479131177352055, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
   m_PrefabInstance: {fileID: 1538765383}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1538765452 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8821803626647126262, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
-  m_PrefabInstance: {fileID: 1538765383}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1538765453 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8112304451883463327, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
@@ -102134,15 +102114,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.5870667
+      value: 34.24
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 49.68392
+      value: 48.222
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.4692688
+      value: -5.03
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -102386,6 +102366,9 @@ PrefabInstance:
       addedObject: {fileID: 1553810441}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1553810445}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1553810440}
   m_SourcePrefab: {fileID: 100100000, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
 --- !u!4 &1553810438 stripped
@@ -102502,38 +102485,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1553810439}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 278f7691e06b4a542997d286e79802cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerTrans: {fileID: 1538765386}
   speakerTrans: {fileID: 1553810438}
-  speakerLook: {fileID: 1538765452}
-  textTalkPrompt:
-    m_TableReference:
-      m_TableCollectionName: GUID:877de6e70d13d9c4c985824d48735096
-    m_TableEntryReference:
-      m_KeyId: 6183305790148608
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  dialogueClip: {fileID: 8300000, guid: 895f285172cdf1143a4b30b408f6fc41, type: 3}
-  dialogueText: "Dave: Once, this mall was alive with color. I\u2019ve seen doors
-    of green swallow the bold whole. Red, though fierce, once led to daylight beyond.
-    Blue hides reflections that aren\u2019t your own."
   dialogueSource: {fileID: 1553810440}
-  subtitleText: {fileID: 338246109}
-  playerController: {fileID: 1538765384}
-  infoText: {fileID: 0}
-  doorColor: green
-  messageDuration: 5
-  HasTalked: 0
-  interactkey: 116
-  references:
-    version: 2
-    RefIds: []
+  defaultTalkClip: {fileID: 0}
 --- !u!54 &1553810442
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -102582,6 +102542,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1553810445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553810439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 263ca0f3b7d7deb4493258cc4b682bfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
+  inkJSON: {fileID: 4900000, guid: f246714094c13f64f8be275daa5a10f3, type: 3}
+  inkKnotName: npc_intro
+  interactionPrompt:
+    m_TableReference:
+      m_TableCollectionName: GUID:877de6e70d13d9c4c985824d48735096
+    m_TableEntryReference:
+      m_KeyId: 6183305790148608
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  interactionKey: 116
+  references:
+    version: 2
+    RefIds: []
 --- !u!1001 &1555443579
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -114377,31 +114364,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTrans: {fileID: 1538765386}
   speakerTrans: {fileID: 1783560287}
-  speakerLook: {fileID: 1538765452}
-  textTalkPrompt:
-    m_TableReference:
-      m_TableCollectionName: GUID:877de6e70d13d9c4c985824d48735096
-    m_TableEntryReference:
-      m_KeyId: 6183305790148608
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  dialogueClip: {fileID: 8300000, guid: 19cf6857295a3de4085e3db36c443c6e, type: 3}
-  dialogueText: "Adam: I tried them all, or maybe I only dreamed I did. The green
-    one whispered promises, then screams.The blue one\u2026 it shows you everything
-    you regret. The red one burns to the touch, but warmth can mean life."
   dialogueSource: {fileID: 1783560290}
-  subtitleText: {fileID: 338246109}
-  playerController: {fileID: 1538765384}
-  infoText: {fileID: 0}
-  doorColor: blue
-  messageDuration: 5
-  HasTalked: 0
-  interactkey: 116
-  references:
-    version: 2
-    RefIds: []
+  defaultTalkClip: {fileID: 0}
 --- !u!82 &1783560290
 AudioSource:
   m_ObjectHideFlags: 0
@@ -122023,6 +121987,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyIds: 
+  allAvailableKeys:
+  - {fileID: 11400000, guid: 3b9ea2d874a5fb34b98651bb91a4e941, type: 2}
+  - {fileID: 11400000, guid: 2d23abb310201c4478003b600f5ae0a6, type: 2}
+  - {fileID: 11400000, guid: 4a51e03ff9a41a34db271018a840fecf, type: 2}
 --- !u!1001 &1926928195
 PrefabInstance:
   m_ObjectHideFlags: 0

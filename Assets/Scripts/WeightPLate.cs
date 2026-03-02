@@ -92,6 +92,9 @@ public class WeightPlateInteractor : MonoBehaviour, InterfaceInteractable
         }
         return "You dont have any boxes";
     }
-
+    public bool IsWeightOptimal()
+    {
+        return Mathf.Approximately(currentweight, optimalweight);
+    }
     public KeyCode GetInteractKey() => KeyCode.E;
 }

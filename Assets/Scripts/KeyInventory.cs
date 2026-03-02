@@ -1,9 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections; // Fontos a Coroutine miatt
 
 public class KeyInventory : MonoBehaviour
 {
     [SerializeField] private List<int> keyIds = new List<int>();
+
+    [Header("Database for loading")]
+    [SerializeField] private List<Key> allAvailableKeys = new List<Key>();
 
     public static KeyInventory Instance { get; private set; }
 
@@ -20,6 +24,44 @@ public class KeyInventory : MonoBehaviour
         }
     }
 
+    IEnumerator Start()
+    {
+        yield return null;
+
+        if (SaveSystem.IsGameJustLoaded)
+        {
+            LoadKeysFromSave();
+        }
+    }
+
+    private void LoadKeysFromSave()
+    {
+        List<int> loadedIds = SaveSystem.GetInventoryKeys();
+
+        if (loadedIds != null && loadedIds.Count > 0)
+        {
+            keyIds.Clear();
+
+            foreach (int id in loadedIds)
+            {
+                Key foundKey = allAvailableKeys.Find(k => k.id == id);
+                if (foundKey != null)
+                {
+                    if (!keyIds.Contains(foundKey.id))
+                    {
+                        keyIds.Add(foundKey.id);
+                        if (UiManager.Instance != null) UiManager.Instance.AddKeyToUI(foundKey);
+                    }
+                }
+            }
+            Debug.Log("Betöltve " + keyIds.Count + " kulcs.");
+        }
+    }
+
+    public List<int> GetSavedKeyIds()
+    {
+        return new List<int>(keyIds);
+    }
     public void AddKey(Key key)
     {
         if (!keyIds.Contains(key.id))

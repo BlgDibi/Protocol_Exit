@@ -9,13 +9,15 @@ public class NPCLookPrompt : MonoBehaviour
         Ray ray = new Ray(playerCam.transform.position, playerCam.transform.forward); 
         RaycastHit hit; 
         if (Physics.Raycast(ray, out hit, maxDistance)) 
-        { 
-            if (hit.collider.CompareTag("NPC")) 
-            { prompt.SetActive(true); 
-                if (Input.GetKeyDown(KeyCode.T)) 
-                { hit.collider.GetComponent<Talk>().StartDialogue(); 
-                } 
-            } 
+        {
+            if (hit.collider.CompareTag("NPC"))
+            {
+                prompt.SetActive(true);
+                if (Input.GetKeyDown(KeyCode.T))
+                {
+                    hit.collider.GetComponent<DialogueTrigger>().Interact();
+                }
+            }
             else 
             { 
                 prompt.SetActive(false); 

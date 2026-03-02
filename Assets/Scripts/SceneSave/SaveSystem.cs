@@ -25,6 +25,7 @@ public class SaveSystem
         public SceneSaveData scenedata;
         public List<string> InventoryBoxnames;
         public List<PlacedBoxData> PlacedBoxes;
+        public List<int> InventoryKeyIds;
     }
     public static string SaveFileName(int slot = 1)
     {
@@ -61,14 +62,18 @@ public class SaveSystem
 
         foreach (GameObject box in boxesInWorld)
         {
-            
+            string cleanName = box.name.Replace("(Clone)", "").Replace("_Placed", "").Trim();
+
             _savedata.PlacedBoxes.Add(new PlacedBoxData
             {
-                boxname = box.name.Replace("(Clone)", "").Trim(),
+                boxname = cleanName,
                 position = box.transform.position
             });
         }
-
+        if (KeyInventory.Instance != null)
+        {
+            _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
+        }
     }
 
     public static void Load(int slot = 1)
@@ -79,8 +84,9 @@ public class SaveSystem
             string saveContent = File.ReadAllText(fileName);
             _savedata = JsonUtility.FromJson<SaveData>(saveContent);
 
-            if (_savedata.InventoryBoxnames == null)
-                _savedata.InventoryBoxnames = new List<string>();
+            if (_savedata.InventoryBoxnames == null) _savedata.InventoryBoxnames = new List<string>();
+            if (_savedata.InventoryKeyIds == null) _savedata.InventoryKeyIds = new List<int>();
+            if (_savedata.PlacedBoxes == null) _savedata.PlacedBoxes = new List<PlacedBoxData>();
 
             IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
@@ -103,5 +109,8 @@ public class SaveSystem
         }
         return _savedata.PlacedBoxes;
     }
-
+    public static List<int> GetInventoryKeys()
+    {
+        return _savedata.InventoryKeyIds ?? new List<int>();
+    }
 }

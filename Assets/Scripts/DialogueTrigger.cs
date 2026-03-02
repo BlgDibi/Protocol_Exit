@@ -4,6 +4,8 @@ using UnityEngine.Localization;
 public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 {
     [Header("Ink Settings")]
+    [Tooltip(".json file")]
+    public TextAsset inkJSON;
     [Tooltip("knot name")]
     public string inkKnotName = "book_intro";
 
@@ -14,6 +16,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     [Header("Settings")]
     [Tooltip("Button to Use")]
     [SerializeField] private KeyCode interactionKey = KeyCode.T;
+
     public KeyCode GetInteractKey()
     {
         return interactionKey;
@@ -26,13 +29,15 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
-        if (GameEvents.instance != null)
+        if (DialogueManager.Instance != null && inkJSON != null)
         {
-            GameEvents.instance.dialogueEvents.EnterDialogue(inkKnotName);
-        }
-        else
-        {
-            Debug.LogError("HIBA: GameEvents instance nem található!");
+            Talk npcScript = GetComponent<Talk>();
+            if (npcScript != null)
+            {
+                npcScript.LookAtPlayer();
+            }
+
+            DialogueManager.Instance.EnterDialogueMode(inkJSON, inkKnotName, npcScript);
         }
     }
 }

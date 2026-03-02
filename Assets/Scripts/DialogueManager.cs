@@ -8,6 +8,9 @@ using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
+    // Csinálunk belõle egy Singletont, hogy könnyû legyen elérni a Talk scriptbõl
+    public static DialogueManager Instance { get; private set; }
+
     [Header("Ink File")]
     [SerializeField] private TextAsset inkJSONAsset;
 
@@ -27,22 +30,29 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float typingSpeed = 0.04f;
     private Coroutine typingCoroutine;
 
+    [Header("Rewards")]
+    [SerializeField] private GameObject greenKey;
+
+   
+
 
     private Story currentStory;
     public bool isDialoguePlaying { get; private set; }
 
+    private Talk currentNPC;
 
-
+    private void Awake()
+    {
+        if (Instance == null) { Instance = this; }
+        else { Destroy(gameObject); }
+    }
 
     private void Start()
     {
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
 
-        if (GameEvents.instance != null && GameEvents.instance.dialogueEvents != null)
-        {
-            GameEvents.instance.dialogueEvents.onEnterDialogue += EnterDialogueMode;
-        }
+       
     }
 
     private void Update()
@@ -58,20 +68,28 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void EnterDialogueMode(string knotName)
+    public void EnterDialogueMode(TextAsset specificInkFile, string knotName = "", Talk npc = null)
     {
         if (isDialoguePlaying) return;
 
-        
-        if (currentStory == null)
+        currentNPC = npc;
+
+        currentStory = new Story(specificInkFile.text);
+
+        currentStory.BindExternalFunction("is_scale_solved", () =>
         {
-            currentStory = new Story(inkJSONAsset.text);
+            WeightPlateInteractor merleg = FindFirstObjectByType<WeightPlateInteractor>();
+            if (merleg != null) return merleg.IsWeightOptimal();
+            return false;
+        });
+
+        if (!string.IsNullOrEmpty(knotName))
+        {
+            currentStory.ChoosePathString(knotName);
         }
 
-        currentStory.ChoosePathString(knotName);
         isDialoguePlaying = true;
         dialoguePanel.SetActive(true);
-
         SetPlayerEnabled(false);
         ContinueStory();
     }
@@ -103,6 +121,7 @@ public class DialogueManager : MonoBehaviour
             ExitDialogueMode();
         }
     }
+
     private void HandleTags(List<string> tags)
     {
         foreach (string tag in tags)
@@ -110,10 +129,19 @@ public class DialogueManager : MonoBehaviour
             if (tag == "move_book")
             {
                 SecretRevealer revealer = FindFirstObjectByType<SecretRevealer>();
-                if (revealer != null)
+                if (revealer != null) revealer.ActivateSecret();
+            }
+            else if (tag == "spawn_green_key")
+            {
+                if (greenKey != null)
                 {
-                    revealer.ActivateSecret();
+                    greenKey.SetActive(true); 
+                    Debug.Log("Green key showed somewhere!");
                 }
+            }
+            else if (tag.StartsWith("play_audio"))
+            {
+                if (currentNPC != null) currentNPC.PlayVoiceLine(tag);
             }
         }
     }
@@ -141,6 +169,8 @@ public class DialogueManager : MonoBehaviour
                 choiceButton.GetComponent<Button>().onClick.AddListener(() => MakeChoice(choice.index));
             }
         }
+
+        Canvas.ForceUpdateCanvases();
     }
 
     public void MakeChoice(int choiceIndex)
@@ -151,7 +181,7 @@ public class DialogueManager : MonoBehaviour
 
     public void ExitDialogueMode()
     {
-        isDialoguePlaying = false; 
+        isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
 
@@ -161,6 +191,12 @@ public class DialogueManager : MonoBehaviour
         }
 
         SetPlayerEnabled(true);
+
+        if (currentNPC != null)
+        {
+            currentNPC.ResetRotation();
+            currentNPC = null; 
+        }
     }
 
     private void SetPlayerEnabled(bool enabled)
@@ -185,15 +221,9 @@ public class DialogueManager : MonoBehaviour
         Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
-    private bool IsLineBlank(string dialogueLine)
-    {
-        return string.IsNullOrWhiteSpace(dialogueLine) || dialogueLine.Trim().Equals("\n");
-    }
-
     private IEnumerator TypeText(string text)
     {
         dialogueText.text = "";
-
         foreach (Transform child in choicesContainer) child.gameObject.SetActive(false);
 
         foreach (char letter in text.ToCharArray())
@@ -205,4 +235,5 @@ public class DialogueManager : MonoBehaviour
         DisplayChoices();
     }
 
+  
 }
