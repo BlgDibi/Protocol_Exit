@@ -1,23 +1,29 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.Localization; 
+using UnityEngine.Localization;
+using System.Collections;
 
 public class Stopwatch : MonoBehaviour
 {
     public TextMeshProUGUI stopwatchText;
-
     public LocalizedString timeFormat;
 
     private float elapsedTime = 0f;
     private bool isRunning = false;
-
     private string cachedPattern;
 
-    void Start()
+    IEnumerator Start()
     {
         cachedPattern = timeFormat.GetLocalizedString();
-
         timeFormat.StringChanged += UpdatePattern;
+
+        bool isLoaded = SaveSystem.IsGameJustLoaded;
+        yield return null;
+
+        if (isLoaded)
+        {
+            elapsedTime = SaveSystem.GetSavedTime();
+        }
 
         StartStopwatch();
     }
@@ -30,7 +36,7 @@ public class Stopwatch : MonoBehaviour
     private void UpdatePattern(string newString)
     {
         cachedPattern = newString;
-        UpdateStopwatchUI(); 
+        UpdateStopwatchUI();
     }
 
     void Update()
@@ -44,6 +50,8 @@ public class Stopwatch : MonoBehaviour
 
     private void UpdateStopwatchUI()
     {
+        if (stopwatchText == null) return;
+
         int minutes = Mathf.FloorToInt(elapsedTime / 60);
         int seconds = Mathf.FloorToInt(elapsedTime % 60);
         int milliseconds = Mathf.FloorToInt((elapsedTime * 100) % 100);
@@ -60,37 +68,18 @@ public class Stopwatch : MonoBehaviour
         }
     }
 
-    public void StartStopwatch()
-    {
-        isRunning = true;
-    }
+    public void StartStopwatch() => isRunning = true;
+    public void StopStopwatch() => isRunning = false;
+    public void ResetStopwatch() { elapsedTime = 0f; UpdateStopwatchUI(); }
 
-    public void StopStopwatch()
-    {
-        isRunning = false;
-    }
+    public float GetElapsedTime() => elapsedTime;
 
-    public void ResetStopwatch()
-    {
-        elapsedTime = 0f;
-        UpdateStopwatchUI();
-    }
-
-    private void SaveElapsedTime()
+    public void SaveTimeOnMainMenu()
     {
         int gameCount = PlayerPrefs.GetInt("GameCount", 0);
         PlayerPrefs.SetFloat("SavedTime" + gameCount, elapsedTime);
         PlayerPrefs.SetInt("GameCount", gameCount + 1);
         PlayerPrefs.Save();
-    }
-
-    public void SaveTimeOnMainMenu()
-    {
-        SaveElapsedTime();
-    }
-
-    private void OnApplicationQuit()
-    {
-        SaveElapsedTime();
+        Debug.Log("Time saved to PlayerPrefs for Menu");
     }
 }
