@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a9006f2d16ce36499a2d634e28ae246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxPickup
-  dobozData: {fileID: 11400000, guid: dfac7ed666939014bafdabb4cb9475da, type: 2}
+  Boxdata: {fileID: 11400000, guid: dfac7ed666939014bafdabb4cb9475da, type: 2}
   interactkey: 101
   crosshair: {fileID: 0}
   interactionPrompt:

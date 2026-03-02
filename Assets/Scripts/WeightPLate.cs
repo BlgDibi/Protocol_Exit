@@ -5,68 +5,81 @@ public class WeightPlateInteractor : MonoBehaviour, InterfaceInteractable
 {
     [Header("Scale Settings")]
     [SerializeField] private float optimalweight = 25f;
-    [SerializeField] private TMP_Text sulySzoveg;
+    [SerializeField] private TMP_Text Weighttext;
     private float currentweight = 0f;
 
     void Start()
     {
-            UiReset();
+        UiReset();
     }
 
     public void Interact()
     {
         if (BoxInventory.Instance.HasAnyBox())
         {
-            SulyDobozData adat = BoxInventory.Instance.GetFirstBox();
-
-            if (adat != null && adat.boxprefab != null)
+            SulyDobozData data = BoxInventory.Instance.GetFirstBox();
+            if (data != null && data.boxprefab != null)
             {
-                BoxInventory.Instance.RemoveBox(adat);
+                BoxInventory.Instance.RemoveBox(data);
+                GameObject boxdropped = Instantiate(data.boxprefab, transform.position + (Vector3.up * 1.5f), Quaternion.identity);
 
-                GameObject boxdropped = Instantiate(adat.boxprefab, transform.position + Vector3.up, Quaternion.identity);
+                boxdropped.name = data.boxname;
+                boxdropped.tag = "Boxes";
 
                 Rigidbody rb = boxdropped.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.mass = adat.weight; 
-                }
+                if (rb != null) rb.mass = data.weight;
             }
         }
-        else
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Boxes"))
         {
-            Debug.Log("You dont have any boxes!");
+            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                currentweight += rb.mass;
+                UiReset();
+            }
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerExit(Collider other)
     {
-        Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
-        if (rb != null)
+        if (other.CompareTag("Boxes"))
         {
-            currentweight += rb.mass; 
-            UiReset();
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            currentweight -= rb.mass;
-            if (currentweight < 0.01f) currentweight = 0f;
-            UiReset();
+            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                currentweight -= rb.mass;
+                if (currentweight < 0.01f) currentweight = 0f;
+                UiReset();
+            }
         }
     }
 
     void UiReset()
     {
-        if (sulySzoveg != null)
+        if (Weighttext != null)
         {
+            if (currentweight < 0.01f)
+            {
+                Weighttext.gameObject.SetActive(false);
+                return; 
+            }
 
-            sulySzoveg.text = currentweight + " / " + optimalweight + " kg";
+            Weighttext.gameObject.SetActive(true);
+            Weighttext.text = currentweight + " / " + optimalweight + " kg";
 
-            sulySzoveg.color = (currentweight == optimalweight) ? Color.green : Color.white;
+            if (Mathf.Approximately(currentweight, optimalweight))
+            {
+                Weighttext.color = Color.green;
+            }
+            else
+            {
+                Weighttext.color = Color.white;
+            }
         }
     }
 
@@ -75,7 +88,7 @@ public class WeightPlateInteractor : MonoBehaviour, InterfaceInteractable
         if (BoxInventory.Instance.HasAnyBox())
         {
             SulyDobozData adat = BoxInventory.Instance.GetFirstBox();
-            return "Drop box (" + adat.weight + "kg)";
+            return "Drop box";
         }
         return "You dont have any boxes";
     }

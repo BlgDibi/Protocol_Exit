@@ -1,15 +1,21 @@
 using UnityEngine;
 using System.IO;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class SaveSystem
 {
     private static SaveData _savedata = new SaveData();
-
-    // Ez a "post-it", ami jelzi a Playernek, hogy tölteni kell
     public static bool IsGameJustLoaded = false;
-
     public static int CurrentSceneIndex;
+
+    [System.Serializable]
+
+    public struct PlacedBoxData 
+    {
+        public string boxname;
+        public Vector3 position;
+    }
 
     [System.Serializable]
     public struct SaveData
@@ -17,8 +23,9 @@ public class SaveSystem
         public PlayerSaveData playerdata;
         public int sceneIndex;
         public SceneSaveData scenedata;
+        public List<string> InventoryBoxnames;
+        public List<PlacedBoxData> PlacedBoxes;
     }
-
     public static string SaveFileName(int slot = 1)
     {
         return Application.persistentDataPath + "/save_" + slot + ".json";
@@ -26,62 +33,75 @@ public class SaveSystem
 
     public static void Save(int slot = 1)
     {
-        HandleSaveData(); // Adatok begyûjtése
+        HandleSaveData(); 
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
-        Debug.Log("Fájl mentve: " + SaveFileName(slot));
+        Debug.Log("Game saved! File: " + SaveFileName(slot));
     }
 
     private static void HandleSaveData()
     {
-        // Pálya index mentése
         _savedata.sceneIndex = SceneManager.GetActiveScene().buildIndex;
 
-        // Játékos adatok mentése
         PlayerSave playerScript = GameObject.FindFirstObjectByType<PlayerSave>();
-        if (playerScript != null)
+        if (playerScript != null) playerScript.Save(ref _savedata.playerdata);
+
+        if (BoxInventory.Instance != null)
         {
-            playerScript.Save(ref _savedata.playerdata);
+            _savedata.InventoryBoxnames = BoxInventory.Instance.GetSavedBoxNames();
         }
         else
         {
-            Debug.LogError("HIBA: Nem található PlayerSave script a mentésnél!");
+            _savedata.InventoryBoxnames = new List<string>();
         }
 
-        // SceneData mentése
-        SceneData sceneScript = GameObject.FindFirstObjectByType<SceneData>();
-        if (sceneScript != null)
+        _savedata.PlacedBoxes = new List<PlacedBoxData>();
+      
+        GameObject[] boxesInWorld = GameObject.FindGameObjectsWithTag("Boxes");
+
+        foreach (GameObject box in boxesInWorld)
         {
-            sceneScript.Save(ref _savedata.scenedata);
+            
+            _savedata.PlacedBoxes.Add(new PlacedBoxData
+            {
+                boxname = box.name.Replace("(Clone)", "").Trim(),
+                position = box.transform.position
+            });
         }
+
     }
 
     public static void Load(int slot = 1)
     {
         string fileName = SaveFileName(slot);
-
         if (File.Exists(fileName))
         {
             string saveContent = File.ReadAllText(fileName);
             _savedata = JsonUtility.FromJson<SaveData>(saveContent);
 
-            // JELZÕ BEÁLLÍTÁSA - Ez a legfontosabb sor!
-            IsGameJustLoaded = true;
+            if (_savedata.InventoryBoxnames == null)
+                _savedata.InventoryBoxnames = new List<string>();
 
-            // Pálya betöltése
-            // A PlayerSave Start() függvénye fogja majd érzékelni az IsGameJustLoaded-et
-            // amikor a pálya betöltõdött.
+            IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
         }
-        else
-        {
-            Debug.LogWarning("Nincs mentés ezen a sloton: " + slot);
-        }
     }
 
-    // Ez adja át az adatot a Playernek
-    public static PlayerSaveData GetPlayerData()
+    public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
+
+
+    public static List<string> GetInventoryBoxes()
     {
-        return _savedata.playerdata;
+        return _savedata.InventoryBoxnames ?? new List<string>();
     }
+
+    public static List<PlacedBoxData> GetSavedPlacedBoxes()
+    {
+        if (_savedata.PlacedBoxes == null)
+        {
+            _savedata.PlacedBoxes = new List<PlacedBoxData>();
+        }
+        return _savedata.PlacedBoxes;
+    }
+
 }

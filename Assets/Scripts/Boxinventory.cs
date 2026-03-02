@@ -1,23 +1,64 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class BoxInventory : MonoBehaviour
 {
     [SerializeField] private List<SulyDobozData> Boxesamount = new List<SulyDobozData>();
 
+    [Header("Database for loading")]
+    [SerializeField] private List<SulyDobozData> Allavailableboxes = new List<SulyDobozData>();
+
     public static BoxInventory Instance { get; private set; }
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance == null) { Instance = this; }
+        else { Destroy(gameObject); }
+    }
+
+    IEnumerator Start()
+    {
+        yield return null; 
+
+        if (SaveSystem.IsGameJustLoaded)
         {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
+            LoadInventoryFromSave(SaveSystem.GetInventoryBoxes());
         }
     }
+
+    public List<string> GetSavedBoxNames()
+    {
+        List<string> name = new List<string>();
+        foreach (var box in Boxesamount)
+        {
+            if (box != null) name.Add(box.boxname);
+        }
+        return name;
+    }
+
+    public void LoadInventoryFromSave(List<string> mentettNevek)
+    {
+        Boxesamount.Clear(); 
+
+        if (mentettNevek != null)
+        {
+            foreach (string nev in mentettNevek)
+            {
+                
+                SulyDobozData megtalaltDoboz = Allavailableboxes.Find(x => x.boxname == nev);
+
+                if (megtalaltDoboz != null)
+                {
+                    
+                    AddBox(megtalaltDoboz);
+                }
+            }
+        }
+    }
+
+   
+
 
     public void AddBox(SulyDobozData doboz)
     {

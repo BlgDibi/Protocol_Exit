@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a9006f2d16ce36499a2d634e28ae246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxPickup
-  holdPosition: {fileID: 0}
+  Boxdata: {fileID: 11400000, guid: ee662b3ba7bc53441a5444133db0874e, type: 2}
   interactkey: 101
   crosshair: {fileID: 0}
   interactionPrompt:
@@ -165,6 +165,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  fallbackText: Box Pickup
   references:
     version: 2
     RefIds: []
