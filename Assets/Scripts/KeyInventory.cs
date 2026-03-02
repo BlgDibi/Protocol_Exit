@@ -1,12 +1,13 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections; // Fontos a Coroutine miatt
 
 public class KeyInventory : MonoBehaviour
 {
     [SerializeField] private List<int> keyIds = new List<int>();
 
     [Header("Database for loading")]
+    [Tooltip("KeyScriptabelObject")]
     [SerializeField] private List<Key> allAvailableKeys = new List<Key>();
 
     public static KeyInventory Instance { get; private set; }
@@ -26,9 +27,12 @@ public class KeyInventory : MonoBehaviour
 
     IEnumerator Start()
     {
+        
+        bool isLoaded = SaveSystem.IsGameJustLoaded;
+
         yield return null;
 
-        if (SaveSystem.IsGameJustLoaded)
+        if (isLoaded)
         {
             LoadKeysFromSave();
         }
@@ -40,21 +44,24 @@ public class KeyInventory : MonoBehaviour
 
         if (loadedIds != null && loadedIds.Count > 0)
         {
-            keyIds.Clear();
+            keyIds.Clear(); 
 
             foreach (int id in loadedIds)
             {
+          
                 Key foundKey = allAvailableKeys.Find(k => k.id == id);
-                if (foundKey != null)
+
+                if (foundKey != null && !keyIds.Contains(foundKey.id))
                 {
-                    if (!keyIds.Contains(foundKey.id))
+                    keyIds.Add(foundKey.id);
+            
+                    if (UiManager.Instance != null)
                     {
-                        keyIds.Add(foundKey.id);
-                        if (UiManager.Instance != null) UiManager.Instance.AddKeyToUI(foundKey);
+                        UiManager.Instance.AddKeyToUI(foundKey);
                     }
                 }
             }
-            Debug.Log("Betöltve " + keyIds.Count + " kulcs.");
+           
         }
     }
 
@@ -62,14 +69,18 @@ public class KeyInventory : MonoBehaviour
     {
         return new List<int>(keyIds);
     }
+
     public void AddKey(Key key)
     {
         if (!keyIds.Contains(key.id))
         {
             keyIds.Add(key.id);
-            Debug.Log("Key Added");
+            
 
-            UiManager.Instance.AddKeyToUI(key);
+            if (UiManager.Instance != null)
+            {
+                UiManager.Instance.AddKeyToUI(key);
+            }
         }
     }
 
@@ -83,18 +94,13 @@ public class KeyInventory : MonoBehaviour
         if (keyIds.Contains(key.id))
         {
             keyIds.Remove(key.id);
-            Debug.Log("Key Removed");
-
-            UiManager.Instance.RemoveKeyFromUI(key);
+            if (UiManager.Instance != null) UiManager.Instance.RemoveKeyFromUI(key);
         }
     }
 
     public void ResetKeys()
     {
         keyIds.Clear();
-        Debug.Log("KeyInventory Reset");
-
-        if (UiManager.Instance != null)
-            UiManager.Instance.ClearAllKeysFromUI(); 
+        if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
     }
 }

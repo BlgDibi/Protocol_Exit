@@ -17,6 +17,8 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
     public LocalizedString interactionPrompt;
     [SerializeField] private string fallbackText = "Box Pickup";
 
+    public bool isPlaced = false;
+
     void Start()
     {
         StartCoroutine(CheckIfAlreadyCollected());
@@ -24,41 +26,50 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     IEnumerator CheckIfAlreadyCollected()
     {
+        if (isPlaced) yield break;
 
         if (gameObject.name.Contains("_Placed")) yield break;
 
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.1f);
 
         if (Boxdata == null) yield break;
 
+        List<string> mentettInventory = SaveSystem.GetInventoryBoxes();
+        if (mentettInventory != null && mentettInventory.Contains(Boxdata.boxname))
+        {
+            gameObject.SetActive(false);
+            yield break;
+        }
 
         List<SaveSystem.PlacedBoxData> placedBoxes = SaveSystem.GetSavedPlacedBoxes();
-        foreach (var placed in placedBoxes)
+        if (placedBoxes != null)
         {
-            if (placed.boxname == Boxdata.boxname)
+            foreach (var placed in placedBoxes)
             {
-                gameObject.SetActive(false); 
+                if (placed.boxname == Boxdata.boxname)
+                {
+                    gameObject.SetActive(false);
 
-                GameObject newBox = Instantiate(Boxdata.boxprefab, placed.position, Quaternion.identity);
+                    GameObject newBox = Instantiate(Boxdata.boxprefab, placed.position, Quaternion.identity);
+                    newBox.name = Boxdata.boxname + "_Placed";
+                    newBox.tag = "Boxes";
 
-                newBox.name = Boxdata.boxname + "_Placed";
-                newBox.tag = "Boxes";
+                    Rigidbody rb = newBox.GetComponent<Rigidbody>();
+                    if (rb != null) rb.mass = Boxdata.weight;
 
-                Rigidbody rb = newBox.GetComponent<Rigidbody>();
-                if (rb != null) rb.mass = Boxdata.weight;
+          
+                    Boxpickup spawnedScript = newBox.GetComponent<Boxpickup>();
+                    if (spawnedScript != null) spawnedScript.isPlaced = true;
 
-                yield break;
+                    yield break;
+                }
             }
         }
     }
 
-
     public string GetInteractText()
     {
-       
-            return interactionPrompt.GetLocalizedString();
-        
-     
+        return interactionPrompt.GetLocalizedString();
     }
 
     public KeyCode GetInteractKey() => interactkey;
@@ -68,16 +79,12 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
         if (Boxdata != null)
         {
             BoxInventory.Instance.AddBox(Boxdata);
-
             HighlightCrosshair(false);
 
-           
             transform.position = new Vector3(transform.position.x, transform.position.y + 1000f, transform.position.z);
 
-           
             Invoke(nameof(DisableBox), 0.1f);
         }
-       
     }
 
     private void DisableBox()

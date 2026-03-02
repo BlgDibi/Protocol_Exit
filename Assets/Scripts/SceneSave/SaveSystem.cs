@@ -26,6 +26,8 @@ public class SaveSystem
         public List<string> InventoryBoxnames;
         public List<PlacedBoxData> PlacedBoxes;
         public List<int> InventoryKeyIds;
+        public float savedElapsedTime;
+
     }
     public static string SaveFileName(int slot = 1)
     {
@@ -74,6 +76,17 @@ public class SaveSystem
         {
             _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
         }
+        else
+        {
+            _savedata.InventoryKeyIds = new List<int>();
+        }
+
+        Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
+        if (stopwatch != null)
+        {
+            _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
+        }
+
     }
 
     public static void Load(int slot = 1)
@@ -85,8 +98,13 @@ public class SaveSystem
             _savedata = JsonUtility.FromJson<SaveData>(saveContent);
 
             if (_savedata.InventoryBoxnames == null) _savedata.InventoryBoxnames = new List<string>();
-            if (_savedata.InventoryKeyIds == null) _savedata.InventoryKeyIds = new List<int>();
+          
             if (_savedata.PlacedBoxes == null) _savedata.PlacedBoxes = new List<PlacedBoxData>();
+
+            if (_savedata.InventoryKeyIds == null)
+            {
+                _savedata.InventoryKeyIds = new List<int>();
+            }
 
             IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
@@ -113,4 +131,10 @@ public class SaveSystem
     {
         return _savedata.InventoryKeyIds ?? new List<int>();
     }
+
+    public static float GetSavedTime()
+    {
+        return _savedata.savedElapsedTime;
+    }
+
 }

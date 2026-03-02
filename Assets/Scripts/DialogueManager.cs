@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
-    // Csinálunk belõle egy Singletont, hogy könnyû legyen elérni a Talk scriptbõl
     public static DialogueManager Instance { get; private set; }
 
     [Header("Ink File")]
@@ -33,7 +32,9 @@ public class DialogueManager : MonoBehaviour
     [Header("Rewards")]
     [SerializeField] private GameObject greenKey;
 
-   
+
+    private static Dictionary<string, string> inkMemory = new Dictionary<string, string>();
+    private TextAsset currentInkAsset;
 
 
     private Story currentStory;
@@ -73,15 +74,21 @@ public class DialogueManager : MonoBehaviour
         if (isDialoguePlaying) return;
 
         currentNPC = npc;
+        currentInkAsset = specificInkFile;
 
         currentStory = new Story(specificInkFile.text);
 
         currentStory.BindExternalFunction("is_scale_solved", () =>
         {
-            WeightPlateInteractor merleg = FindFirstObjectByType<WeightPlateInteractor>();
-            if (merleg != null) return merleg.IsWeightOptimal();
+            WeightPlate Scale = FindFirstObjectByType<WeightPlate>();
+            if (Scale != null) return Scale.IsWeightOptimal();
             return false;
         });
+
+        if (inkMemory.ContainsKey(specificInkFile.name))
+        {
+            currentStory.state.LoadJson(inkMemory[specificInkFile.name]);
+        }
 
         if (!string.IsNullOrEmpty(knotName))
         {
@@ -181,21 +188,23 @@ public class DialogueManager : MonoBehaviour
 
     public void ExitDialogueMode()
     {
+        if (currentStory != null && currentInkAsset != null)
+        {
+            inkMemory[currentInkAsset.name] = currentStory.state.ToJson();
+        }
+
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
 
-        foreach (Transform child in choicesContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in choicesContainer) Destroy(child.gameObject);
 
         SetPlayerEnabled(true);
 
         if (currentNPC != null)
         {
             currentNPC.ResetRotation();
-            currentNPC = null; 
+            currentNPC = null;
         }
     }
 
