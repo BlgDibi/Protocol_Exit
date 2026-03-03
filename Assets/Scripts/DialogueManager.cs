@@ -32,10 +32,9 @@ public class DialogueManager : MonoBehaviour
     [Header("Rewards")]
     [SerializeField] private GameObject greenKey;
 
-
+  
     private static Dictionary<string, string> inkMemory = new Dictionary<string, string>();
     private TextAsset currentInkAsset;
-
 
     private Story currentStory;
     public bool isDialoguePlaying { get; private set; }
@@ -53,7 +52,7 @@ public class DialogueManager : MonoBehaviour
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
 
-       
+        StartCoroutine(CheckAndSpawnKeyOnLoad());
     }
 
     private void Update()
@@ -69,13 +68,22 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    public static void SetInkMemory(Dictionary<string, string> loadedMemory)
+    {
+        inkMemory = loadedMemory;
+    }
+
+    public static Dictionary<string, string> GetInkMemory()
+    {
+        return inkMemory;
+    }
+
     public void EnterDialogueMode(TextAsset specificInkFile, string knotName = "", Talk npc = null)
     {
         if (isDialoguePlaying) return;
 
         currentNPC = npc;
         currentInkAsset = specificInkFile;
-
         currentStory = new Story(specificInkFile.text);
 
         currentStory.BindExternalFunction("is_scale_solved", () =>
@@ -140,11 +148,7 @@ public class DialogueManager : MonoBehaviour
             }
             else if (tag == "spawn_green_key")
             {
-                if (greenKey != null)
-                {
-                    greenKey.SetActive(true); 
-                    Debug.Log("Green key showed somewhere!");
-                }
+                SpawnGreenKey();
             }
             else if (tag.StartsWith("play_audio"))
             {
@@ -152,6 +156,90 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator CheckAndSpawnKeyOnLoad()
+    {
+        // Várunk a SaveSystem-re
+        yield return new WaitForSeconds(0.8f);
+
+        string state = GetVariableState("got_reward");
+        Debug.Log("Manager betöltéskor: got_reward = " + state);
+
+        if (state.ToLower() == "true")
+        {
+            // Elõször ellenõrizzük az ID-t (3-as ID a zöld kulcs)
+            List<int> invKeys = SaveSystem.GetInventoryKeys();
+
+            if (invKeys == null || !invKeys.Contains(3))
+            {
+                Debug.Log("Manager: A kulcs még nincs az inventory-ban, aktiválom a tárgyat!");
+                SpawnGreenKey(); // Ez teszi aktívvá (SetActive(true))
+            }
+            else
+            {
+                Debug.Log("Manager: A kulcs már nálad van, nem spawnolom újra.");
+            }
+        }
+    }
+
+    public void SpawnGreenKey()
+    {
+        if (greenKey != null)
+        {
+            greenKey.SetActive(true);
+            var rend = greenKey.GetComponentInChildren<Renderer>();
+            if (rend != null) rend.enabled = true;
+        }
+    }
+
+    public string GetVariableState(string variableName)
+    {
+        if (currentStory != null)
+        {
+            try
+            {
+                var value = currentStory.variablesState[variableName];
+                if (value != null) return value.ToString();
+            }
+            catch { }
+        }
+
+        foreach (var entry in inkMemory)
+        {
+            string fileName = entry.Key; // Ez nálad most "npc1"
+            TextAsset asset = null;
+
+            // 1. Próbálkozás: Simán a Resources mappában
+            asset = Resources.Load<TextAsset>(fileName);
+
+            // 2. Próbálkozás: Az Ink Resources mappában
+            if (asset == null) asset = Resources.Load<TextAsset>("ink resources/" + fileName);
+
+            // 3. Próbálkozás: Kisbetûs/Nagybetûs variációk kizárása (opcionális, de segít)
+            if (asset == null) asset = Resources.Load<TextAsset>(fileName.ToLower());
+
+            if (asset == null)
+            {
+                // Ha még mindig nem leli, kiírjuk a pontos elérési utat, amit próbált
+                Debug.LogError($"HIBA: Nem lelem a fájlt! Keresett név: '{fileName}' vagy 'Ink Resources/{fileName}'. Ellenõrizd a Resources mappádat!");
+                continue;
+            }
+
+            try
+            {
+                Story tempStory = new Story(asset.text);
+                tempStory.state.LoadJson(entry.Value);
+                var value = tempStory.variablesState[variableName];
+                if (value != null) return value.ToString();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Hiba a JSON betöltésekor: " + e.Message);
+            }
+        }
+        return "";
+    }
+
 
     private void DisplayChoices()
     {
@@ -161,7 +249,6 @@ public class DialogueManager : MonoBehaviour
         {
             GameObject choiceButton = Instantiate(choiceButtonPrefab, choicesContainer);
             choiceButton.transform.localScale = Vector3.one;
-
             DialogueChoiceButton buttonScript = choiceButton.GetComponent<DialogueChoiceButton>();
 
             if (buttonScript != null)
@@ -172,11 +259,9 @@ public class DialogueManager : MonoBehaviour
             {
                 TextMeshProUGUI text = choiceButton.GetComponentInChildren<TextMeshProUGUI>();
                 if (text != null) text.text = choice.text;
-
                 choiceButton.GetComponent<Button>().onClick.AddListener(() => MakeChoice(choice.index));
             }
         }
-
         Canvas.ForceUpdateCanvases();
     }
 
@@ -196,9 +281,7 @@ public class DialogueManager : MonoBehaviour
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
-
         foreach (Transform child in choicesContainer) Destroy(child.gameObject);
-
         SetPlayerEnabled(true);
 
         if (currentNPC != null)
@@ -240,9 +323,6 @@ public class DialogueManager : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
-
         DisplayChoices();
     }
-
-  
 }

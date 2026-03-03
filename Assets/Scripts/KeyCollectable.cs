@@ -16,7 +16,30 @@ public class KeyCollectable : MonoBehaviour, InterfaceInteractable
 
     void Start()
     {
-        StartCoroutine(CheckIfAlreadyCollected());
+        // Amint aktiválódik, azonnal ellenõrizze magát
+        StartCoroutine(CheckStatusAfterLoad());
+    }
+
+    IEnumerator CheckStatusAfterLoad()
+    {
+        // Itt már nem kell sokat várni, mert a Manager már várt
+        yield return new WaitForSeconds(0.1f);
+
+        if (key == null) yield break;
+
+        // Dupla ellenõrzés: ha valamiért mégis nálunk lenne, tûnjön el
+        List<int> mentettKeys = SaveSystem.GetInventoryKeys();
+        if (mentettKeys != null && mentettKeys.Contains(key.id))
+        {
+            gameObject.SetActive(false);
+            yield break;
+        }
+
+        // Kényszerítsük a megjelenítést (Renderer és Collider)
+        if (GetComponent<Renderer>()) GetComponent<Renderer>().enabled = true;
+        if (GetComponent<Collider>()) GetComponent<Collider>().enabled = true;
+
+        Debug.Log("Kulcs: Sikeresen megjelentem a világban!");
     }
 
     IEnumerator CheckIfAlreadyCollected()

@@ -2,8 +2,14 @@ using UnityEngine;
 
 public class FlashlightAim : MonoBehaviour
 {
-    [Header("A játékos kamerája")]
+    [Header("Main camera ")]
     public Camera mainCam;
+
+    [Header("Player Body")]
+    public Transform playerBody;
+
+    [Header("Max rotation")]
+    public float maxAngle = 80f;
 
     void Start()
     {
@@ -15,22 +21,10 @@ public class FlashlightAim : MonoBehaviour
 
     void LateUpdate()
     {
-        if (mainCam == null) return;
+        if (mainCam == null || playerBody == null) return;
 
-        Ray ray = mainCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
-        Vector3 targetPoint;
+        Quaternion targetRotation = mainCam.transform.rotation;
 
-        if (Physics.Raycast(ray, out hit, 100f))
-        {
-            targetPoint = hit.point; 
-        }
-        else
-        {
-          
-            targetPoint = ray.GetPoint(100f);
-        }
-
-        transform.LookAt(targetPoint);
+        transform.rotation = Quaternion.RotateTowards(playerBody.rotation, targetRotation, maxAngle);
     }
 }

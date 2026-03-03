@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 public class BoxInventory : MonoBehaviour
@@ -13,18 +13,100 @@ public class BoxInventory : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) { Instance = this; }
-        else { Destroy(gameObject); }
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    IEnumerator Start()
+    private void OnDestroy()
     {
-        yield return null; 
+        if (Instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StartCoroutine(RefreshAfterLoad());
+    }
+
+    private System.Collections.IEnumerator RefreshAfterLoad()
+    {
+        yield return new WaitForSeconds(0.2f);
 
         if (SaveSystem.IsGameJustLoaded)
         {
-            LoadInventoryFromSave(SaveSystem.GetInventoryBoxes());
+            LoadInventoryFromSave();
         }
+        else
+        {
+            RefreshUI();
+        }
+    }
+
+    private void LoadInventoryFromSave()
+    {
+        List<string> mentettNevek = SaveSystem.GetInventoryBoxes();
+        Boxesamount.Clear(); 
+
+        if (mentettNevek != null && mentettNevek.Count > 0)
+        {
+            foreach (string nev in mentettNevek)
+            {
+                SulyDobozData megtalaltDoboz = Allavailableboxes.Find(x => x.boxname == nev);
+                if (megtalaltDoboz != null)
+                {
+                    Boxesamount.Add(megtalaltDoboz);
+                }
+            }
+        }
+
+        RefreshUI();
+    }
+
+    private void RefreshUI()
+    {
+        if (UiManager.Instance != null)
+        {
+            foreach (var doboz in Boxesamount)
+            {
+                UiManager.Instance.AddBoxToUI(doboz);
+            }
+        }
+    }
+
+    public void AddBox(SulyDobozData doboz)
+    {
+        if (!Boxesamount.Contains(doboz))
+        {
+            Boxesamount.Add(doboz);
+            if (UiManager.Instance != null) UiManager.Instance.AddBoxToUI(doboz);
+        }
+    }
+
+    public void RemoveBox(SulyDobozData doboz)
+    {
+        if (Boxesamount.Contains(doboz))
+        {
+            Boxesamount.Remove(doboz);
+            if (UiManager.Instance != null) UiManager.Instance.RemoveBoxFromUI(doboz);
+        }
+    }
+
+    public bool HasAnyBox() => Boxesamount.Count > 0;
+
+    public SulyDobozData GetFirstBox()
+    {
+        return HasAnyBox() ? Boxesamount[0] : null;
     }
 
     public List<string> GetSavedBoxNames()
@@ -35,53 +117,5 @@ public class BoxInventory : MonoBehaviour
             if (box != null) name.Add(box.boxname);
         }
         return name;
-    }
-
-    public void LoadInventoryFromSave(List<string> mentettNevek)
-    {
-        Boxesamount.Clear(); 
-
-        if (mentettNevek != null)
-        {
-            foreach (string nev in mentettNevek)
-            {
-                
-                SulyDobozData megtalaltDoboz = Allavailableboxes.Find(x => x.boxname == nev);
-
-                if (megtalaltDoboz != null)
-                {
-                    
-                    AddBox(megtalaltDoboz);
-                }
-            }
-        }
-    }
-
-   
-
-
-    public void AddBox(SulyDobozData doboz)
-    {
-        if (!Boxesamount.Contains(doboz))
-        {
-            Boxesamount.Add(doboz);
-            UiManager.Instance.AddBoxToUI(doboz);
-        }
-    }
-
-    public void RemoveBox(SulyDobozData doboz)
-    {
-        if (Boxesamount.Contains(doboz))
-        {
-            Boxesamount.Remove(doboz);
-            UiManager.Instance.RemoveBoxFromUI(doboz);
-        }
-    }
-
-    public bool HasAnyBox() => Boxesamount.Count > 0;
-
-    public SulyDobozData GetFirstBox()
-    {
-        return HasAnyBox() ? Boxesamount[0] : null;
     }
 }

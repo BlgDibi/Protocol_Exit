@@ -38,8 +38,9 @@ public class UiManager : MonoBehaviour
 
     public void AddBoxToUI(SulyDobozData doboz)
     {
-        GameObject boxImage = Instantiate(keyImagePrefab, keyPanel);
+        if (boxImages.ContainsKey(doboz)) return;
 
+        GameObject boxImage = Instantiate(keyImagePrefab, keyPanel);
         boxImage.GetComponent<UnityEngine.UI.Image>().sprite = doboz.boxpicture;
 
         boxImages[doboz] = boxImage;
@@ -53,6 +54,8 @@ public class UiManager : MonoBehaviour
             boxImages.Remove(doboz);
         }
     }
+
+
 
     public void AddKeyToUI(Key key)
     {
