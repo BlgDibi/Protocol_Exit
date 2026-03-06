@@ -31734,6 +31734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rayDistance: 5
+  sphereRadius: 0.3
   crosshair: {fileID: 190421854}
   interactionText: {fileID: 1914552358}
   interactionPanel: {fileID: 1948575156}
@@ -51658,7 +51659,7 @@ MonoBehaviour:
   choicesContainer: {fileID: 1195351604}
   playerController: {fileID: 1472591109}
   playerInputs: {fileID: 1472591111}
-  typingSpeed: 0.045
+  typingSpeed: 0.035
   greenKey: {fileID: 1451905444}
 --- !u!114 &805306967
 MonoBehaviour:
