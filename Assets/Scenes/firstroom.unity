@@ -30256,8 +30256,8 @@ Light:
   m_Color: {r: 1, g: 1, b: 0.8784314, a: 1}
   m_Intensity: 5
   m_Range: 3
-  m_SpotAngle: 69.98494
-  m_InnerSpotAngle: 51.14285
+  m_SpotAngle: 56.87727
+  m_InnerSpotAngle: 56.87727
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
     m_Type: 2
@@ -49394,6 +49394,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5b99249f5dd04742b2ea23df1d2cc22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::A1_Door
+  doorID: exit_door_1
   fadeout: {fileID: 1579259898}
   sceneToLoad: 2
   messagePanel: {fileID: 23851397}
@@ -55029,7 +55030,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Range
-      value: 2.59
+      value: 2.8
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Color.b
@@ -55045,7 +55046,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Intensity
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_SpotAngle
@@ -66446,7 +66447,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Range
-      value: 2.58
+      value: 2.8
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Color.b
@@ -66462,7 +66463,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Intensity
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_SpotAngle

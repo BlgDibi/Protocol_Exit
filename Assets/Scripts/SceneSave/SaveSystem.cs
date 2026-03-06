@@ -30,6 +30,10 @@ public class SaveSystem
         public List<string> activatedSecrets;
         public List<string> inkMemoryKeys;
         public List<string> inkMemoryValues;
+
+        public bool hasFlashlight;
+
+        public List<string> unlockedDoors;
     }
 
     public static string SaveFileName(int slot = 1)
@@ -91,6 +95,10 @@ public class SaveSystem
                 _savedata.inkMemoryValues.Add(kvp.Value);
             }
         }
+
+        _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
+
+
     }
 
     public static void Load(int slot = 1)
@@ -106,6 +114,8 @@ public class SaveSystem
             if (_savedata.InventoryKeyIds == null) _savedata.InventoryKeyIds = new List<int>();
             if (_savedata.activatedSecrets == null) _savedata.activatedSecrets = new List<string>();
 
+            if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
+
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryValues != null)
             {
                 Dictionary<string, string> loadedInkMem = new Dictionary<string, string>();
@@ -116,6 +126,8 @@ public class SaveSystem
                 DialogueManager.SetInkMemory(loadedInkMem);
             }
 
+            Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
+
             IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
         }
@@ -125,6 +137,21 @@ public class SaveSystem
     {
         if (_savedata.activatedSecrets == null || string.IsNullOrEmpty(secretID)) return false;
         return _savedata.activatedSecrets.Contains(secretID);
+    }
+
+    public static void SaveDoorUnlocked(string doorID)
+    {
+        if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
+        if (!_savedata.unlockedDoors.Contains(doorID))
+        {
+            _savedata.unlockedDoors.Add(doorID);
+        }
+    }
+
+    public static bool IsDoorUnlocked(string doorID)
+    {
+        if (_savedata.unlockedDoors == null || string.IsNullOrEmpty(doorID)) return false;
+        return _savedata.unlockedDoors.Contains(doorID);
     }
 
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;

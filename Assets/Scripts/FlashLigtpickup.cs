@@ -7,7 +7,9 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 {
     public static bool IsPlayerInZone = false;
 
-    [Header("Flashlight Beállítások")]
+    public static bool HasFlashlight = false;
+
+    [Header("Flashlight Settings")]
     public GameObject flashlightInHand;
     public GameObject flashlightOnTable;
 
@@ -18,6 +20,14 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
     public LocalizedString interactionPrompt;
 
     [SerializeField] private KeyCode interactkey = KeyCode.E;
+
+    void Start()
+    {
+        if (HasFlashlight)
+        {
+            ApplyFlashlightState();
+        }
+    }
 
     public string GetInteractText()
     {
@@ -32,18 +42,22 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
     public void Interact()
     {
         HighlightCrosshair(false);
+        HasFlashlight = true; 
+        ApplyFlashlightState();
+    }
 
+    private void ApplyFlashlightState()
+    {
         if (flashlightInHand != null)
         {
             flashlightInHand.SetActive(true);
 
-           
             ThirdPersonController controller = flashlightInHand.GetComponentInParent<ThirdPersonController>();
             if (controller != null)
             {
                 controller.isFlashlightMode = true;
                 controller.flashlightObject = flashlightInHand;
-                Debug.Log("Zseblámpa mód aktiválva a karakteren!");
+                Debug.Log("Flashlight mode activated");
             }
         }
 

@@ -2,19 +2,21 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.Localization; 
+using UnityEngine.Localization;
 
 public class A1_Door : MonoBehaviour
 {
+    [Header("Save Settings")]
+    [Tooltip("Door ID")]
+    public string doorID;
+
     [Header("Transition Settings")]
     [SerializeField] GameObject fadeout;
     [SerializeField] int sceneToLoad = 2;
 
     [Header("Lock State")]
-    private bool isLocked = true; 
-    private bool playerInZone = false; 
-
-
+    private bool isLocked = true;
+    private bool playerInZone = false;
 
     [Header("UI Message")]
     [Tooltip("DoormessageCanvas")]
@@ -29,6 +31,11 @@ public class A1_Door : MonoBehaviour
     void Start()
     {
         if (messagePanel != null) messagePanel.SetActive(false);
+
+        if (!string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID))
+        {
+            isLocked = false;
+        }
     }
 
     void Update()
@@ -43,7 +50,6 @@ public class A1_Door : MonoBehaviour
                 }
                 else
                 {
-                   
                     StartTransition();
                 }
             }
@@ -53,13 +59,16 @@ public class A1_Door : MonoBehaviour
     public void Unlock()
     {
         isLocked = false;
-       
+
+        if (!string.IsNullOrEmpty(doorID))
+        {
+            SaveSystem.SaveDoorUnlocked(doorID);
+        }
     }
 
-   
     void StartTransition()
     {
-        playerInZone = false; 
+        playerInZone = false;
 
         if (GetComponent<BoxCollider>() != null)
             GetComponent<BoxCollider>().enabled = false;
@@ -74,13 +83,10 @@ public class A1_Door : MonoBehaviour
         if (fadeout != null) fadeout.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         SceneManager.LoadScene(sceneToLoad);
-       
     }
-
 
     private void HandleLockedDoor()
     {
-       
         if (!lockedMessageKey.IsEmpty)
         {
             ShowTemporaryMessage(lockedMessageKey.GetLocalizedString());
