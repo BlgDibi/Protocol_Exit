@@ -5,7 +5,7 @@ using UnityEngine;
 public class HP : MonoBehaviour
 {
     [Header("Player Stats")]
-    public float Hp = 100;
+    public float Hp = 100f;
     public bool isDead = false;
     public bool diedFromSteam = false;
 
@@ -26,6 +26,8 @@ public class HP : MonoBehaviour
             stopwatch.StartStopwatch();
 
         tpc = GetComponent<ThirdPersonController>();
+
+       
     }
 
     public void TakeDamage(float damageAmount)
@@ -53,7 +55,6 @@ public class HP : MonoBehaviour
     {
         if (diedFromSteam && endingScript != null)
         {
-   
             if (playerVisual != null)
                 playerVisual.SetActive(false);
 
@@ -87,5 +88,4 @@ public class HP : MonoBehaviour
                 gameOverMenu.gameover();
         }
     }
-
 }

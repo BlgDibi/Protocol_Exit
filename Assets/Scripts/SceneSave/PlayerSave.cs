@@ -1,33 +1,29 @@
 using UnityEngine;
-using System.Collections; // Fontos a Coroutine miatt!
+using System.Collections; 
 
 public class PlayerSave : MonoBehaviour
 {
     private CharacterController controller;
+    private HP playerHP;
 
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        playerHP = GetComponent<HP>();
     }
 
-    // A Start coroutine vár egy picit, majd beállítja a pozíciót
     IEnumerator Start()
     {
-        // Várunk egy képkockát, hogy a Unity biztosan betöltse a pályát
         yield return null;
 
-        // Megkérdezzük a rendszert, hogy mentésbõl jöttünk-e
         if (SaveSystem.IsGameJustLoaded)
         {
-            Debug.Log("MENTÉS ÉRZÉKELVE! Pozíció beállítása...");
+            Debug.Log("Save inicialized, HP and position sync");
 
-            // Adatok lekérése a SaveSystem-tõl
             PlayerSaveData data = SaveSystem.GetPlayerData();
 
-            // Pozíció alkalmazása
             Load(data);
 
-            // Jelzõ kikapcsolása
             SaveSystem.IsGameJustLoaded = false;
         }
     }
@@ -35,29 +31,43 @@ public class PlayerSave : MonoBehaviour
     public void Save(ref PlayerSaveData data)
     {
         data.Position = transform.position;
+
+        if (playerHP != null)
+        {
+            data.Health = playerHP.Hp;
+        }
+        else
+        {
+            data.Health = 100f;
+        }
     }
 
     public void Load(PlayerSaveData data)
     {
-        // 1. CharacterController kikapcsolása (KÖTELEZÕ teleportálásnál!)
         if (controller != null) controller.enabled = false;
 
-        // 2. Pozíció átírása
         transform.position = data.Position;
 
-        // 3. Fizika szinkronizálása
         Physics.SyncTransforms();
 
-        Debug.Log("PlayerSave: Játékos teleportálva ide: " + data.Position);
+        if (playerHP != null)
+        {
+            playerHP.Hp = data.Health;
+            if (playerHP.Hp > 0)
+            {
+                playerHP.isDead = false;
+            }
+        }
 
-        // 4. Controller visszakapcsolása
+        Debug.Log("PlayerSave: Player TP-d here: " + data.Position + " HP: " + data.Health);
+
         if (controller != null) controller.enabled = true;
     }
 }
 
-// Ennek az osztályon KÍVÜL kell lennie, a fájl legvégén!
 [System.Serializable]
 public struct PlayerSaveData
 {
     public Vector3 Position;
+    public float Health;
 }
