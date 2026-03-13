@@ -50,6 +50,19 @@ MonoBehaviour:
     m_Localized: "K\xF3d be\xEDr\xE1sa"
     m_Metadata:
       m_Items: []
+  - m_Id: 21424632484122624
+    m_Localized: Rossz kulcs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21439732267929600
+    m_Localized: "Teljesen lez\xE1rt\xE1k. El\u0151bb ki kell nyitnom a falon l\xE9v\u0151
+      h\xE1rom z\xE1rat."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21441382357454848
+    m_Localized: "Nyomd meg a(z) F bet\u0171t a pr\xF3b\xE1hoz"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

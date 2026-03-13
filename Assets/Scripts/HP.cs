@@ -7,11 +7,11 @@ public class HP : MonoBehaviour
     [Header("Player Stats")]
     public float Hp = 100f;
     public bool isDead = false;
+
     public bool diedFromSteam = false;
 
     [Header("References")]
     public GameOverMenu gameOverMenu;
-    public Ending3 endingScript;
     public GameObject gravestonePrefab;
     public GameObject playerVisual;
     public float delayBeforeGameOver = 1f;
@@ -26,8 +26,6 @@ public class HP : MonoBehaviour
             stopwatch.StartStopwatch();
 
         tpc = GetComponent<ThirdPersonController>();
-
-       
     }
 
     public void TakeDamage(float damageAmount)
@@ -53,39 +51,21 @@ public class HP : MonoBehaviour
 
     private IEnumerator DeathSequence()
     {
-        if (diedFromSteam && endingScript != null)
+        if (playerVisual != null)
         {
-            if (playerVisual != null)
-                playerVisual.SetActive(false);
-
-            if (gravestonePrefab != null)
-                Instantiate(gravestonePrefab, transform.position, Quaternion.identity);
-
-            if (endingScript.gameOverUI != null)
-                endingScript.gameOverUI.SetActive(true);
-
-            if (tpc != null)
-                tpc.isDead = true;
-
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            yield return new WaitForSeconds(endingScript.delayBeforeButtons);
-
-            endingScript.TriggerSteamDeath();
+            Renderer[] renderers = playerVisual.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                r.enabled = false;
+            }
         }
-        else
-        {
-            if (playerVisual != null)
-                playerVisual.SetActive(false);
 
-            if (gravestonePrefab != null)
-                Instantiate(gravestonePrefab, transform.position, Quaternion.identity);
+        if (gravestonePrefab != null)
+            Instantiate(gravestonePrefab, transform.position, Quaternion.identity);
 
-            yield return new WaitForSeconds(delayBeforeGameOver);
+        yield return new WaitForSecondsRealtime(delayBeforeGameOver);
 
-            if (gameOverMenu != null)
-                gameOverMenu.gameover();
-        }
+        if (gameOverMenu != null)
+            gameOverMenu.gameover();
     }
 }

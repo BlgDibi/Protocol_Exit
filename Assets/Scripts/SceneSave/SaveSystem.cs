@@ -24,7 +24,10 @@ public class SaveSystem
         public SceneSaveData scenedata;
         public List<string> InventoryBoxnames;
         public List<PlacedBoxData> PlacedBoxes;
+
         public List<int> InventoryKeyIds;
+        public List<int> historicalKeyIds;
+
         public float savedElapsedTime;
 
         public List<string> activatedSecrets;
@@ -67,8 +70,16 @@ public class SaveSystem
             _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position });
         }
 
-        if (KeyInventory.Instance != null) { _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds(); }
-        else { _savedata.InventoryKeyIds = new List<int>(); }
+        if (KeyInventory.Instance != null)
+        {
+            _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
+            _savedata.historicalKeyIds = KeyInventory.Instance.GetHistoricalKeyIds();
+        }
+        else
+        {
+            _savedata.InventoryKeyIds = new List<int>();
+            _savedata.historicalKeyIds = new List<int>();
+        }
 
         Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
         if (stopwatch != null) { _savedata.savedElapsedTime = stopwatch.GetElapsedTime(); }
@@ -97,8 +108,6 @@ public class SaveSystem
         }
 
         _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
-
-
     }
 
     public static void Load(int slot = 1)
@@ -112,10 +121,9 @@ public class SaveSystem
             if (_savedata.InventoryBoxnames == null) _savedata.InventoryBoxnames = new List<string>();
             if (_savedata.PlacedBoxes == null) _savedata.PlacedBoxes = new List<PlacedBoxData>();
             if (_savedata.InventoryKeyIds == null) _savedata.InventoryKeyIds = new List<int>();
+            if (_savedata.historicalKeyIds == null) _savedata.historicalKeyIds = new List<int>();
             if (_savedata.activatedSecrets == null) _savedata.activatedSecrets = new List<string>();
-
             if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
-
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryValues != null)
             {
                 Dictionary<string, string> loadedInkMem = new Dictionary<string, string>();
@@ -133,34 +141,15 @@ public class SaveSystem
         }
     }
 
-    public static bool IsSecretActivated(string secretID)
-    {
-        if (_savedata.activatedSecrets == null || string.IsNullOrEmpty(secretID)) return false;
-        return _savedata.activatedSecrets.Contains(secretID);
-    }
-
-    public static void SaveDoorUnlocked(string doorID)
-    {
-        if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
-        if (!_savedata.unlockedDoors.Contains(doorID))
-        {
-            _savedata.unlockedDoors.Add(doorID);
-        }
-    }
-
-    public static bool IsDoorUnlocked(string doorID)
-    {
-        if (_savedata.unlockedDoors == null || string.IsNullOrEmpty(doorID)) return false;
-        return _savedata.unlockedDoors.Contains(doorID);
-    }
-
+    public static bool IsSecretActivated(string secretID) { return _savedata.activatedSecrets != null && _savedata.activatedSecrets.Contains(secretID); }
+    public static void SaveDoorUnlocked(string doorID) { if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>(); if (!_savedata.unlockedDoors.Contains(doorID)) _savedata.unlockedDoors.Add(doorID); }
+    public static bool IsDoorUnlocked(string doorID) { return _savedata.unlockedDoors != null && _savedata.unlockedDoors.Contains(doorID); }
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
     public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
-    public static List<PlacedBoxData> GetSavedPlacedBoxes()
-    {
-        if (_savedata.PlacedBoxes == null) _savedata.PlacedBoxes = new List<PlacedBoxData>();
-        return _savedata.PlacedBoxes;
-    }
+    public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();
     public static List<int> GetInventoryKeys() => _savedata.InventoryKeyIds ?? new List<int>();
+
+    public static List<int> GetHistoricalKeys() => _savedata.historicalKeyIds ?? new List<int>();
+
     public static float GetSavedTime() => _savedata.savedElapsedTime;
 }

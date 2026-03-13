@@ -50,6 +50,18 @@ MonoBehaviour:
     m_Localized: Enter Code
     m_Metadata:
       m_Items: []
+  - m_Id: 21424632484122624
+    m_Localized: Wrong key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21439732267929600
+    m_Localized: It's sealed shut. I need to unlock the three mechanisms on the wall.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21441382357454848
+    m_Localized: Press F to try
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -6,6 +6,8 @@ public class KeyInventory : MonoBehaviour
 {
     [SerializeField] private List<int> keyIds = new List<int>();
 
+    [SerializeField] private List<int> historicalKeyIds = new List<int>();
+
     [Header("Database for loading")]
     [Tooltip("KeyScriptabelObject")]
     [SerializeField] private List<Key> allAvailableKeys = new List<Key>();
@@ -27,9 +29,7 @@ public class KeyInventory : MonoBehaviour
 
     IEnumerator Start()
     {
-        
         bool isLoaded = SaveSystem.IsGameJustLoaded;
-
         yield return null;
 
         if (isLoaded)
@@ -42,52 +42,42 @@ public class KeyInventory : MonoBehaviour
     {
         List<int> loadedIds = SaveSystem.GetInventoryKeys();
 
+        List<int> loadedHistorical = SaveSystem.GetHistoricalKeys();
+        if (loadedHistorical != null) historicalKeyIds = new List<int>(loadedHistorical);
+
         if (loadedIds != null && loadedIds.Count > 0)
         {
-            keyIds.Clear(); 
+            keyIds.Clear();
 
             foreach (int id in loadedIds)
             {
-          
                 Key foundKey = allAvailableKeys.Find(k => k.id == id);
-
                 if (foundKey != null && !keyIds.Contains(foundKey.id))
                 {
                     keyIds.Add(foundKey.id);
-            
-                    if (UiManager.Instance != null)
-                    {
-                        UiManager.Instance.AddKeyToUI(foundKey);
-                    }
+                    if (UiManager.Instance != null) UiManager.Instance.AddKeyToUI(foundKey);
                 }
             }
-           
         }
     }
 
-    public List<int> GetSavedKeyIds()
-    {
-        return new List<int>(keyIds);
-    }
+    public List<int> GetSavedKeyIds() => new List<int>(keyIds);
+
+    public List<int> GetHistoricalKeyIds() => new List<int>(historicalKeyIds);
 
     public void AddKey(Key key)
     {
         if (!keyIds.Contains(key.id))
         {
             keyIds.Add(key.id);
-            
 
-            if (UiManager.Instance != null)
-            {
-                UiManager.Instance.AddKeyToUI(key);
-            }
+            if (!historicalKeyIds.Contains(key.id)) historicalKeyIds.Add(key.id);
+
+            if (UiManager.Instance != null) UiManager.Instance.AddKeyToUI(key);
         }
     }
 
-    public bool HasKey(Key key)
-    {
-        return keyIds.Contains(key.id);
-    }
+    public bool HasKey(Key key) => keyIds.Contains(key.id);
 
     public void RemoveKey(Key key)
     {
@@ -101,6 +91,7 @@ public class KeyInventory : MonoBehaviour
     public void ResetKeys()
     {
         keyIds.Clear();
+        historicalKeyIds.Clear();
         if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
     }
 }

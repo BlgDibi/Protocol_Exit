@@ -47,6 +47,18 @@ MonoBehaviour:
     m_Key: Action_KeyPad
     m_Metadata:
       m_Items: []
+  - m_Id: 21424632484122624
+    m_Key: Enddoor_Lock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21439732267929600
+    m_Key: Enddoor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21441382357454848
+    m_Key: Press F to try
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

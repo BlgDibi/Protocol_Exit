@@ -7,30 +7,34 @@ public class GameOverMenu : MonoBehaviour
     public GameObject gameoverui;
     public GameObject youDiedText;
     public GameObject buttonPanel;
-    public float delayBeforeButtons = 5f;
+
+    [Tooltip("Delay before buttons")]
+    public float delayBeforeButtons = 2f;
     public GameObject crosshair;
 
     private CanvasGroup youDiedCanvasGroup;
     private CanvasGroup buttonPanelCanvasGroup;
 
-
     private void Start()
     {
-        youDiedCanvasGroup = youDiedText.GetComponent<CanvasGroup>();
-        buttonPanelCanvasGroup = buttonPanel.GetComponent<CanvasGroup>();
-        youDiedCanvasGroup.alpha = 0;
-        buttonPanelCanvasGroup.alpha = 0;
-        gameoverui.SetActive(false);
+        if (youDiedText != null) youDiedText.SetActive(true);
+        if (buttonPanel != null) buttonPanel.SetActive(true);
+
+        if (youDiedText != null) youDiedCanvasGroup = youDiedText.GetComponent<CanvasGroup>();
+        if (buttonPanel != null) buttonPanelCanvasGroup = buttonPanel.GetComponent<CanvasGroup>();
+
+        if (youDiedCanvasGroup != null) youDiedCanvasGroup.alpha = 0;
+        if (buttonPanelCanvasGroup != null) buttonPanelCanvasGroup.alpha = 0;
+
+        if (buttonPanel != null) buttonPanel.SetActive(false);
+        if (gameoverui != null) gameoverui.SetActive(false);
     }
 
     public void gameover()
     {
-        gameoverui.SetActive(true);
+        if (gameoverui != null) gameoverui.SetActive(true);
 
-        if (crosshair != null)
-        {
-            crosshair.SetActive(false);
-        }
+        if (crosshair != null) crosshair.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -40,11 +44,25 @@ public class GameOverMenu : MonoBehaviour
 
     private IEnumerator GameOverSequence()
     {
-        yield return new WaitForSeconds(2f); 
-        yield return StartCoroutine(FadeInCanvasGroup(youDiedCanvasGroup, 1f));
-        yield return new WaitForSeconds(delayBeforeButtons);
-        yield return StartCoroutine(FadeOutCanvasGroup(youDiedCanvasGroup));
-        yield return StartCoroutine(FadeInCanvasGroup(buttonPanelCanvasGroup, 1f));
+        if (youDiedText != null) youDiedText.SetActive(true);
+        yield return new WaitForSecondsRealtime(1f);
+
+        if (youDiedCanvasGroup != null)
+            yield return StartCoroutine(FadeInCanvasGroup(youDiedCanvasGroup, 1f));
+
+        yield return new WaitForSecondsRealtime(delayBeforeButtons);
+
+        if (youDiedCanvasGroup != null)
+            yield return StartCoroutine(FadeOutCanvasGroup(youDiedCanvasGroup));
+
+        if (youDiedText != null) youDiedText.SetActive(false);
+
+        if (buttonPanel != null)
+        {
+            buttonPanel.SetActive(true);
+            if (buttonPanelCanvasGroup != null)
+                yield return StartCoroutine(FadeInCanvasGroup(buttonPanelCanvasGroup, 1f));
+        }
     }
 
     private IEnumerator FadeInCanvasGroup(CanvasGroup canvasGroup, float targetAlpha)
@@ -55,10 +73,9 @@ public class GameOverMenu : MonoBehaviour
         while (timeElapsed < 1f)
         {
             canvasGroup.alpha = Mathf.Lerp(startingAlpha, targetAlpha, timeElapsed);
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.unscaledDeltaTime;
             yield return null;
         }
-
         canvasGroup.alpha = targetAlpha;
     }
 
@@ -70,37 +87,34 @@ public class GameOverMenu : MonoBehaviour
         while (timeElapsed < 1f)
         {
             canvasGroup.alpha = Mathf.Lerp(startingAlpha, 0f, timeElapsed);
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.unscaledDeltaTime;
             yield return null;
         }
-
         canvasGroup.alpha = 0f;
     }
 
     public void restart()
     {
-        if (KeyInventory.Instance != null)
-            KeyInventory.Instance.ResetKeys();
+        Time.timeScale = 1f;
+
+        if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             HP hp = player.GetComponent<HP>();
-            if (hp != null)
-                hp.Hp = 100; 
+            if (hp != null) hp.Hp = 100;
             player.transform.position = Vector3.zero;
             player.transform.rotation = Quaternion.identity;
         }
 
-        if (crosshair != null)
-            crosshair.SetActive(true);
-
+        if (crosshair != null) crosshair.SetActive(true);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
     }
 
     public void MainMenu()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MENU");
     }
 
