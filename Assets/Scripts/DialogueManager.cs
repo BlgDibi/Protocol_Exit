@@ -150,13 +150,20 @@ public class DialogueManager : MonoBehaviour
             {
                 SpawnGreenKey();
             }
-            else if (tag.StartsWith("play_audio"))
+            else if (tag.StartsWith("voice:"))
             {
-                if (currentNPC != null) currentNPC.PlayVoiceLine(tag);
+                if (currentNPC != null)
+                {
+                    string voiceFile = tag.Replace("voice:", "").Trim();
+                    currentNPC.PlayVoiceLine(voiceFile);
+                }
+            }
+            else if (tag == "play_audio")
+            {
+                if (currentNPC != null) currentNPC.PlayVoiceLine("default_audio");
             }
         }
     }
-
     private IEnumerator CheckAndSpawnKeyOnLoad()
     {
         // Várunk a SaveSystem-re
@@ -276,6 +283,12 @@ public class DialogueManager : MonoBehaviour
         if (currentStory != null && currentInkAsset != null)
         {
             inkMemory[currentInkAsset.name] = currentStory.state.ToJson();
+        }
+
+        if (currentNPC != null)
+        {
+            DialogueTrigger trigger = currentNPC.GetComponent<DialogueTrigger>();
+            if (trigger != null) trigger.DialogueEnded();
         }
 
         isDialoguePlaying = false;

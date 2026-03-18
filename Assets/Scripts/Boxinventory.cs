@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
@@ -16,6 +16,7 @@ public class BoxInventory : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -41,11 +42,16 @@ public class BoxInventory : MonoBehaviour
 
     private System.Collections.IEnumerator RefreshAfterLoad()
     {
+       
+        bool isLoadEvent = SaveSystem.IsGameJustLoaded;
+
+     
         yield return new WaitForSeconds(0.2f);
 
-        if (SaveSystem.IsGameJustLoaded)
+        if (isLoadEvent)
         {
             LoadInventoryFromSave();
+            SaveSystem.IsGameJustLoaded = false;
         }
         else
         {
@@ -55,8 +61,17 @@ public class BoxInventory : MonoBehaviour
 
     private void LoadInventoryFromSave()
     {
+        
+        if (UiManager.Instance != null)
+        {
+            foreach (var regiDoboz in Boxesamount)
+            {
+                UiManager.Instance.RemoveBoxFromUI(regiDoboz);
+            }
+        }
+
         List<string> mentettNevek = SaveSystem.GetInventoryBoxes();
-        Boxesamount.Clear(); 
+        Boxesamount.Clear();
 
         if (mentettNevek != null && mentettNevek.Count > 0)
         {

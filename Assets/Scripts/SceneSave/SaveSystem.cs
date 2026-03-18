@@ -66,8 +66,12 @@ public class SaveSystem
         GameObject[] boxesInWorld = GameObject.FindGameObjectsWithTag("Boxes");
         foreach (GameObject box in boxesInWorld)
         {
-            string cleanName = box.name.Replace("(Clone)", "").Replace("_Placed", "").Trim();
-            _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position });
+            Boxpickup bp = box.GetComponent<Boxpickup>();
+            if (bp != null && bp.isPlaced)
+            {
+                string cleanName = box.name.Replace("(Clone)", "").Replace("_Placed", "").Trim();
+                _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position });
+            }
         }
 
         if (KeyInventory.Instance != null)
