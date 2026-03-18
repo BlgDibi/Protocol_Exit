@@ -102518,6 +102518,9 @@ PrefabInstance:
       addedObject: {fileID: 1553810445}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1553810448}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1553810440}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92d3489eca381394b877f238f4d62ff1, type: 3}
       insertIndex: -1
@@ -102554,8 +102557,8 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 0.33723295
-  MaxDistance: 500
+  MinDistance: 0
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -102590,7 +102593,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -102690,7 +102693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 263ca0f3b7d7deb4493258cc4b682bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
-  inkJSON: {fileID: 4900000, guid: f246714094c13f64f8be275daa5a10f3, type: 3}
+  inkJSON: {fileID: 4900000, guid: 2dcf930956f4be846bed7934c3db2993, type: 3}
   inkKnotName: npc_intro
   interactionPrompt:
     m_TableReference:
@@ -102740,6 +102743,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1553810448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553810439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 278f7691e06b4a542997d286e79802cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Talk
+  playerTrans: {fileID: 625688540}
+  speakerTrans: {fileID: 1553810438}
+  dialogueSource: {fileID: 1553810440}
+  defaultTalkClip: {fileID: 0}
 --- !u!1001 &1555443579
 PrefabInstance:
   m_ObjectHideFlags: 0

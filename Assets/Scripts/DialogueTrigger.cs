@@ -33,6 +33,36 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        // ÚJ: Betöltés utáni állapot helyreállítása
+        StartCoroutine(RestoreStateAfterLoad());
+    }
+
+    private IEnumerator RestoreStateAfterLoad()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        string rewardState = DialogueManager.Instance.GetVariableState(questVariableToWatch);
+
+        if (rewardState.ToLower() == "true")
+        {
+            hasSatDownOnce = true;
+
+            if (agent != null)
+            {
+                agent.enabled = false;
+            }
+
+            if (chairPosition != null)
+            {
+                transform.position = new Vector3(chairPosition.position.x, chairPosition.position.y - 0.11f, chairPosition.position.z);
+                transform.rotation = Quaternion.Euler(0, -20f, 0);
+            }
+
+            if (npcAnimator != null)
+            {
+                npcAnimator.SetBool(startAnimParameter, true);
+            }
+        }
     }
 
     private void Update()
@@ -71,7 +101,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
         if (hasKey)
         {
-           
+
             DialogueManager.Instance.EnterDialogueMode(inkJSON, "told_everything", GetComponent<Talk>());
         }
         else if (chairPosition != null && agent != null && !hasSatDownOnce)
@@ -113,7 +143,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         }
 
         agent.isStopped = true;
-        agent.updateRotation = false; 
+        agent.updateRotation = false;
         agent.velocity = Vector3.zero;
 
         float perfectYRotation = -20f;
@@ -155,3 +185,4 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             }
         }
     }
+}

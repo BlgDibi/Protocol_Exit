@@ -53,7 +53,11 @@ Wow... The scale is perfectly balanced! You actually did it. #voice:npc_solved_0
     -> npc_end
 
 === npc_done ===
-// Ez jön be, ha már megkaptad a kulcsot
+// Ezt a részt akkor hívja az Ink, ha a got_reward = true
+-> told_everything
+
+=== told_everything ===
+// Ezt a részt hívja a C# kódod közvetlenül, ha már beszéltetek
 I told you everything I know. The path is clear now. #voice:npc_done_01
 -> DONE
 

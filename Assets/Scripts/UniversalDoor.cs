@@ -43,6 +43,9 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     public LocalizedString textOpenDoor;
     public LocalizedString textCloseDoor;
 
+    [Header("Save System")]
+    [Tooltip("Door Unique Name(ID)")]
+    public string doorID;
 
     [SerializeField] private KeyCode interactionKey = KeyCode.F;
 
@@ -53,12 +56,27 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     private void Start()
     {
-        targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (messagePanel != null) messagePanel.SetActive(false);
 
-        if (messagePanel != null)
-            messagePanel.SetActive(false);
+        if (!string.IsNullOrEmpty(doorID))
+        {
+            if (SaveSystem.IsDoorUnlocked(doorID))
+            {
+                isLocked = false;
+                isDoorOpen = true;
+                doorPivot.localRotation = Quaternion.Euler(0f, openAngle, 0f);
+                targetRotation = doorPivot.localRotation;
+            }
+            else
+            {
+                targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
+            }
+        }
+        else
+        {
+            targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
+        }
     }
 
     private void Update()

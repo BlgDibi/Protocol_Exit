@@ -15,7 +15,6 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     [Header("Localization")]
     public LocalizedString interactionPrompt;
-    [SerializeField] private string fallbackText = "Box Pickup";
 
     public bool isPlaced = false;
 
