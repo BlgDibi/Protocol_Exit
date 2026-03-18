@@ -279,7 +279,7 @@ public class DialogueManager : MonoBehaviour
 
     private IEnumerator CheckAndSpawnKeyOnLoad()
     {
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.2f);
         string state = GetVariableState("got_reward");
         if (state.ToLower() == "true")
         {
@@ -294,6 +294,13 @@ public class DialogueManager : MonoBehaviour
             greenKey.SetActive(true);
             var rend = greenKey.GetComponentInChildren<Renderer>();
             if (rend != null) rend.enabled = true;
+
+            // Rögzítjük a SaveSystem listájába
+            SaveSystem.SaveNPCMet("green_key_spawned");
+
+            // Kényszerített mentés a fájlba, hogy ne tûnjön el, ha most kilépsz
+            SaveSystem.Save();
+            Debug.Log("<color=yellow>KULCS SPAWNOLVA ÉS MENTVE!</color>");
         }
     }
 }

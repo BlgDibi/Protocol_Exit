@@ -1,11 +1,14 @@
+VAR met_npc = false
 VAR trying_alone = false
 VAR got_reward = false
 EXTERNAL is_scale_solved()
 
 === npc_intro ===
+~ met_npc = true
+// Első körben ellenőrizzük, megkapta-e már a jutalmat (hogy üljön maradjon)
 { 
     - got_reward: 
-        -> npc_done
+        -> told_everything
     - is_scale_solved(): 
         -> npc_solved
     - trying_alone: 
@@ -45,19 +48,20 @@ The red crates are the heaviest of all. But red alone won't work. You need to mi
     -> npc_end
 
 === npc_solved ===
-// Ez a rész csak akkor jön be, ha az is_scale_solved() C# függvény TRUE-t ad vissza
+// Ha véletlenül idekerülne, de már megvan a jutalom, irányítsuk át
+{ 
+    - got_reward: 
+        -> told_everything 
+}
+
 ~ got_reward = true
 Wow... The scale is perfectly balanced! You actually did it. #voice:npc_solved_01
 + [So, what happens now?]
     The path is clear now. Oh, and take this as a thank you! #spawn_green_key #voice:npc_solved_02
     -> npc_end
 
-=== npc_done ===
-// Ezt a részt akkor hívja az Ink, ha a got_reward = true
--> told_everything
-
 === told_everything ===
-// Ezt a részt hívja a C# kódod közvetlenül, ha már beszéltetek
+// Ezt hívjuk meg, ha már minden kész, és az NPC csak ül a székben
 I told you everything I know. The path is clear now. #voice:npc_done_01
 -> DONE
 

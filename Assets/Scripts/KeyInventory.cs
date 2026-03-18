@@ -94,4 +94,8 @@ public class KeyInventory : MonoBehaviour
         historicalKeyIds.Clear();
         if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
     }
+
+
+
+
 }

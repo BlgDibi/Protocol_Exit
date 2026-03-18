@@ -13,11 +13,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     [Header("Lock")]
     public bool isLocked = false;
-
-    [Tooltip("Key")]
     public Key requiredKey;
-
-    [Tooltip("Conditions")]
     public string requiredCondition;
 
     [Header("Sounds")]
@@ -26,52 +22,43 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     [SerializeField] private AudioClip closeSound;
     [SerializeField] private AudioClip lockedSound;
 
-
     [Header("UI Message")]
-    [Tooltip("Doormessage Canvas")]
     public GameObject messagePanel;
-    [Tooltip("Text")]
     public TextMeshProUGUI messageText;
-    [Tooltip("Time to see the text")]
     public float messageDuration = 3f;
 
-    [Header("Localization Keys")]
-    [Tooltip("Text")]
+    [Header("Localization")]
     public LocalizedString lockedMessageKey;
-
-    [Header("Localization Text")]
     public LocalizedString textOpenDoor;
     public LocalizedString textCloseDoor;
 
     [Header("Save System")]
-    [Tooltip("Door Unique Name(ID)")]
     public string doorID;
-
     [SerializeField] private KeyCode interactionKey = KeyCode.F;
-
 
     private bool isDoorOpen = false;
     private bool isAnimating = false;
     private Quaternion targetRotation;
 
-    private void Start()
+    private IEnumerator Start()
     {
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
         if (messagePanel != null) messagePanel.SetActive(false);
 
-        if (!string.IsNullOrEmpty(doorID))
+        // Megnövelt várakozás a mentés betöltéséhez
+        yield return new WaitForSeconds(1.0f);
+
+        string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
+        bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
+
+        // Ha az öreg már odaadta a kulcsot VAGY a mentés szerint nyitva van
+        if (rewardState.ToLower() == "true" || wasUnlockedBySave)
         {
-            if (SaveSystem.IsDoorUnlocked(doorID))
-            {
-                isLocked = false;
-                isDoorOpen = true;
-                doorPivot.localRotation = Quaternion.Euler(0f, openAngle, 0f);
-                targetRotation = doorPivot.localRotation;
-            }
-            else
-            {
-                targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
-            }
+            isLocked = false;
+            isDoorOpen = true;
+            doorPivot.localRotation = Quaternion.Euler(0f, openAngle, 0f);
+            targetRotation = doorPivot.localRotation;
+            Debug.Log($"<color=green>AJTÓ HELYREÁLLÍTVA: {doorID}</color>");
         }
         else
         {
@@ -81,7 +68,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     private void Update()
     {
-        if (isAnimating)
+        if (isAnimating && doorPivot != null)
         {
             doorPivot.localRotation = Quaternion.Lerp(doorPivot.localRotation, targetRotation, Time.deltaTime * rotationSpeed);
             if (Quaternion.Angle(doorPivot.localRotation, targetRotation) < 0.1f)
@@ -91,116 +78,60 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
             }
         }
     }
-
     public void Interact()
     {
+        // 1. Ha már fel van oldva, csak nyitjuk-csukjuk
         if (!isLocked)
         {
             ToggleDoor();
             return;
         }
 
-    
-        if (!string.IsNullOrEmpty(requiredCondition))
-        {
-            if (ConditionManager.Instance.CheckCondition(requiredCondition))
-            {
-                UnlockAndOpen();
-                if (messagePanel != null) messagePanel.SetActive(false);
-            }
-            else
-            {
-                HandleLockedDoor();
-            }
-            return;
-        }
-
+        // 2. HA ZÁRVA VAN (isLocked = true), nézzük meg, van-e kulcs/feltétel
         if (requiredKey != null)
         {
             if (KeyInventory.Instance.HasKey(requiredKey))
             {
                 KeyInventory.Instance.RemoveKey(requiredKey);
                 UnlockAndOpen();
-                if (messagePanel != null) messagePanel.SetActive(false);
+                return;
             }
-            else
+            else { HandleLockedDoor(true); return; }
+        }
+
+        if (!string.IsNullOrEmpty(requiredCondition))
+        {
+            if (ConditionManager.Instance.CheckCondition(requiredCondition))
             {
-                HandleLockedDoor(true);
+                UnlockAndOpen();
+                return;
             }
-            return;
+            else { HandleLockedDoor(false); return; }
         }
 
-        HandleLockedDoor();
-    }
-
-    public string GetInteractText()
-    {
-        if (isDoorOpen)
-        {
-            return textCloseDoor.GetLocalizedString();
-        }
-        else
-        {
-            return textOpenDoor.GetLocalizedString();
-        }
-    }
-
-    public void KeypadSuccess()
-    {
-        if (isLocked)
-        {
-            isLocked = false;
-
-           
-            if (messagePanel != null) messagePanel.SetActive(false);
-
-    
-        }
-    }
-
-
-    private void HandleLockedDoor(bool isKeyMissing = false)
-    {
-        PlaySound(lockedSound);
-
-        if (isKeyMissing && requiredKey != null)
-        {
-            ShowTemporaryMessage($"Locked!");
-            return;
-        }
-
-        if (!lockedMessageKey.IsEmpty)
-        {
-            ShowTemporaryMessage(lockedMessageKey.GetLocalizedString());
-        }
-        else
-        {
-            if (!string.IsNullOrEmpty(requiredCondition)) Debug.Log($"Closed! The '{requiredCondition}' condition is missing.");
-            ShowTemporaryMessage("Locked. I need to find something first.");
-        }
-    }
-
-    private void ShowTemporaryMessage(string text)
-    {
-        if (messagePanel != null)
-        {
-            messageText.text = text;
-            messagePanel.SetActive(true);
-            StopAllCoroutines();
-            StartCoroutine(HideMessageAfterDelay());
-        }
-        if (messageText != null) messageText.gameObject.SetActive(true);
-    }
-
-    private IEnumerator HideMessageAfterDelay()
-    {
-        yield return new WaitForSeconds(messageDuration);
-        if (messagePanel != null) messagePanel.SetActive(false);
+       
+        HandleLockedDoor(false);
     }
 
     private void UnlockAndOpen()
     {
         isLocked = false;
+
+        if (!string.IsNullOrEmpty(doorID))
+        {
+            // 1. Betesszük a memóriába (a listába)
+            SaveSystem.SaveDoorUnlocked(doorID);
+
+            // 2. AZONNAL kiíratjuk a fájlba a lemezre!
+            SaveSystem.Save();
+
+            Debug.Log("<color=cyan>AJTÓ SIKERESEN RÖGZÍTVE A FÁJLBA: </color>" + doorID);
+        }
+        else
+        {
+            Debug.LogError("HIÁNYZIK A doorID! Adj nevet az ajtónak az Inspectorban!");
+        }
+
         ToggleDoor();
     }
 
@@ -210,15 +141,48 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         targetRotation = Quaternion.Euler(0f, isDoorOpen ? openAngle : closeAngle, 0f);
         isAnimating = true;
         PlaySound(isDoorOpen ? openSound : closeSound);
+
+        // BIZTONSÁGI MENTÉS: Ha kinyitottad, és nem volt zárolva, akkor is mentsük el az állapotát
+        if (isDoorOpen && !isLocked && !string.IsNullOrEmpty(doorID))
+        {
+            SaveSystem.SaveDoorUnlocked(doorID);
+            // Itt nem hívunk Save-et, hogy ne szaggasson, de a lista frissül
+        }
     }
+
+
+    public string GetInteractText() => isDoorOpen ? textCloseDoor.GetLocalizedString() : textOpenDoor.GetLocalizedString();
+
+   
 
     private void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
     }
 
-    public KeyCode GetInteractKey()
+    private void HandleLockedDoor(bool isKeyMissing)
     {
-        return interactionKey;
+        PlaySound(lockedSound);
+        string msg = isKeyMissing ? "Locked! I need a key." : (lockedMessageKey.IsEmpty ? "Locked." : lockedMessageKey.GetLocalizedString());
+        ShowTemporaryMessage(msg);
     }
+
+    private void ShowTemporaryMessage(string text)
+    {
+        if (messagePanel != null && messageText != null)
+        {
+            messageText.text = text;
+            messagePanel.SetActive(true);
+            StopAllCoroutines();
+            StartCoroutine(HideMessageAfterDelay());
+        }
+    }
+
+    private IEnumerator HideMessageAfterDelay()
+    {
+        yield return new WaitForSeconds(messageDuration);
+        if (messagePanel != null) messagePanel.SetActive(false);
+    }
+
+    public KeyCode GetInteractKey() => interactionKey;
 }

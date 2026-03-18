@@ -7,6 +7,9 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
+
+        SaveSystem.ResetAllData();
+
         if (KeyInventory.Instance != null)
             KeyInventory.Instance.ResetKeys();
 
