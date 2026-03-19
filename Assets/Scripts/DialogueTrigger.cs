@@ -14,7 +14,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     [Header("Settings")]
     [SerializeField] private KeyCode interactionKey = KeyCode.T;
-    public string npcID = "npc1";
+    public string interactableID = "npc1";
 
     [Header("Animation & Movement")]
     public Animator npcAnimator;
@@ -22,12 +22,12 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     public string questVariableToWatch = "got_reward";
 
     [Header("Navigation Settings")]
-    public Transform chairPosition;
+    public Transform interactionPoint;
     public Transform[] patrolPoints;
 
     private NavMeshAgent agent;
-    private bool isWalkingToChair = false;
-    private bool hasSatDownOnce = false;
+    private bool isMovingToPoint = false;
+    private bool hasReachedPoint = false;
     private int currentPatrolIndex = -1;
 
     private void Start()
@@ -40,31 +40,31 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     {
         yield return new WaitForSeconds(0.2f);
 
-        bool metInSaveList = SaveSystem.WasNPCMet(npcID);
+        bool metInSaveList = SaveSystem.WasNPCMet(interactableID);
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState(questVariableToWatch) : "false";
 
         if (metInSaveList || rewardState.ToLower() == "true")
         {
-            hasSatDownOnce = true;
+            hasReachedPoint = true;
             if (agent != null) agent.enabled = false;
 
-            if (chairPosition != null)
+            if (interactionPoint != null)
             {
-                transform.position = chairPosition.position;
-                transform.rotation = chairPosition.rotation;
+                transform.position = interactionPoint.position;
+                transform.rotation = interactionPoint.rotation;
             }
 
             if (npcAnimator != null)
             {
                 npcAnimator.SetBool(startAnimParameter, true);
             }
-            Debug.Log("<color=green>NPC ÜLVE MARAD: </color>" + npcID);
+            Debug.Log("NPC ÜLVE MARAD:" + interactableID);
         }
     }
 
     public void Interact()
     {
-        if (isWalkingToChair || DialogueManager.Instance == null || inkJSON == null) return;
+        if (isMovingToPoint || DialogueManager.Instance == null || inkJSON == null) return;
 
         string metState = DialogueManager.Instance.GetVariableState("met_npc");
         string rewardState = DialogueManager.Instance.GetVariableState(questVariableToWatch);
@@ -72,7 +72,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         bool hasMet = (metState != null && metState.ToLower() == "true");
         bool hasFinished = (rewardState != null && rewardState.ToLower() == "true");
 
-        if (hasSatDownOnce || hasMet || hasFinished)
+        if (hasReachedPoint || hasMet || hasFinished)
         {
             if (hasFinished)
                 DialogueManager.Instance.EnterDialogueMode(inkJSON, "told_everything", GetComponent<Talk>());
@@ -81,16 +81,20 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             return;
         }
 
-        if (chairPosition != null && agent != null)
+      
+        if (agent == null || interactionPoint == null)
         {
-            StartCoroutine(WalkToChairAndTalk());
+            StartDialogue(); 
+            return;
         }
+
+        StartCoroutine(WalkToChairAndTalk());
     }
 
     private void StartDialogue()
     {
-        SaveSystem.SaveNPCMet(npcID);
-        SaveSystem.Save();
+        SaveSystem.SaveNPCMet(interactableID);
+       
 
         if (npcAnimator != null)
             npcAnimator.SetBool(startAnimParameter, true);
@@ -100,13 +104,13 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     private IEnumerator WalkToChairAndTalk()
     {
-        isWalkingToChair = true;
-        hasSatDownOnce = true;
+        isMovingToPoint = true;
+        hasReachedPoint = true;
 
         while (agent == null || !agent.isOnNavMesh) yield return null;
 
         agent.isStopped = false;
-        agent.SetDestination(chairPosition.position);
+        agent.SetDestination(interactionPoint.position);
         yield return new WaitForSeconds(0.1f);
 
         while (agent.pathPending || agent.remainingDistance > 0.1f) yield return null;
@@ -115,7 +119,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         agent.updateRotation = false;
         agent.velocity = Vector3.zero;
 
-        Quaternion targetRotation = chairPosition.rotation;
+        Quaternion targetRotation = interactionPoint.rotation;
         Quaternion startRotation = transform.rotation;
         float turnProgress = 0f;
         while (turnProgress < 1f)
@@ -126,11 +130,11 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         }
 
         transform.rotation = targetRotation;
-        transform.position = chairPosition.position;
+        transform.position = interactionPoint.position;
 
         agent.enabled = false;
         StartDialogue();
-        isWalkingToChair = false;
+        isMovingToPoint = false;
     }
 
     public void DialogueEnded()
@@ -143,7 +147,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     private void Update()
     {
-        if (hasSatDownOnce || isWalkingToChair || agent == null || patrolPoints.Length == 0) return;
+        if (hasReachedPoint || isMovingToPoint || agent == null || patrolPoints.Length == 0) return;
         if (!agent.enabled || !agent.isOnNavMesh) return;
 
         if (!agent.hasPath || (!agent.pathPending && agent.remainingDistance < 0.5f))
@@ -154,5 +158,5 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     }
 
     public KeyCode GetInteractKey() => interactionKey;
-    public string GetInteractText() => isWalkingToChair ? "" : interactionPrompt.GetLocalizedString();
+    public string GetInteractText() => isMovingToPoint ? "" : interactionPrompt.GetLocalizedString();
 }

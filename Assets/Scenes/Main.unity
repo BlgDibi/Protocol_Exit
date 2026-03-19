@@ -55578,11 +55578,11 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   interactionKey: 102
-  npcID: npc1
+  interactableID: book2
   npcAnimator: {fileID: 0}
   startAnimParameter: 
   questVariableToWatch: 
-  chairPosition: {fileID: 0}
+  interactionPoint: {fileID: 0}
   patrolPoints: []
   references:
     version: 2
@@ -102967,11 +102967,11 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   interactionKey: 116
-  npcID: npc1
+  interactableID: npc1
   npcAnimator: {fileID: 1553810446}
   startAnimParameter: hasSatDown
   questVariableToWatch: got_reward
-  chairPosition: {fileID: 1790910684}
+  interactionPoint: {fileID: 1790910684}
   patrolPoints:
   - {fileID: 567885384}
   - {fileID: 762360246}

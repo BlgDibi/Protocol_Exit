@@ -191,7 +191,10 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
         foreach (Transform child in choicesContainer) Destroy(child.gameObject);
-        SetPlayerEnabled(true);
+        if (!PauseMenu.GameIsPaused)
+        {
+            SetPlayerEnabled(true);
+        }
 
         if (currentNPC != null)
         {
@@ -279,9 +282,9 @@ public class DialogueManager : MonoBehaviour
 
     private IEnumerator CheckAndSpawnKeyOnLoad()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.3f);
         string state = GetVariableState("got_reward");
-        if (state.ToLower() == "true")
+        if (state.ToLower() == "true" && SaveSystem.WasNPCMet("green_key_spawned"))
         {
             SpawnGreenKey();
         }
@@ -295,11 +298,9 @@ public class DialogueManager : MonoBehaviour
             var rend = greenKey.GetComponentInChildren<Renderer>();
             if (rend != null) rend.enabled = true;
 
-            // Rögzítjük a SaveSystem listájába
             SaveSystem.SaveNPCMet("green_key_spawned");
 
-            // Kényszerített mentés a fájlba, hogy ne tûnjön el, ha most kilépsz
-            SaveSystem.Save();
+           
             Debug.Log("<color=yellow>KULCS SPAWNOLVA ÉS MENTVE!</color>");
         }
     }

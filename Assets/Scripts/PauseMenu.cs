@@ -38,7 +38,6 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
- 
         pauseMenuParent.SetActive(false);
         savePanel.SetActive(false);
         loadPanel.SetActive(false);
@@ -48,8 +47,17 @@ public class PauseMenu : MonoBehaviour
         ToggleScripts(true);
         if (crosshair != null) crosshair.SetActive(true);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+      
+        if (DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     void Pause()

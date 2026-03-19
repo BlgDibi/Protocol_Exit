@@ -16,7 +16,6 @@ public class PersistentItem : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // Várunk, amíg a SaveSystem és a többi script biztosan beöltött (0.5 másodperc)
         yield return new WaitForSeconds(0.5f);
 
         // 1. Ha nálunk van, töröljük

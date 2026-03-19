@@ -46,7 +46,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (messagePanel != null) messagePanel.SetActive(false);
 
         // Megnövelt várakozás a mentés betöltéséhez
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.1f);
 
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);

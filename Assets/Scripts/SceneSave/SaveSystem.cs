@@ -132,21 +132,29 @@ public class SaveSystem
         string path = SaveFileName(slot);
         if (File.Exists(path))
         {
+            ResetAllData();
+
+            if (KeyInventory.Instance != null)
+                KeyInventory.Instance.ResetKeys();
+
             string json = File.ReadAllText(path);
             _savedata = JsonUtility.FromJson<SaveData>(json);
 
             InitializeData();
 
-            // Statikus listák visszaállítása a betöltött adatokból
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
 
-            if (_savedata.inkMemoryKeys != null)
+            if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
                 Dictionary<string, string> dict = new Dictionary<string, string>();
                 for (int i = 0; i < _savedata.inkMemoryKeys.Count; i++)
                     dict[_savedata.inkMemoryKeys[i]] = _savedata.inkMemoryValues[i];
                 DialogueManager.SetInkMemory(dict);
+            }
+            else
+            {
+                DialogueManager.SetInkMemory(new Dictionary<string, string>());
             }
 
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
