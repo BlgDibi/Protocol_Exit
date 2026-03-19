@@ -17,6 +17,9 @@ public class PauseMenu : MonoBehaviour
     public GameObject crosshair;
     public MonoBehaviour[] scriptsToDisable;
 
+    [Header("Background Image")]
+    public GameObject background;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -38,6 +41,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
+        if (background != null) background.SetActive(false);
         pauseMenuParent.SetActive(false);
         savePanel.SetActive(false);
         loadPanel.SetActive(false);
@@ -62,8 +66,9 @@ public class PauseMenu : MonoBehaviour
 
     void Pause()
     {
-        pauseMenuParent.SetActive(true); 
-        buttonsPanel.SetActive(true);  
+        pauseMenuParent.SetActive(true);
+        if (background != null) background.SetActive(true);
+        buttonsPanel.SetActive(true);
 
         savePanel.SetActive(false);
         loadPanel.SetActive(false);
