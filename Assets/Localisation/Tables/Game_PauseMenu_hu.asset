@@ -19,23 +19,27 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 6013112320
-    m_Localized: "Folytat\xE1s"
+    m_Localized: "FOLYTAT\xC1S"
     m_Metadata:
       m_Items: []
   - m_Id: 29744484352
-    m_Localized: "Men\xFC"
+    m_Localized: "MEN\xDC"
     m_Metadata:
       m_Items: []
   - m_Id: 48463663104
-    m_Localized: "Kil\xE9p\xE9s"
+    m_Localized: "KIL\xC9P\xC9S"
     m_Metadata:
       m_Items: []
   - m_Id: 13791438880428032
-    m_Localized: "Ment\xE9s"
+    m_Localized: "MENT\xC9S"
     m_Metadata:
       m_Items: []
   - m_Id: 13791479896526848
-    m_Localized: "Bet\xF6lt\xE9s"
+    m_Localized: "BET\xD6LT\xC9S"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30099799200550912
+    m_Localized: "\xDAJRA"
     m_Metadata:
       m_Items: []
   references:

@@ -27,6 +27,10 @@ MonoBehaviour:
     m_Key: Quit_key
     m_Metadata:
       m_Items: []
+  - m_Id: 30084741741465600
+    m_Key: Load_key
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

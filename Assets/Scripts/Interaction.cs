@@ -8,6 +8,12 @@ public class Interaction : MonoBehaviour
     [SerializeField] private float rayDistance = 5f;
     [SerializeField] private Image crosshair;
 
+    [Header("Crosshair Icons")]
+    [SerializeField] private Sprite defaultCrosshairSprite;  
+    [SerializeField] private Sprite interactCrosshairSprite;
+
+    [SerializeField] private bool changeColorAsWell = false;
+
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI interactionText;
     [SerializeField] private GameObject interactionPanel;
@@ -20,6 +26,9 @@ public class Interaction : MonoBehaviour
 
         if (interactionText != null) interactionText.gameObject.SetActive(false);
         if (interactionPanel != null) interactionPanel.SetActive(false);
+
+        if (crosshair != null && defaultCrosshairSprite != null)
+            crosshair.sprite = defaultCrosshairSprite;
     }
 
     void Update()
@@ -32,113 +41,74 @@ public class Interaction : MonoBehaviour
         Vector3 rayOrigin = _camera.transform.position;
         Vector3 rayDirection = _camera.transform.forward;
 
-            if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, rayDistance))
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, rayDistance))
+        {
+            InterfaceInteractable interactable = hit.collider.GetComponent<InterfaceInteractable>();
 
+            if (interactable != null)
             {
+                HighlightCrosshair(true);
 
-                InterfaceInteractable interactable = hit.collider.GetComponent<InterfaceInteractable>();
-
-
-
-                if (interactable != null)
-
+                if (interactionText != null)
                 {
+                    string textToShow = interactable.GetInteractText();
+                    KeyCode keyNeeded = interactable.GetInteractKey();
 
-                    HighlightCrosshair(true);
+                    interactionText.text = textToShow;
 
-
-
-                    if (interactionText != null)
-
+                    if (!string.IsNullOrEmpty(textToShow))
                     {
-
-                        string textToShow = interactable.GetInteractText();
-
-                        KeyCode keyNeeded = interactable.GetInteractKey();
-
-
-
-                        interactionText.text = textToShow;
-
-
-
-                        if (!string.IsNullOrEmpty(textToShow))
-
-                        {
-
-                            interactionText.gameObject.SetActive(true);
-
-                            if (interactionPanel != null) interactionPanel.SetActive(true);
-
-                        }
-
-                        else
-
-                        {
-
-                            if (interactionPanel != null) interactionPanel.SetActive(false);
-
-                        }
-
-
-
-                        if (Input.GetKeyDown(keyNeeded))
-
-                        {
-
-                            interactable.Interact();
-
-                        }
-
+                        interactionText.gameObject.SetActive(true);
+                        if (interactionPanel != null) interactionPanel.SetActive(true);
+                    }
+                    else
+                    {
+                        if (interactionPanel != null) interactionPanel.SetActive(false);
                     }
 
+                    if (Input.GetKeyDown(keyNeeded))
+                    {
+                        interactable.Interact();
+                    }
                 }
-
-                else
-
-                {
-
-                    ClearTarget();
-
-                }
-
             }
-
             else
-
             {
-
                 ClearTarget();
-
             }
-
         }
-
-        void ClearTarget()
-
+        else
         {
-
-            if (KeyPadTrigger.IsPlayerInZone) return;
-
-
-
-            HighlightCrosshair(false);
-
-
-
-            if (interactionText != null) interactionText.gameObject.SetActive(false);
-
-            if (interactionPanel != null) interactionPanel.SetActive(false);
-
+            ClearTarget();
         }
+    }
 
-        void HighlightCrosshair(bool on)
+    void ClearTarget()
+    {
+        if (KeyPadTrigger.IsPlayerInZone) return;
 
+        HighlightCrosshair(false);
+
+        if (interactionText != null) interactionText.gameObject.SetActive(false);
+        if (interactionPanel != null) interactionPanel.SetActive(false);
+    }
+
+    void HighlightCrosshair(bool on)
+    {
+        if (crosshair != null)
         {
+            if (on && interactCrosshairSprite != null)
+                crosshair.sprite = interactCrosshairSprite;
+            else if (!on && defaultCrosshairSprite != null)
+                crosshair.sprite = defaultCrosshairSprite;
 
-            if (crosshair != null) crosshair.color = on ? Color.red : Color.white;
-
+            if (changeColorAsWell)
+                crosshair.color = on ? Color.red : Color.white;
+            else
+                crosshair.color = Color.white; 
         }
+    }
+
     private void OnDrawGizmos()
     {
         if (_camera == null) _camera = GetComponent<Camera>();

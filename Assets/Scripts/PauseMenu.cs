@@ -15,6 +15,8 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Others")]
     public GameObject crosshair;
+
+    public GameObject[] canvasesToHide;
     public MonoBehaviour[] scriptsToDisable;
 
     [Header("Background Image")]
@@ -62,6 +64,10 @@ public class PauseMenu : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+        foreach (GameObject canvasObj in canvasesToHide)
+        {
+            if (canvasObj != null) canvasObj.SetActive(true);
+        }
     }
 
     void Pause()
@@ -80,6 +86,10 @@ public class PauseMenu : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        foreach (GameObject canvasObj in canvasesToHide)
+        {
+            if (canvasObj != null) canvasObj.SetActive(false);
+        }
     }
 
     public void OpenSaveMenu()

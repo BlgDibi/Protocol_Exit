@@ -30,6 +30,10 @@ MonoBehaviour:
     m_Localized: "KIL\xC9P\xC9S"
     m_Metadata:
       m_Items: []
+  - m_Id: 30084741741465600
+    m_Localized: "BET\xD6LT\xC9S"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

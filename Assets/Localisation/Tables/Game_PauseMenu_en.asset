@@ -19,23 +19,27 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 6013112320
-    m_Localized: Resume
+    m_Localized: RESUME
     m_Metadata:
       m_Items: []
   - m_Id: 29744484352
-    m_Localized: Menu
+    m_Localized: MENU
     m_Metadata:
       m_Items: []
   - m_Id: 48463663104
-    m_Localized: Exit
+    m_Localized: EXIT
     m_Metadata:
       m_Items: []
   - m_Id: 13791438880428032
-    m_Localized: Save
+    m_Localized: SAVE
     m_Metadata:
       m_Items: []
   - m_Id: 13791479896526848
-    m_Localized: Load
+    m_Localized: LOAD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30099799200550912
+    m_Localized: RESTART
     m_Metadata:
       m_Items: []
   references:

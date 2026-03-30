@@ -35,6 +35,10 @@ MonoBehaviour:
     m_Key: Load_key
     m_Metadata:
       m_Items: []
+  - m_Id: 30099799200550912
+    m_Key: Restart
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
