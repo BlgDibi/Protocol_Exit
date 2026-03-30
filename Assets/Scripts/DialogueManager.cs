@@ -60,7 +60,6 @@ public class DialogueManager : MonoBehaviour
     {
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
-        StartCoroutine(CheckAndSpawnKeyOnLoad());
     }
 
     private void Update()
@@ -280,28 +279,20 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private IEnumerator CheckAndSpawnKeyOnLoad()
-    {
-        yield return new WaitForSeconds(0.3f);
-        string state = GetVariableState("got_reward");
-        if (state.ToLower() == "true" && SaveSystem.WasNPCMet("green_key_spawned"))
-        {
-            SpawnGreenKey();
-        }
-    }
+
 
     public void SpawnGreenKey()
     {
         if (greenKey != null)
         {
-            greenKey.SetActive(true);
-            var rend = greenKey.GetComponentInChildren<Renderer>();
-            if (rend != null) rend.enabled = true;
+            PersistentItem pi = greenKey.GetComponent<PersistentItem>();
+            if (pi != null)
+            {
+                pi.SetVisibility(true);
+            }
 
             SaveSystem.SaveNPCMet("green_key_spawned");
-
-           
-            Debug.Log("<color=yellow>KULCS SPAWNOLVA ÉS MENTVE!</color>");
+            Debug.Log("<color=yellow>KULCS SPAWNOLVA ÉS MENTVE A RAM-BA!</color>");
         }
     }
 }
