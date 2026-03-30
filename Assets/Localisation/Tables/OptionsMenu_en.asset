@@ -19,23 +19,23 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 8328368128
-    m_Localized: Controls
+    m_Localized: "CONTROLS\t"
     m_Metadata:
       m_Items: []
   - m_Id: 99252490240
-    m_Localized: Time
+    m_Localized: TIME
     m_Metadata:
       m_Items: []
   - m_Id: 148858523648
-    m_Localized: Back
+    m_Localized: BACK
     m_Metadata:
       m_Items: []
   - m_Id: 23465590050816
-    m_Localized: Volume
+    m_Localized: VOLUME
     m_Metadata:
       m_Items: []
   - m_Id: 2513822206709760
-    m_Localized: Language Selector
+    m_Localized: LANGUAGE
     m_Metadata:
       m_Items: []
   references:

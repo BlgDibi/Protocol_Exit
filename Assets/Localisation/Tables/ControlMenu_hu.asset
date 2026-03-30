@@ -27,8 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21521605644288
-    m_Localized: "Mozg\xE1s:\tWASD\nFut\xE1s:\tShift\nUgr\xE1s:\tSpace\nN\xE9z\xE9s:        
-      Eg\xE9r\nBesz\xE9d:\tT\nInterakci\xF3:\tF\nFelv\xE9tel:      E\n"
+    m_Localized: "MOZG\xC1S:\nFUT\xC1S:\nUGR\xC1S:\nN\xC9Z\xC9S:\nBESZ\xC9D:\nINTERAKCI\xD3:\nFELV\xC9TEL:\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30064006125899776
+    m_Localized: "WASD\nSHIFT\nSPACE\nEG\xC9R\nT\nF\nE"
     m_Metadata:
       m_Items: []
   references:

@@ -27,6 +27,10 @@ MonoBehaviour:
     m_Key: Texts_key
     m_Metadata:
       m_Items: []
+  - m_Id: 30064006125899776
+    m_Key: Buttons_KEY
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
