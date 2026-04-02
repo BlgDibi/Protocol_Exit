@@ -8333,8 +8333,8 @@ MonoBehaviour:
   rayDistance: 5
   crosshair: {fileID: 190421854}
   defaultCrosshairSprite: {fileID: 21300000, guid: 59fde877251414e43a6e9791f23fec5f, type: 3}
-  interactCrosshairSprite: {fileID: 21300000, guid: 2920fc8bdbe32e240bc53871952852ba, type: 3}
-  changeColorAsWell: 1
+  interactCrosshairSprite: {fileID: 21300000, guid: 295ab9d75ca23f2418b0fc81316c8e2d, type: 3}
+  changeColorAsWell: 0
   interactionText: {fileID: 1914552358}
   interactionPanel: {fileID: 1948575156}
 --- !u!114 &523396141

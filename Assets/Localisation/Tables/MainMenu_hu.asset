@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 11100803072
-    m_Localized: "J\xC1T\xC9K"
+    m_Localized: "\xDAJ J\xC1T\xC9K"
     m_Metadata:
       m_Items: []
   - m_Id: 35893334016
@@ -31,7 +31,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30084741741465600
-    m_Localized: "BET\xD6LT\xC9S"
+    m_Localized: "MENT\xC9S BET\xD6LT\xC9SE"
     m_Metadata:
       m_Items: []
   references:
