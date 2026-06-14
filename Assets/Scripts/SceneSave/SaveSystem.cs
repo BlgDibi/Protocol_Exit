@@ -201,9 +201,20 @@ public class SaveSystem
         Debug.Log("<color=red>Minden statikus mentési adat törölve!</color>");
     }
 
+    //  ÚJ JÁTÉK - TÖRLÉS
+    public static void DeleteSaveFile(int slot = 1)
+    {
+        string path = SaveFileName(slot);
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            Debug.Log("<color=red>Mentésfájl törölve a géprõl!</color>");
+        }
+        ResetAllData();
+    }
+
     public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
 
-    // --- GETTEREK ---
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
     public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
     public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();

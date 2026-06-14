@@ -8,15 +8,15 @@ public class Talk : MonoBehaviour
     private Quaternion initialRotation;
 
     [Header("Audio")]
-    public AudioSource dialogueSource; // Ebbe húztad be az NPC-t az Inspectorban!
-    public AudioClip defaultTalkClip; // Ezt üresen is hagyhatod, a kód felülírja
+    public AudioSource dialogueSource; 
+    public AudioClip defaultTalkClip;
 
     private void Start()
     {
         if (speakerTrans != null)
             initialRotation = speakerTrans.rotation;
 
-        // Biztonsági játék: ha az Inspectorban elfelejtetted volna behúzni
+
         if (dialogueSource == null)
         {
             dialogueSource = GetComponent<AudioSource>();
