@@ -97,6 +97,12 @@ public class GameOverMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        if (gameoverui != null) gameoverui.SetActive(false);
+        if (buttonPanel != null) buttonPanel.SetActive(false);
+
+        if (youDiedCanvasGroup != null) youDiedCanvasGroup.alpha = 0f;
+        if (buttonPanelCanvasGroup != null) buttonPanelCanvasGroup.alpha = 0f;
+
         if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -115,6 +121,12 @@ public class GameOverMenu : MonoBehaviour
     public void MainMenu()
     {
         Time.timeScale = 1f;
+
+        if (gameoverui != null) gameoverui.SetActive(false);
+        if (buttonPanel != null) buttonPanel.SetActive(false);
+        if (youDiedCanvasGroup != null) youDiedCanvasGroup.alpha = 0f;
+        if (buttonPanelCanvasGroup != null) buttonPanelCanvasGroup.alpha = 0f;
+
         SceneManager.LoadScene("MENU");
     }
 
