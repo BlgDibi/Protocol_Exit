@@ -9587,7 +9587,7 @@ MonoBehaviour:
   Hp: 100
   isDead: 0
   diedFromSteam: 0
-  gameOverMenu: {fileID: 0}
+  gameOverMenu: {fileID: 824434506}
   gravestonePrefab: {fileID: 259336861}
   playerVisual: {fileID: 625688539}
   delayBeforeGameOver: 1
@@ -12995,7 +12995,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbf5470b84900324dbe0c8a408651d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
-  inkJSONAsset: {fileID: 4900000, guid: f246714094c13f64f8be275daa5a10f3, type: 3}
+  inkJSONAsset: {fileID: 4900000, guid: c17937471559fc848ad958a922baa055, type: 3}
   dialoguePanel: {fileID: 399713188}
   dialogueText: {fileID: 2003384797}
   choiceButtonPrefab: {fileID: 4261338697677952310, guid: 9e433890071df814bba62eeb596bc80d, type: 3}

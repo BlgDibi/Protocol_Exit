@@ -5,29 +5,32 @@ using UnityEngine;
 
 namespace EqualchanceGames.Tools.AutoTranslate.Editor
 {
-    public class AutoLocalization_MenuItems : MonoBehaviour
+	public class AutoLocalization_MenuItems : MonoBehaviour
     {
-        private const string NameDefine_AutoTranslate = "AutoLocalization";
+		private const string NameDefine_AutoTranslate = "AutoLocalization";
+		private const string NamePackage_AutoTranslate = "AutoLocalization";
 
         public const string MainDomainNameMenuItem = "Tools/Auto Localization";
 
-      
-        [MenuItem(MainDomainNameMenuItem + "/Add Define Auto Localization", false, 10000 + 120)]
-        public static void AddDefine_AutoLocalization()
-        {
-            List<BuildTargetGroup> namedBuildTargets = NamedBuildTargetExtension.GetNamedBuildTargets();
-            string names;
-            List<string> list;
+        [MenuItem(MainDomainNameMenuItem, false, 6000)]
+		public static void PriorityDomainName() {}
 
-            foreach (BuildTargetGroup namedBuildTarget in namedBuildTargets)
-            {
-                names = PlayerSettings.GetScriptingDefineSymbolsForGroup(namedBuildTarget);
-                list = names.Split(',').ToList();
-                if (!list.Contains(NameDefine_AutoTranslate))
-                    list.Add(NameDefine_AutoTranslate);
-                names = string.Join(",", list.ToArray());
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(namedBuildTarget, names);
-            }
-        }
-    }
+        [MenuItem("Tools/Auto Localization/Add Define Auto Localization", false, 10000 + 120)]
+        public static void AddDefine_AutoLocalization()
+		{
+			List<BuildTargetGroup> namedBuildTargets = NamedBuildTargetExtension.GetNamedBuildTargets();
+			string names;
+			List<string> list;
+
+			foreach (BuildTargetGroup namedBuildTarget in namedBuildTargets)
+			{
+				names = PlayerSettings.GetScriptingDefineSymbolsForGroup(namedBuildTarget);
+				list = names.Split(',').ToList();
+				if (!list.Contains(NameDefine_AutoTranslate))
+					list.Add(NameDefine_AutoTranslate);
+				names = string.Join(",", list.ToArray());
+				PlayerSettings.SetScriptingDefineSymbolsForGroup(namedBuildTarget, names);
+			}
+		}
+	}
 }

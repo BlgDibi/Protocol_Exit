@@ -25,6 +25,8 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private ThirdPersonController playerController;
     [SerializeField] private StarterAssetsInputs playerInputs;
 
+
+
     [Header("Typing Settings")]
     [SerializeField] private float typingSpeed = 0.04f;
     private Coroutine typingCoroutine;
@@ -254,7 +256,7 @@ public class DialogueManager : MonoBehaviour
 
         if (playerController != null)
         {
-            playerController.freezeAll = !enabled;
+          //  playerController.freezeAll = !enabled;
             playerController.enabled = enabled;
         }
 

@@ -1,5 +1,4 @@
 using System.Collections;
-using TMPro.Examples;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
@@ -99,12 +98,7 @@ public class Ending1 : MonoBehaviour
     private void LockCamera(bool isLocked)
     {
         isCameraLocked = isLocked;
-        if (mainCamera != null)
-        {
-            CameraController cameraController = mainCamera.GetComponent<CameraController>();
-            if (cameraController != null)
-                cameraController.enabled = !isLocked;
-        }
+       
     }
 
     private void EnableCursor(bool enable)

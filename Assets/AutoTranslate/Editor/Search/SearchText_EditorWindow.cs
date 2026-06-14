@@ -18,7 +18,7 @@ namespace EqualchanceGames.Tools.AutoTranslate.Windows
         private bool LSC = true;
         private bool LC = true;
 
-        [MenuItem("Auto Localization/Search Text in Scene or Prefab", false, MyProjectSettings_AutoTranslate.BaseIndex + 40)]
+        [MenuItem("Tools/Auto Localization/Search Text in Scene or Prefab", false, MyProjectSettings_AutoTranslate.BaseIndex + 40)]
         public static void ShowWindow()
         {
             Type gameview = typeof(UnityEditor.EditorWindow).Assembly.GetType("UnityEditor.GameView");

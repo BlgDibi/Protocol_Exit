@@ -9,7 +9,7 @@ namespace EqualchanceGames.Tools.AutoTranslate.Windows
     {
         private const string k_WindowTitle = "Search Texture";
 
-        [MenuItem("Auto Localization/Search Texture", false, MyProjectSettings_AutoTranslate.BaseIndex + 42)]
+        [MenuItem("Tools/Auto Localization/Search Texture", false, MyProjectSettings_AutoTranslate.BaseIndex + 42)]
         public static void ShowWindow()
         {
             Type gameview = typeof(UnityEditor.EditorWindow).Assembly.GetType("UnityEditor.GameView");

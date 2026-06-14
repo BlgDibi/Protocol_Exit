@@ -9,7 +9,7 @@ namespace EqualchanceGames.Tools.AutoTranslate.Windows
     {
         private const string k_WindowTitle = "Search Audio";
 
-        [MenuItem("Auto Localization/Search Audio", false, MyProjectSettings_AutoTranslate.BaseIndex + 43)]
+        [MenuItem("Tools/Auto Localization/Search Audio", false, MyProjectSettings_AutoTranslate.BaseIndex + 43)]
         public static void ShowWindow()
         {
             Type gameview = typeof(UnityEditor.EditorWindow).Assembly.GetType("UnityEditor.GameView");

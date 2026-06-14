@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 public class SaveSystem
 {
@@ -130,15 +132,33 @@ public class SaveSystem
     public static void Load(int slot = 1)
     {
         string path = SaveFileName(slot);
-        if (File.Exists(path))
+        if (!File.Exists(path))
         {
+            Debug.LogWarning("Nincs mentés ezen a sloton!");
+            return;
+        }
+
+        // VÉDÕHÁLÓ
+        try
+        {
+            string json = File.ReadAllText(path);
+
+            // Ha a fájl üres vagy olvashatatlan karakterek vannak benne, ez hibát dob
+            SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
+
+            // Csekkoljuk, hogy nem töltött-e be egy teljesen üres, hibás adathalmazt
+            if (string.IsNullOrEmpty(json))
+            {
+                throw new Exception("A mentésfájl teljesen üres!");
+            }
+
+            // --- NORMÁL BETÖLTÉS (Ha minden rendben van) ---
             ResetAllData();
 
             if (KeyInventory.Instance != null)
                 KeyInventory.Instance.ResetKeys();
 
-            string json = File.ReadAllText(path);
-            _savedata = JsonUtility.FromJson<SaveData>(json);
+            _savedata = loadedData; // Csak akkor írjuk felül a memóriát, ha az adat jó!
 
             InitializeData();
 
@@ -160,6 +180,24 @@ public class SaveSystem
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
             IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
+        }
+        catch (Exception error)
+        {
+            // --- FALLBACK (Kritikus hiba elhárítása) ---
+            Debug.LogError($"<color=red>Kritikus adatsérülés a {slot}. mentésben!</color>\nOka: {error.Message}");
+            Debug.LogWarning("Biztonsági hiba elhárítás aktiválva: Tiszta alapállapot betöltése a Crash elkerülésére!");
+
+            // Töröljük a sérült fájlt, hogy ne okozzon több gondot
+            File.Delete(path);
+
+            // Lenullázunk minden adatot, hogy alap legyen a játék
+            ResetAllData();
+            if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
+            if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
+
+            // Betöltjük a legelsõ pályát, mint egy új játéknál (feltételezem ez a build index 1)
+            IsGameJustLoaded = false;
+            SceneManager.LoadScene(1);
         }
     }
 
