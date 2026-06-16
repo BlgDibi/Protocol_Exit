@@ -33,16 +33,31 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        StartCoroutine(RestoreStateAfterLoad());
+
+        // Biztosítjuk, hogy az NPC pontosan a NavMesh-en álljon induláskor
+        if (agent != null && !agent.isOnNavMesh)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+                agent.Warp(hit.position);
+            }
+        }
+
+        // Indításkor mindig leellenõrizzük az állapotot!
+        StartCoroutine(InitializeNPCState());
     }
 
-    private IEnumerator RestoreStateAfterLoad()
+    private IEnumerator InitializeNPCState()
     {
+        // Várunk egy picit, hogy az Ink és a NavMesh felébredjen
         yield return new WaitForSeconds(0.2f);
 
         bool metInSaveList = SaveSystem.WasNPCMet(interactableID);
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState(questVariableToWatch) : "false";
 
+        // HA MÁR BESZÉLTETEK (vagy megkaptad a jutalmat) -> Üljön le!
         if (metInSaveList || rewardState.ToLower() == "true")
         {
             hasReachedPoint = true;
@@ -59,6 +74,13 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
                 npcAnimator.SetBool(startAnimParameter, true);
             }
             Debug.Log("NPC ÜLVE MARAD:" + interactableID);
+        }
+        else
+        {
+            // HA MÉG SOHA NEM BESZÉLTETEK -> Sétáljon!
+            hasReachedPoint = false;
+            if (agent != null) agent.enabled = true;
+            Debug.Log("Új játék indult, az NPC elkezd sétálni: " + interactableID);
         }
     }
 
@@ -81,10 +103,9 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             return;
         }
 
-      
         if (agent == null || interactionPoint == null)
         {
-            StartDialogue(); 
+            StartDialogue();
             return;
         }
 
@@ -94,7 +115,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     private void StartDialogue()
     {
         SaveSystem.SaveNPCMet(interactableID);
-       
 
         if (npcAnimator != null)
             npcAnimator.SetBool(startAnimParameter, true);

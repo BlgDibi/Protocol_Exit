@@ -1,12 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Localization;
-using StarterAssets;
 
 public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 {
-    public static bool IsPlayerInZone = false;
-
     public static bool HasFlashlight = false;
 
     [Header("Flashlight Settings")]
@@ -18,76 +15,37 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 
     [Header("Localization")]
     public LocalizedString interactionPrompt;
-
     [SerializeField] private KeyCode interactkey = KeyCode.E;
 
     void Start()
     {
-        if (HasFlashlight)
+        if (HasFlashlight && flashlightInHand != null)
         {
-            ApplyFlashlightState();
+            flashlightInHand.SetActive(true);
+            if (flashlightOnTable != null) flashlightOnTable.SetActive(false);
         }
     }
 
-    public string GetInteractText()
-    {
-        return interactionPrompt.GetLocalizedString();
-    }
-
-    public KeyCode GetInteractKey()
-    {
-        return interactkey;
-    }
+    public string GetInteractText() => interactionPrompt.GetLocalizedString();
+    public KeyCode GetInteractKey() => interactkey;
 
     public void Interact()
     {
-        HighlightCrosshair(false);
-        HasFlashlight = true; 
+        HasFlashlight = true;
         ApplyFlashlightState();
     }
 
     private void ApplyFlashlightState()
     {
-        if (flashlightInHand != null)
-        {
-            flashlightInHand.SetActive(true);
+        if (flashlightInHand != null) flashlightInHand.SetActive(true);
+        if (flashlightOnTable != null) flashlightOnTable.SetActive(false);
+        else gameObject.SetActive(false);
 
-            ThirdPersonController controller = flashlightInHand.GetComponentInParent<ThirdPersonController>();
-            if (controller != null)
-            {
-                controller.isFlashlightMode = true;
-                controller.flashlightObject = flashlightInHand;
-                Debug.Log("Flashlight mode activated");
-            }
-        }
-
-        if (flashlightOnTable != null)
-        {
-            flashlightOnTable.SetActive(false);
-        }
-        else
-        {
-            gameObject.SetActive(false);
-        }
+        HighlightCrosshair(false);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            IsPlayerInZone = true;
-            HighlightCrosshair(true);
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            IsPlayerInZone = false;
-            HighlightCrosshair(false);
-        }
-    }
+    void OnTriggerEnter(Collider other) { if (other.CompareTag("Player")) HighlightCrosshair(true); }
+    void OnTriggerExit(Collider other) { if (other.CompareTag("Player")) HighlightCrosshair(false); }
 
     void HighlightCrosshair(bool on)
     {

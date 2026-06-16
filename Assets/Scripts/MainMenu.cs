@@ -1,6 +1,7 @@
+using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.IO;
 
 public class MainMenu : MonoBehaviour
 {
@@ -9,65 +10,108 @@ public class MainMenu : MonoBehaviour
     public GameObject loadMenuPanel;
     public GameObject confirmationPanel;
     public GameObject mainMenuPanel;
+    public GameObject customizerPanel;
 
-    [Header("Main Charachter")]
+
+    [Header("Character")]
     public GameObject mainCharacter;
+    public GameObject dummyCharacter;
+
+    [Header("UI Text")]
+    public TextMeshProUGUI warningText;
+
     private void Start()
     {
         if (confirmationPanel != null) confirmationPanel.SetActive(false);
+        if (customizerPanel != null) customizerPanel.SetActive(false);
+        if (dummyCharacter != null) dummyCharacter.SetActive(false);
     }
+
+    private bool isOverwriting = false;
 
     public void StartNewGame()
     {
-        // Megnézzük, hogy a 3 slot közül LÉTEZIK-E BÁRMELYIK
-        bool hasAnySave = File.Exists(SaveSystem.SaveFileName(1)) ||
-                          File.Exists(SaveSystem.SaveFileName(2)) ||
-                          File.Exists(SaveSystem.SaveFileName(3));
+        Debug.Log("StartNewGame elindult! Fõmenü kikapcsolása...");
 
-        if (hasAnySave)
+        if (mainMenuPanel != null)
         {
-            // Ha bármelyik sloton van mentés, jöhet a figyelmeztetés
-            if (confirmationPanel != null) confirmationPanel.SetActive(true);
-
-            if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
-
-            if (mainCharacter != null) mainCharacter.SetActive(false);
+            mainMenuPanel.SetActive(false);
+            Debug.Log("Fõmenü panel kikapcsolva!");
         }
         else
         {
-            // Ha teljesen üres mind a 3 slot, indul a játék
-            ExecuteFreshStart();
+            Debug.LogError("HIBA: A Main Menu Panel nincs behúzva az Inspectorban!");
         }
+
+        if (mainCharacter != null) mainCharacter.SetActive(false);
+
+        int emptySlot = SaveSystem.GetFirstEmptySlot(3);
+        if (emptySlot != -1)
+        {
+            isOverwriting = false;
+            SaveSystem.SlotToSaveAfterLoad = emptySlot;
+
+            if (warningText != null)
+                warningText.text = "There is no save here (Slot " + emptySlot + "). Do you want to start a new game here?";
+
+            if (confirmationPanel != null) confirmationPanel.SetActive(true);
+        }
+        else
+        {
+            string oldest = SaveSystem.GetOldestSaveFileName();
+            if (oldest != null)
+            {
+                isOverwriting = true;
+                if (warningText != null)
+                    warningText.text = "All slots are full! The oldest save (" + oldest + ") will be deleted. Continue?";
+
+                if (confirmationPanel != null) confirmationPanel.SetActive(true);
+            }
+            else
+            {
+                OpenCustomizer();
+            }
+        }
+
     }
 
     public void ConfirmNewGame()
     {
         if (confirmationPanel != null) confirmationPanel.SetActive(false);
-
-        // Végigmegyünk mind a 3 sloton, és letöröljük, amelyik létezik
-        for (int i = 1; i <= 3; i++)
+        if (isOverwriting)
         {
-            string path = SaveSystem.SaveFileName(i);
-            if (File.Exists(path))
+            string oldestFile = SaveSystem.GetOldestSaveFileName();
+            if (oldestFile != null)
             {
-                File.Delete(path);
-                Debug.Log($"<color=red>Régi mentésfájl (Slot {i}) törölve!</color>");
+                string slotString = oldestFile.Replace("save_", "").Replace(".json", "");
+                SaveSystem.SlotToSaveAfterLoad = int.Parse(slotString);
+                SaveSystem.DeleteOldestSaveFile();
             }
         }
 
-        ExecuteFreshStart();
+        OpenCustomizer();
     }
+    public void OpenCustomizer()
+    {
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (confirmationPanel != null) confirmationPanel.SetActive(false);
 
+        if (mainCharacter != null) mainCharacter.SetActive(false);
+
+        if (dummyCharacter != null) dummyCharacter.SetActive(true);
+
+        if (customizerPanel != null) customizerPanel.SetActive(true);
+    }
     public void CancelNewGame()
     {
         if (confirmationPanel != null) confirmationPanel.SetActive(false);
-
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-
         if (mainCharacter != null) mainCharacter.SetActive(true);
+
+        if (dummyCharacter != null) dummyCharacter.SetActive(false);
     }
 
-    private void ExecuteFreshStart()
+    public void ExecuteFreshStart()
     {
         SaveSystem.ResetAllData();
 

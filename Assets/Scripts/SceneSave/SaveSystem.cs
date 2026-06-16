@@ -1,17 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+
 
 
 public class SaveSystem
 {
+    public static int SelectedSkinIndex = 0;
+
+    public static int SlotToSaveAfterLoad = -1;
+
     private static SaveData _savedata = new SaveData();
     public static bool IsGameJustLoaded = false;
     public static int CurrentSceneIndex;
 
-    // Statikus listák a jelenetváltások közötti adatmegõrzéshez
     private static List<string> _tempUnlockedDoors = new List<string>();
     private static List<string> _tempMetNPCs = new List<string>();
 
@@ -56,6 +62,8 @@ public class SaveSystem
         public bool hasFlashlight;
         public List<string> unlockedDoors;
         public List<string> metNPCs;
+        public int savedSkinIndex;
+
     }
 
     public static string SaveFileName(int slot = 1) => Application.persistentDataPath + "/save_" + slot + ".json";
@@ -63,27 +71,20 @@ public class SaveSystem
     public static void Save(int slot = 1)
     {
         HandleSaveData();
-
-        // Statikus listák szinkronizálása a mentés elõtt
         _savedata.unlockedDoors = new List<string>(_tempUnlockedDoors);
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
-
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
-        Debug.Log("<color=green>MENTÉS SIKERES!</color> Ajtók: " + _savedata.unlockedDoors.Count + " | NPC-k: " + _savedata.metNPCs.Count);
+        Debug.Log("<color=green>MENTÉS SIKERES!</color>");
     }
 
     private static void HandleSaveData()
     {
         _savedata.sceneIndex = SceneManager.GetActiveScene().buildIndex;
         CurrentSceneIndex = _savedata.sceneIndex;
-
         PlayerSave playerScript = GameObject.FindFirstObjectByType<PlayerSave>();
         if (playerScript != null) playerScript.Save(ref _savedata.playerdata);
-
         if (BoxInventory.Instance != null) _savedata.InventoryBoxnames = BoxInventory.Instance.GetSavedBoxNames();
-
-        // Dobozok mentése a világban
         _savedata.PlacedBoxes = new List<PlacedBoxData>();
         GameObject[] boxesInWorld = GameObject.FindGameObjectsWithTag("Boxes");
         foreach (GameObject box in boxesInWorld)
@@ -95,17 +96,13 @@ public class SaveSystem
                 _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position });
             }
         }
-
         if (KeyInventory.Instance != null)
         {
             _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
             _savedata.historicalKeyIds = KeyInventory.Instance.GetHistoricalKeyIds();
         }
-
         Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
         if (stopwatch != null) _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
-
-        // Titkok mentése
         _savedata.activatedSecrets = new List<string>();
         SecretRevealer[] secrets = GameObject.FindObjectsByType<SecretRevealer>(FindObjectsSortMode.None);
         foreach (var secret in secrets)
@@ -113,8 +110,6 @@ public class SaveSystem
             if (secret.isMoved && !string.IsNullOrEmpty(secret.secretID))
                 _savedata.activatedSecrets.Add(secret.secretID);
         }
-
-        // Ink Memória mentése
         _savedata.inkMemoryKeys = new List<string>();
         _savedata.inkMemoryValues = new List<string>();
         var mem = DialogueManager.GetInkMemory();
@@ -127,44 +122,26 @@ public class SaveSystem
             }
         }
         _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
+
+        _savedata.savedSkinIndex = SelectedSkinIndex;
+
     }
 
     public static void Load(int slot = 1)
     {
         string path = SaveFileName(slot);
-        if (!File.Exists(path))
-        {
-            Debug.LogWarning("Nincs mentés ezen a sloton!");
-            return;
-        }
-
-        // VÉDÕHÁLÓ
+        if (!File.Exists(path)) return;
         try
         {
             string json = File.ReadAllText(path);
-
-            // Ha a fájl üres vagy olvashatatlan karakterek vannak benne, ez hibát dob
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
-
-            // Csekkoljuk, hogy nem töltött-e be egy teljesen üres, hibás adathalmazt
-            if (string.IsNullOrEmpty(json))
-            {
-                throw new Exception("A mentésfájl teljesen üres!");
-            }
-
-            // --- NORMÁL BETÖLTÉS (Ha minden rendben van) ---
+            if (string.IsNullOrEmpty(json)) throw new Exception("Üres mentés!");
             ResetAllData();
-
-            if (KeyInventory.Instance != null)
-                KeyInventory.Instance.ResetKeys();
-
-            _savedata = loadedData; // Csak akkor írjuk felül a memóriát, ha az adat jó!
-
+            if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
+            _savedata = loadedData;
             InitializeData();
-
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
-
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
                 Dictionary<string, string> dict = new Dictionary<string, string>();
@@ -172,60 +149,49 @@ public class SaveSystem
                     dict[_savedata.inkMemoryKeys[i]] = _savedata.inkMemoryValues[i];
                 DialogueManager.SetInkMemory(dict);
             }
-            else
-            {
-                DialogueManager.SetInkMemory(new Dictionary<string, string>());
-            }
-
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
+
+            SelectedSkinIndex = _savedata.savedSkinIndex;
+
             IsGameJustLoaded = true;
             SceneManager.LoadScene(_savedata.sceneIndex);
         }
         catch (Exception error)
         {
-            // --- FALLBACK (Kritikus hiba elhárítása) ---
-            Debug.LogError($"<color=red>Kritikus adatsérülés a {slot}. mentésben!</color>\nOka: {error.Message}");
-            Debug.LogWarning("Biztonsági hiba elhárítás aktiválva: Tiszta alapállapot betöltése a Crash elkerülésére!");
-
-            // Töröljük a sérült fájlt, hogy ne okozzon több gondot
             File.Delete(path);
-
-            // Lenullázunk minden adatot, hogy alap legyen a játék
             ResetAllData();
-            if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
-            if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
-
-            // Betöltjük a legelsõ pályát, mint egy új játéknál (feltételezem ez a build index 1)
-            IsGameJustLoaded = false;
             SceneManager.LoadScene(1);
         }
     }
 
-    // --- NPC KEZELÉS ---
-    public static void SaveNPCMet(string npcID)
+    public static int GetFirstEmptySlot(int maxSlots = 3)
     {
-        if (string.IsNullOrEmpty(npcID)) return;
-        if (!_tempMetNPCs.Contains(npcID))
+        for (int i = 1; i <= maxSlots; i++)
         {
-            _tempMetNPCs.Add(npcID);
-            Debug.Log("<color=magenta>NPC rögzítve a listába: </color>" + npcID);
+            if (!File.Exists(SaveFileName(i)))
+            {
+                return i;
+            }
         }
+        return -1;
+    }
+    public static string GetOldestSaveFileName()
+    {
+        string folder = Application.persistentDataPath;
+        var files = Directory.GetFiles(folder, "save_*.json");
+        return files.Length > 0 ? Path.GetFileName(files.OrderBy(f => File.GetLastWriteTime(f)).First()) : null;
     }
 
-    public static bool WasNPCMet(string npcID)
+    public static void DeleteOldestSaveFile()
     {
-        if (string.IsNullOrEmpty(npcID)) return false;
-        return _tempMetNPCs.Contains(npcID);
-    }
-
-    // --- AJTÓK KEZELÉSE ---
-    public static void SaveDoorUnlocked(string doorID)
-    {
-        if (string.IsNullOrEmpty(doorID)) return;
-        if (!_tempUnlockedDoors.Contains(doorID))
+        string folder = Application.persistentDataPath;
+        var files = Directory.GetFiles(folder, "save_*.json");
+        if (files.Length > 0)
         {
-            _tempUnlockedDoors.Add(doorID);
-            Debug.Log("<color=blue>Ajtó felvéve a listába: </color>" + doorID);
+            string oldestFile = files.OrderBy(f => File.GetLastWriteTime(f)).First();
+            File.Delete(oldestFile);
+            ResetAllData();
+            Debug.Log("Legöregebb mentés törölve: " + oldestFile);
         }
     }
 
@@ -236,23 +202,13 @@ public class SaveSystem
         _tempMetNPCs.Clear();
         InitializeData();
         IsGameJustLoaded = false;
-        Debug.Log("<color=red>Minden statikus mentési adat törölve!</color>");
+
     }
 
-    //  ÚJ JÁTÉK - TÖRLÉS
-    public static void DeleteSaveFile(int slot = 1)
-    {
-        string path = SaveFileName(slot);
-        if (File.Exists(path))
-        {
-            File.Delete(path);
-            Debug.Log("<color=red>Mentésfájl törölve a géprõl!</color>");
-        }
-        ResetAllData();
-    }
-
+    public static void SaveNPCMet(string npcID) { if (string.IsNullOrEmpty(npcID)) return; if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID); }
+    public static bool WasNPCMet(string npcID) => _tempMetNPCs.Contains(npcID);
+    public static void SaveDoorUnlocked(string doorID) { if (string.IsNullOrEmpty(doorID)) return; if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID); }
     public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
-
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
     public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
     public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();

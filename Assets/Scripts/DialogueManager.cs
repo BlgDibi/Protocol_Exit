@@ -1,5 +1,4 @@
 using Ink.Runtime;
-using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -22,10 +21,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform choicesContainer;
 
     [Header("Player References")]
-    [SerializeField] private ThirdPersonController playerController;
-    [SerializeField] private StarterAssetsInputs playerInputs;
-
-
+    [SerializeField] private OwnMovement playerController; // Csak a Te scripted kell ide!
 
     [Header("Typing Settings")]
     [SerializeField] private float typingSpeed = 0.04f;
@@ -61,14 +57,13 @@ public class DialogueManager : MonoBehaviour
     private void Start()
     {
         isDialoguePlaying = false;
-        dialoguePanel.SetActive(false);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
     }
 
     private void Update()
     {
         if (!isDialoguePlaying) return;
 
-        // Csak akkor engedjük a továbblépést, ha nincsenek válaszlehetõségek
         if (currentStory.currentChoices.Count == 0)
         {
             if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.F))
@@ -86,7 +81,6 @@ public class DialogueManager : MonoBehaviour
         currentInkAsset = specificInkFile;
         currentStory = new Story(specificInkFile.text);
 
-        // Külsõ függvény bekötése a mérleghez
         currentStory.BindExternalFunction("is_scale_solved", () =>
         {
             WeightPlate Scale = FindFirstObjectByType<WeightPlate>();
@@ -94,13 +88,11 @@ public class DialogueManager : MonoBehaviour
             return false;
         });
 
-        // Memória betöltése (hogy emlékezzen, beszéltünk-e már)
         if (inkMemory.ContainsKey(specificInkFile.name))
         {
             currentStory.state.LoadJson(inkMemory[specificInkFile.name]);
         }
 
-        // Knot keresése (pl. told_everything)
         if (!string.IsNullOrEmpty(knotName))
         {
             try
@@ -115,7 +107,7 @@ public class DialogueManager : MonoBehaviour
 
         isDialoguePlaying = true;
         dialoguePanel.SetActive(true);
-        SetPlayerEnabled(false);
+        SetPlayerEnabled(false); // Játékos lefagyasztása
         ContinueStory();
     }
 
@@ -126,8 +118,6 @@ public class DialogueManager : MonoBehaviour
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
             string nextLine = currentStory.Continue();
-
-            // Tagek feldolgozása (itt történik a hang lejátszása is)
             HandleTags(currentStory.currentTags);
 
             if (string.IsNullOrWhiteSpace(nextLine))
@@ -192,10 +182,8 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
         foreach (Transform child in choicesContainer) Destroy(child.gameObject);
-        if (!PauseMenu.GameIsPaused)
-        {
-            SetPlayerEnabled(true);
-        }
+
+        SetPlayerEnabled(true); // Játékos feloldása
 
         if (currentNPC != null)
         {
@@ -203,7 +191,6 @@ public class DialogueManager : MonoBehaviour
             currentNPC = null;
         }
     }
-
 
     public string GetVariableState(string variableName)
     {
@@ -244,22 +231,13 @@ public class DialogueManager : MonoBehaviour
 
     private void SetPlayerEnabled(bool enabled)
     {
-        if (playerInputs != null)
-        {
-            playerInputs.enabled = enabled;
-            if (!enabled)
-            {
-                playerInputs.move = Vector2.zero;
-                playerInputs.look = Vector2.zero;
-            }
-        }
-
+        // 1. Csak az OwnMovement scriptet kapcsoljuk ki/be
         if (playerController != null)
         {
-          //  playerController.freezeAll = !enabled;
             playerController.enabled = enabled;
         }
 
+        // 2. Kurzort kiszabadítjuk a párbeszéd alatt, majd visszazárjuk
         Cursor.visible = !enabled;
         Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -280,8 +258,6 @@ public class DialogueManager : MonoBehaviour
             DisplayChoices();
         }
     }
-
-
 
     public void SpawnGreenKey()
     {

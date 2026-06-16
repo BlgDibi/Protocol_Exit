@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class KeyInventory : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class KeyInventory : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -27,17 +29,29 @@ public class KeyInventory : MonoBehaviour
         }
     }
 
-    IEnumerator Start()
+    private void OnDestroy()
     {
-        bool isLoaded = SaveSystem.IsGameJustLoaded;
+        if (Instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StartCoroutine(CheckLoadStatus());
+    }
+    IEnumerator CheckLoadStatus()
+    {
         yield return null;
+
+        bool isLoaded = SaveSystem.IsGameJustLoaded;
 
         if (isLoaded)
         {
             LoadKeysFromSave();
         }
     }
-
     private void LoadKeysFromSave()
     {
         List<int> loadedIds = SaveSystem.GetInventoryKeys();
