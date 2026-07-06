@@ -10,8 +10,8 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Child Panels")]
     public GameObject buttonsPanel;
-    public GameObject savePanel;   
-    public GameObject loadPanel; 
+    public GameObject savePanel;
+    public GameObject loadPanel;
 
     [Header("Others")]
     public GameObject crosshair;
@@ -53,7 +53,6 @@ public class PauseMenu : MonoBehaviour
         ToggleScripts(true);
         if (crosshair != null) crosshair.SetActive(true);
 
-      
         if (DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying)
         {
             Cursor.lockState = CursorLockMode.None;
@@ -94,8 +93,8 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenSaveMenu()
     {
-        buttonsPanel.SetActive(false); 
-        savePanel.SetActive(true);   
+        buttonsPanel.SetActive(false);
+        savePanel.SetActive(true);
     }
 
     public void OpenLoadMenu()
@@ -110,25 +109,35 @@ public class PauseMenu : MonoBehaviour
         loadPanel.SetActive(false);
 
         pauseMenuParent.SetActive(true);
-        buttonsPanel.SetActive(true); 
+        buttonsPanel.SetActive(true);
     }
 
     public void SaveSlot(int slotIndex)
     {
         SaveSystem.Save(slotIndex);
-        Debug.Log("Mentve: " + slotIndex);
+        Debug.Log("Saved: " + slotIndex);
     }
 
     public void LoadSlot(int slotIndex)
     {
+        Debug.Log("Load From Pause Menu, slot: " + slotIndex);
+
+        Time.timeScale = 1f;
+        GameIsPaused = false;
+
         SaveSystem.Load(slotIndex);
-        Resume();
+
+        AsyncLoader.IsLoadingFromSave = true;
+
+        AsyncLoader.TargetSceneIndex = SaveSystem.CurrentSceneIndex;
+
+        SceneManager.LoadScene(1);
     }
 
     public void LoadMenuScene()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene(0);
     }
 
     public void QuitGame()

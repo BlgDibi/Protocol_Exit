@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class KeyPadSystem : MonoBehaviour
 {
     [Header("Settings")]
-    public string correctCode = "5821";
     public GameObject keypadCanvas;
     public TMP_Text display;
 
@@ -73,7 +72,10 @@ public class KeyPadSystem : MonoBehaviour
 
     public void EnterCode()
     {
-        if (currentInput == correctCode)
+
+        string targetCode = string.IsNullOrEmpty(SaveSystem.KeypadFullCode) ? "0000" : SaveSystem.KeypadFullCode;
+
+        if (currentInput == targetCode)
         {
             if (audioSource != null && grantedSound != null)
                 audioSource.PlayOneShot(grantedSound);

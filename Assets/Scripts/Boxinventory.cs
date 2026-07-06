@@ -133,4 +133,18 @@ public class BoxInventory : MonoBehaviour
         }
         return name;
     }
+
+    public void ClearInventory()
+    {
+        if (UiManager.Instance != null)
+        {
+            foreach (var doboz in Boxesamount)
+            {
+                UiManager.Instance.RemoveBoxFromUI(doboz);
+            }
+        }
+
+        Boxesamount.Clear();
+    }
+
 }

@@ -13,7 +13,7 @@ public class SceneData : MonoBehaviour
 
     public SceneData_Save Data;
 
-
+    public static string TargetSceneName = "";
 
     private void Awake()
 
@@ -23,55 +23,16 @@ public class SceneData : MonoBehaviour
 
         {
 
-            SaveSystem.CurrentSceneIndex = Data.SceneIndex;
-
+            SaveSystem.CurrentSceneId = Data.UniqueName;
         }
-
-    }
-
-
-
-    public void Save(ref SceneSaveData data)
-
-    {
-
-        data.SceneId = Data.UniqueName;
-
-    }
-
-    public void Load(ref SceneSaveData data)
-
-    {
-
-        if (SceneLoader.Instance != null)
-
+        else
         {
-
-            SceneLoader.Instance.LoadSceneByIndex(data.SceneId);
-
+            Debug.LogWarning("SceneData not connected");
         }
 
     }
 
-}
-
-
-
-
-
-
-
-[System.Serializable]
-
-
-
-public struct SceneSaveData
-
-{
-
-    public string SceneId;
-
-
+ 
 
 }
 

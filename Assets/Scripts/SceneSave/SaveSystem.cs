@@ -63,8 +63,17 @@ public class SaveSystem
         public List<string> unlockedDoors;
         public List<string> metNPCs;
         public int savedSkinIndex;
+        public string savedKeypadFullCode;
+        public string savedKeypadClue;
+        public string savedDocumentText;
+        public string savedSceneId;
 
     }
+
+    public static string KeypadFullCode = "";
+    public static string KeypadClue = "";
+    public static string CurrentDocumentText = "";
+    public static string CurrentSceneId = "";
 
     public static string SaveFileName(int slot = 1) => Application.persistentDataPath + "/save_" + slot + ".json";
 
@@ -75,7 +84,7 @@ public class SaveSystem
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
-        Debug.Log("<color=green>MENTÉS SIKERES!</color>");
+        Debug.Log("<color=green>Succesfull save!</color>");
     }
 
     private static void HandleSaveData()
@@ -121,10 +130,15 @@ public class SaveSystem
                 _savedata.inkMemoryValues.Add(kvp.Value);
             }
         }
+        
         _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
 
         _savedata.savedSkinIndex = SelectedSkinIndex;
 
+        _savedata.savedKeypadFullCode = KeypadFullCode;
+        _savedata.savedKeypadClue = KeypadClue;
+        _savedata.savedDocumentText = CurrentDocumentText;
+        _savedata.savedSceneId = CurrentSceneId;
     }
 
     public static void Load(int slot = 1)
@@ -135,7 +149,7 @@ public class SaveSystem
         {
             string json = File.ReadAllText(path);
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
-            if (string.IsNullOrEmpty(json)) throw new Exception("Üres mentés!");
+            if (string.IsNullOrEmpty(json)) throw new Exception("Empty save!");
             ResetAllData();
             if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
             _savedata = loadedData;
@@ -152,15 +166,20 @@ public class SaveSystem
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
 
             SelectedSkinIndex = _savedata.savedSkinIndex;
+            
+            CurrentSceneIndex = _savedata.sceneIndex;
 
-            IsGameJustLoaded = true;
-            SceneManager.LoadScene(_savedata.sceneIndex);
+            KeypadFullCode = _savedata.savedKeypadFullCode;
+            KeypadClue = _savedata.savedKeypadClue;
+            CurrentDocumentText = _savedata.savedDocumentText;
+            CurrentSceneId = _savedata.savedSceneId;
+
         }
         catch (Exception error)
         {
-            File.Delete(path);
+            Debug.LogError("Error while loading: " + error.Message);
             ResetAllData();
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(0);
         }
     }
 
@@ -191,7 +210,7 @@ public class SaveSystem
             string oldestFile = files.OrderBy(f => File.GetLastWriteTime(f)).First();
             File.Delete(oldestFile);
             ResetAllData();
-            Debug.Log("Legöregebb mentés törölve: " + oldestFile);
+            Debug.Log("Oldest save deleted: " + oldestFile);
         }
     }
 
@@ -202,7 +221,11 @@ public class SaveSystem
         _tempMetNPCs.Clear();
         InitializeData();
         IsGameJustLoaded = false;
-
+        if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
+        KeypadFullCode = "";
+        KeypadClue = "";
+        CurrentDocumentText = "";
+        CurrentSceneId = "";
     }
 
     public static void SaveNPCMet(string npcID) { if (string.IsNullOrEmpty(npcID)) return; if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID); }

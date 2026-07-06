@@ -81,7 +81,9 @@ public class A1_Door : MonoBehaviour
     IEnumerator TransitionRoutine()
     {
         if (fadeout != null) fadeout.SetActive(true);
+
         yield return new WaitForSeconds(0.5f);
+
         SceneManager.LoadScene(sceneToLoad);
     }
 

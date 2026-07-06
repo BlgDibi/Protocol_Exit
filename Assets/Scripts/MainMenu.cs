@@ -121,7 +121,14 @@ public class MainMenu : MonoBehaviour
         if (UiManager.Instance != null)
             UiManager.Instance.ClearAllKeysFromUI();
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (BoxInventory.Instance != null)
+            BoxInventory.Instance.ClearInventory();
+
+     
+        DialogueManager.SetInkMemory(new System.Collections.Generic.Dictionary<string, string>());
+
+        AsyncLoader.TargetSceneIndex = 2; 
+        SceneManager.LoadScene(1);       
     }
 
     public void OpenLoadMenu()
@@ -156,5 +163,10 @@ public class MainMenu : MonoBehaviour
     {
         Debug.Log("Trying to load a game from slot: " + slotIndex);
         SaveSystem.Load(slotIndex);
+        AsyncLoader.IsLoadingFromSave = true;
+
+        AsyncLoader.TargetSceneIndex = SaveSystem.CurrentSceneIndex;
+
+        SceneManager.LoadScene(1);
     }
 }

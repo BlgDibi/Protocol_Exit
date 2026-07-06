@@ -1,32 +1,34 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class DoorAnimation : MonoBehaviour
 {
-
     public GameObject doorpivot;
     public AudioSource dooropen;
     public AudioSource doorclose;
 
+    [Header("Transition Settings")]
+    public int nextSceneIndex = 4;
+
     void Start()
     {
         StartCoroutine(dooropening());
-
     }
-
 
     IEnumerator dooropening()
     {
-        yield return new  WaitForSeconds(3);
+        yield return new WaitForSeconds(3);
         dooropen.Play();
         doorpivot.GetComponent<Animator>().Play("dooranim");
         yield return new WaitForSeconds(4);
         doorclose.Play();
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene(3);
+
+     
+        AsyncLoader.TargetSceneIndex = nextSceneIndex;
+
+      
+        SceneManager.LoadScene(1);
     }
-
-
 }

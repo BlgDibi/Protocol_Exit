@@ -1,0 +1,62 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Collections;
+using TMPro;
+
+public class AsyncLoader : MonoBehaviour
+{
+    [Header("UI Settings Loading Bar, Progress text")]
+    public Slider loadingBar;
+    public TextMeshProUGUI progressText;
+
+    public static int TargetSceneIndex = -1;
+    public static bool IsLoadingFromSave = false;
+
+    private void Start()
+    {
+        StartCoroutine(LoadLevelAsync());
+    }
+
+    IEnumerator LoadLevelAsync()
+    {
+        int sceneToLoad = (TargetSceneIndex != -1) ? TargetSceneIndex : 0;
+
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneToLoad);
+        operation.allowSceneActivation = false;
+
+        float visualProgress = 0f;
+
+        while (!operation.isDone)
+        {
+            float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
+            visualProgress = Mathf.MoveTowards(visualProgress, targetProgress, Time.deltaTime * 0.7f);
+
+            if (loadingBar != null)
+            {
+                loadingBar.value = visualProgress;
+            }
+
+            if (progressText != null)
+            {
+                progressText.text = $"Loading... {Mathf.RoundToInt(visualProgress * 100)}%";
+            }
+
+            if (visualProgress >= 0.99f && operation.progress >= 0.9f)
+            {
+                yield return new WaitForSeconds(0.2f);
+
+              
+                if (IsLoadingFromSave)
+                {
+                    SaveSystem.IsGameJustLoaded = true; 
+                    IsLoadingFromSave = false; 
+                }
+
+                operation.allowSceneActivation = true;
+            }
+
+            yield return null;
+        }
+    }
+}
