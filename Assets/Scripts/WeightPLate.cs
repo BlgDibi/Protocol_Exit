@@ -21,6 +21,17 @@ public class WeightPlate : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
+        
+        if (IsWeightOptimal())
+        {
+            if (Weighttext != null)
+            {
+                Weighttext.text = "The scale is already balanced!";
+                Weighttext.color = Color.yellow;
+            }
+            return;
+        }
+
         if (BoxInventory.Instance.HasAnyBox())
         {
             SulyDobozData data = BoxInventory.Instance.GetFirstBox();
@@ -40,6 +51,51 @@ public class WeightPlate : MonoBehaviour, InterfaceInteractable
 
                 Rigidbody rb = boxdropped.GetComponent<Rigidbody>();
                 if (rb != null) rb.mass = data.weight;
+            }
+        }
+    }
+
+    void UiReset()
+    {
+        if (Weighttext != null)
+        {
+            if (currentweight < 0.01f)
+            {
+                Weighttext.gameObject.SetActive(false);
+                if (scaleUIPanel != null) scaleUIPanel.SetActive(false);
+                return;
+            }
+
+            if (scaleUIPanel != null && !isUiHidden) scaleUIPanel.SetActive(true);
+            Weighttext.gameObject.SetActive(true);
+            Weighttext.text = currentweight + " / " + optimalweight + " kg";
+
+            if (Mathf.Approximately(currentweight, optimalweight))
+            {
+                Weighttext.color = Color.green;
+
+                ConditionManager.Instance.SetCondition("ScaleSolved", true);
+
+                if (!isUiHidden)
+                {
+                    isUiHidden = true;
+                    if (hideCoroutine != null) StopCoroutine(hideCoroutine);
+                    hideCoroutine = StartCoroutine(HideUIAfterDelay());
+                }
+            }
+            else
+            {
+                Weighttext.color = Color.white;
+
+                ConditionManager.Instance.SetCondition("ScaleSolved", false);
+
+                isUiHidden = false;
+                if (hideCoroutine != null)
+                {
+                    StopCoroutine(hideCoroutine);
+                    hideCoroutine = null;
+                }
+                if (scaleUIPanel != null) scaleUIPanel.SetActive(true);
             }
         }
     }
@@ -71,46 +127,6 @@ public class WeightPlate : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    void UiReset()
-    {
-        if (Weighttext != null)
-        {
-            if (currentweight < 0.01f)
-            {
-                Weighttext.gameObject.SetActive(false);
-                if (scaleUIPanel != null) scaleUIPanel.SetActive(false);
-                return;
-            }
-
-            if (scaleUIPanel != null && !isUiHidden) scaleUIPanel.SetActive(true);
-            Weighttext.gameObject.SetActive(true);
-            Weighttext.text = currentweight + " / " + optimalweight + " kg";
-
-            if (Mathf.Approximately(currentweight, optimalweight))
-            {
-                Weighttext.color = Color.green;
-
-                if (!isUiHidden)
-                {
-                    isUiHidden = true;
-                    if (hideCoroutine != null) StopCoroutine(hideCoroutine);
-                    hideCoroutine = StartCoroutine(HideUIAfterDelay());
-                }
-            }
-            else
-            {
-                Weighttext.color = Color.white;
-
-                isUiHidden = false;
-                if (hideCoroutine != null)
-                {
-                    StopCoroutine(hideCoroutine);
-                    hideCoroutine = null;
-                }
-                if (scaleUIPanel != null) scaleUIPanel.SetActive(true);
-            }
-        }
-    }
 
     private IEnumerator HideUIAfterDelay()
     {

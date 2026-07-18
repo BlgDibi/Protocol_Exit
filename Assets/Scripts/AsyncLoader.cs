@@ -44,7 +44,9 @@ public class AsyncLoader : MonoBehaviour
 
             if (visualProgress >= 0.99f && operation.progress >= 0.9f)
             {
-                yield return new WaitForSeconds(0.2f);
+                if (loadingBar != null) loadingBar.value = 1f;
+                if (progressText != null) progressText.text = "Loading... 100%";
+                yield return new WaitForSeconds(0.3f);
 
               
                 if (IsLoadingFromSave)

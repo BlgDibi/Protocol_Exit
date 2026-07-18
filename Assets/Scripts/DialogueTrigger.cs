@@ -34,7 +34,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     {
         agent = GetComponent<NavMeshAgent>();
 
-        // Biztosítjuk, hogy az NPC pontosan a NavMesh-en álljon induláskor
         if (agent != null && !agent.isOnNavMesh)
         {
             NavMeshHit hit;
@@ -45,19 +44,16 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             }
         }
 
-        // Indításkor mindig leellenõrizzük az állapotot!
         StartCoroutine(InitializeNPCState());
     }
 
     private IEnumerator InitializeNPCState()
     {
-        // Várunk egy picit, hogy az Ink és a NavMesh felébredjen
         yield return new WaitForSeconds(0.2f);
 
         bool metInSaveList = SaveSystem.WasNPCMet(interactableID);
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState(questVariableToWatch) : "false";
 
-        // HA MÁR BESZÉLTETEK (vagy megkaptad a jutalmat) -> Üljön le!
         if (metInSaveList || rewardState.ToLower() == "true")
         {
             hasReachedPoint = true;
@@ -77,7 +73,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         }
         else
         {
-            // HA MÉG SOHA NEM BESZÉLTETEK -> Sétáljon!
             hasReachedPoint = false;
             if (agent != null) agent.enabled = true;
             Debug.Log("Új játék indult, az NPC elkezd sétálni: " + interactableID);
@@ -91,15 +86,20 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         string metState = DialogueManager.Instance.GetVariableState("met_npc");
         string rewardState = DialogueManager.Instance.GetVariableState(questVariableToWatch);
 
-        bool hasMet = (metState != null && metState.ToLower() == "true");
+        bool hasMet = (metState != null && metState.ToLower() == "true") || SaveSystem.WasNPCMet(interactableID);
         bool hasFinished = (rewardState != null && rewardState.ToLower() == "true");
 
         if (hasReachedPoint || hasMet || hasFinished)
         {
-            if (hasFinished)
+          
+            if (hasMet || hasFinished)
+            {
                 DialogueManager.Instance.EnterDialogueMode(inkJSON, "told_everything", GetComponent<Talk>());
+            }
             else
+            {
                 StartDialogue();
+            }
             return;
         }
 

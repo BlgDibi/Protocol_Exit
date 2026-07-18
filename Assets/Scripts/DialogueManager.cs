@@ -21,7 +21,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform choicesContainer;
 
     [Header("Player References")]
-    [SerializeField] private OwnMovement playerController; // Csak a Te scripted kell ide!
+    [SerializeField] private OwnMovement playerController;
 
     [Header("Typing Settings")]
     [SerializeField] private float typingSpeed = 0.04f;
@@ -81,10 +81,20 @@ public class DialogueManager : MonoBehaviour
         currentInkAsset = specificInkFile;
         currentStory = new Story(specificInkFile.text);
 
+        
         currentStory.BindExternalFunction("is_scale_solved", () =>
         {
-            WeightPlate Scale = FindFirstObjectByType<WeightPlate>();
-            if (Scale != null) return Scale.IsWeightOptimal();
+            if (ConditionManager.Instance != null)
+                return ConditionManager.Instance.CheckCondition("ScaleSolved");
+
+            return false;
+        });
+
+        currentStory.BindExternalFunction("check_condition", (string conditionName) =>
+        {
+            if (ConditionManager.Instance != null)
+                return ConditionManager.Instance.CheckCondition(conditionName);
+
             return false;
         });
 
@@ -101,13 +111,13 @@ public class DialogueManager : MonoBehaviour
             }
             catch (System.Exception e)
             {
-                Debug.LogError("Nem találom a Knot-ot az Ink fájlban: " + knotName + " | Hiba: " + e.Message);
+                Debug.LogError("There is no Knot in Ink file: " + knotName + " | Error: " + e.Message);
             }
         }
 
         isDialoguePlaying = true;
         dialoguePanel.SetActive(true);
-        SetPlayerEnabled(false); // Játékos lefagyasztása
+        SetPlayerEnabled(false);
         ContinueStory();
     }
 
@@ -157,7 +167,7 @@ public class DialogueManager : MonoBehaviour
                 if (currentNPC != null)
                 {
                     string fileName = tag.Replace("voice:", "").Trim();
-                    Debug.Log("DialogueManager hívja a hangot: " + fileName);
+                    Debug.Log("Dialogumenager voice: " + fileName);
                     currentNPC.PlayVoiceLine(fileName);
                 }
             }
@@ -169,7 +179,7 @@ public class DialogueManager : MonoBehaviour
         if (currentStory != null && currentInkAsset != null)
         {
             inkMemory[currentInkAsset.name] = currentStory.state.ToJson();
-            Debug.Log("Ink memória elmentve: " + currentInkAsset.name);
+            Debug.Log("Ink memory saved: " + currentInkAsset.name);
         }
 
         if (currentNPC != null)
@@ -183,7 +193,7 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
         foreach (Transform child in choicesContainer) Destroy(child.gameObject);
 
-        SetPlayerEnabled(true); // Játékos feloldása
+        SetPlayerEnabled(true);
 
         if (currentNPC != null)
         {
@@ -231,13 +241,11 @@ public class DialogueManager : MonoBehaviour
 
     private void SetPlayerEnabled(bool enabled)
     {
-        // 1. Csak az OwnMovement scriptet kapcsoljuk ki/be
         if (playerController != null)
         {
             playerController.enabled = enabled;
         }
 
-        // 2. Kurzort kiszabadítjuk a párbeszéd alatt, majd visszazárjuk
         Cursor.visible = !enabled;
         Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -270,7 +278,7 @@ public class DialogueManager : MonoBehaviour
             }
 
             SaveSystem.SaveNPCMet("green_key_spawned");
-            Debug.Log("<color=yellow>KULCS SPAWNOLVA ÉS MENTVE A RAM-BA!</color>");
+            Debug.Log("<color=yellow>Key Spawned!</color>");
         }
     }
 }
