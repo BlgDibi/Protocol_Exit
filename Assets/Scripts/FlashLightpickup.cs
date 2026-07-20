@@ -33,6 +33,11 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
     {
         HasFlashlight = true;
         ApplyFlashlightState();
+
+        if (UiManager.Instance != null)
+        {
+            UiManager.Instance.AddFlashlightToUI();
+        }
     }
 
     private void ApplyFlashlightState()

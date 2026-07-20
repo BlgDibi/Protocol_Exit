@@ -14,11 +14,20 @@ public class UiManager : MonoBehaviour
 
     private Dictionary<Key,GameObject> keyImages = new Dictionary<Key,GameObject>();
 
+    [SerializeField] private Sprite flashlightSprite;
+    private GameObject flashlightUIInstance;
+
     public static UiManager Instance { get; private set; }
 
     public Transform keysParent;
 
-
+    private void Start()
+    {
+        if (Flashlightpickup.HasFlashlight)
+        {
+            AddFlashlightToUI();
+        }
+    }
 
 
     private void Awake()
@@ -33,6 +42,16 @@ public class UiManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void AddFlashlightToUI()
+    {
+        if (flashlightUIInstance != null || flashlightSprite == null) return;
+
+        flashlightUIInstance = Instantiate(keyImagePrefab, keyPanel);
+        flashlightUIInstance.GetComponent<Image>().sprite = flashlightSprite;
+
+        Debug.Log("Flashlight added to UI!");
     }
 
 

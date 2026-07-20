@@ -5,12 +5,7 @@ public class Steam : MonoBehaviour
     public float damagePerSecond = 5f;
     private bool playerInside = false;
     private HP playerHP;
-    private Ending3 ending3;
 
-    private void Start()
-    {
-        ending3 = FindFirstObjectByType<Ending3>();
-    }
 
     private void OnTriggerEnter(Collider other)
     {
