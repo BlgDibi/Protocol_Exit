@@ -679,6 +679,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashlightAim
   mainCam: {fileID: 1311821353}
+  playerBody: {fileID: 1124553206}
+  maxUpDown: 50
+  maxLeftRight: 40
 --- !u!1 &41052680
 GameObject:
   m_ObjectHideFlags: 0
@@ -1992,6 +1995,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashlightAim
   mainCam: {fileID: 1311821353}
+  playerBody: {fileID: 0}
+  maxUpDown: 50
+  maxLeftRight: 50
 --- !u!65 &160849661
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7036,6 +7042,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashlightAim
   mainCam: {fileID: 239704493}
+  playerBody: {fileID: 0}
+  maxUpDown: 50
+  maxLeftRight: 50
 --- !u!65 &699102546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7377,9 +7386,11 @@ MonoBehaviour:
   inkJSONAsset: {fileID: 4900000, guid: 4f360bf8b83cb144a91b064814c5bc79, type: 3}
   dialoguePanel: {fileID: 1523373074}
   dialogueText: {fileID: 1585005876}
+  talkPromptUI: {fileID: 1515931193}
   choiceButtonPrefab: {fileID: 4261338697677952310, guid: 9e433890071df814bba62eeb596bc80d, type: 3}
   choicesContainer: {fileID: 1652994512}
   playerController: {fileID: 1700655009}
+  playerInteraction: {fileID: 1311821346}
   typingSpeed: 0.04
   greenKey: {fileID: 0}
 --- !u!114 &739067976
@@ -10491,6 +10502,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashlightAim
   mainCam: {fileID: 239704493}
+  playerBody: {fileID: 0}
+  maxUpDown: 50
+  maxLeftRight: 50
 --- !u!65 &1034009817
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12076,7 +12090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.46226418, g: 0.07193665, b: 0.006541462, a: 1}
+  m_Color: {r: 0.46666667, g: 0.06666667, b: 0.06666667, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
@@ -20946,6 +20960,7 @@ MonoBehaviour:
   greenbar: {fileID: 2098643935}
   redbar: {fileID: 1301435064}
   playerHP: {fileID: 0}
+  ghostSpeed: 3
 --- !u!4 &2052288691 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4455331854129734, guid: 1bbe2c604601fdb44b9e7eeec90773ef, type: 3}
@@ -21197,7 +21212,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.16605076, g: 0.5377358, b: 0.1496529, a: 1}
+  m_Color: {r: 0.078431375, g: 0.972549, b: 0.043137256, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0

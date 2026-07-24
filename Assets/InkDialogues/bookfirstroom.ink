@@ -1,31 +1,41 @@
 VAR read_diary = false
 VAR book_moved = false
 
+
+=== told_everything ===
+-> book_interaction
+
 === book_interaction ===
 
 { book_moved:
-    The journal is already pushed aside. There is nothing else to do here.
-    + [Leave]
-        -> DONE
+    -> already_moved
+- else:
+    -> normal_state
 }
 
+= already_moved
+The journal is already pushed aside. There is nothing else to do here.
++ [Leave]
+    -> DONE
 
-{ not book_moved:
-    {not read_diary: It is a dusty journal left on the shelf. It looks old. | What do you want to do?}
+= normal_state
 
-    + {not read_diary} [Read it] 
-        -> read_entry
-
-    + {read_diary} [Move it aside]
-        You push the book slightly to the left.
-        ~ book_moved = true 
-        #move_book
-        -> DONE
-
-    + [Close it] 
-        -> DONE
+{ not read_diary:
+    It is a dusty journal left on the shelf. It looks old.
+- else:
+    What do you want to do?
 }
-    
+
++ { not read_diary } [Read it]
+    -> read_entry
++ { read_diary } [Move it aside]
+    You push the book slightly to the left.
+    ~ book_moved = true 
+    #move_book
+    -> DONE
++ [Close it]
+    -> DONE
+
 = read_entry
 Day 6... 
 I am still trapped here. The doors won't open.

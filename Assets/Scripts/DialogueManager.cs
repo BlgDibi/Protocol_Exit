@@ -16,12 +16,17 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
 
+    [Header("UI Prompts To Hide")]
+
+    [SerializeField] private GameObject talkPromptUI;
+
     [Header("Answer Buttons")]
     [SerializeField] private GameObject choiceButtonPrefab;
     [SerializeField] private Transform choicesContainer;
 
     [Header("Player References")]
     [SerializeField] private OwnMovement playerController;
+    [SerializeField] private Interaction playerInteraction;
 
     [Header("Typing Settings")]
     [SerializeField] private float typingSpeed = 0.04f;
@@ -81,7 +86,6 @@ public class DialogueManager : MonoBehaviour
         currentInkAsset = specificInkFile;
         currentStory = new Story(specificInkFile.text);
 
-        
         currentStory.BindExternalFunction("is_scale_solved", () =>
         {
             if (ConditionManager.Instance != null)
@@ -118,6 +122,10 @@ public class DialogueManager : MonoBehaviour
         isDialoguePlaying = true;
         dialoguePanel.SetActive(true);
         SetPlayerEnabled(false);
+
+        if (playerInteraction != null) playerInteraction.enabled = false;
+        if (talkPromptUI != null) talkPromptUI.SetActive(false);
+
         ContinueStory();
     }
 
@@ -194,6 +202,8 @@ public class DialogueManager : MonoBehaviour
         foreach (Transform child in choicesContainer) Destroy(child.gameObject);
 
         SetPlayerEnabled(true);
+
+        if (playerInteraction != null) playerInteraction.enabled = true;
 
         if (currentNPC != null)
         {

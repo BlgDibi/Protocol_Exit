@@ -17,26 +17,45 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Sprite flashlightSprite;
     private GameObject flashlightUIInstance;
 
+
+    [SerializeField] private Sprite crowbarSprite;
+    private GameObject crowbarUIInstance;
+
     public static UiManager Instance { get; private set; }
 
     public Transform keysParent;
 
     private void Start()
     {
+        RefreshAllUI();
+    }
+
+    private void OnEnable()
+    {
+        RefreshAllUI();
+    }
+    public void RefreshAllUI()
+    {
         if (Flashlightpickup.HasFlashlight)
         {
             AddFlashlightToUI();
         }
-    }
 
+        if (CrowbarPickup.HasCrowbar)
+        {
+            AddCrowbarToUI();
+        }
+
+        Canvas.ForceUpdateCanvases();
+    }
 
     private void Awake()
     {
         if (Instance == null) 
         {
             Instance = this;
-           
-        
+
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -52,9 +71,21 @@ public class UiManager : MonoBehaviour
         flashlightUIInstance.GetComponent<Image>().sprite = flashlightSprite;
 
         Debug.Log("Flashlight added to UI!");
+
+        Canvas.ForceUpdateCanvases();
     }
 
+    public void AddCrowbarToUI()
+    {
+        if (crowbarUIInstance != null || crowbarSprite == null) return;
 
+        crowbarUIInstance = Instantiate(keyImagePrefab, keyPanel);
+        crowbarUIInstance.GetComponent<Image>().sprite = crowbarSprite;
+
+        Debug.Log("Crowbar added to UI!");
+
+        Canvas.ForceUpdateCanvases();
+    }
     public void AddBoxToUI(SulyDobozData doboz)
     {
         if (boxImages.ContainsKey(doboz)) return;
