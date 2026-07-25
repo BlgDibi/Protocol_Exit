@@ -7,7 +7,6 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
     public static bool HasFlashlight = false;
 
     [Header("Flashlight Settings")]
-    public GameObject flashlightInHand;
     public GameObject flashlightOnTable;
 
     [Header("Settings")]
@@ -19,10 +18,9 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 
     void Start()
     {
-        if (HasFlashlight && flashlightInHand != null)
+        if (HasFlashlight && flashlightOnTable != null)
         {
-            flashlightInHand.SetActive(true);
-            if (flashlightOnTable != null) flashlightOnTable.SetActive(false);
+            flashlightOnTable.SetActive(false);
         }
     }
 
@@ -32,21 +30,22 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
     public void Interact()
     {
         HasFlashlight = true;
-        ApplyFlashlightState();
+
+        if (flashlightOnTable != null) flashlightOnTable.SetActive(false);
+        else gameObject.SetActive(false);
+
+        HighlightCrosshair(false);
 
         if (UiManager.Instance != null)
         {
             UiManager.Instance.AddFlashlightToUI();
         }
-    }
 
-    private void ApplyFlashlightState()
-    {
-        if (flashlightInHand != null) flashlightInHand.SetActive(true);
-        if (flashlightOnTable != null) flashlightOnTable.SetActive(false);
-        else gameObject.SetActive(false);
-
-        HighlightCrosshair(false);
+        FlashlightController equipSystem = FindFirstObjectByType<FlashlightController>();
+        if (equipSystem != null)
+        {
+            equipSystem.EquipItemAutomatically(1);
+        }
     }
 
     void OnTriggerEnter(Collider other) { if (other.CompareTag("Player")) HighlightCrosshair(true); }
