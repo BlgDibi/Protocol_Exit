@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class FlashlightController : MonoBehaviour
 {
@@ -21,11 +22,25 @@ public class FlashlightController : MonoBehaviour
     [Tooltip("How much drain while not active")]
     public float passiveDrainRate = 0.1f;
 
+
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip clickSound;
+
+    [Header("Light Effects")]
+    public Light flashlightLightComponent;
+    private float originalIntensity;
+
     private int selectedItem = 1;
     private bool isHoldingItem = true;
 
     void Start()
     {
+        if (flashlightLightComponent != null)
+        {
+            originalIntensity = flashlightLightComponent.intensity;
+        }
+
         UpdateEquipmentState();
 
     }
@@ -46,6 +61,12 @@ public class FlashlightController : MonoBehaviour
             }
 
             isHoldingItem = !isHoldingItem;
+
+            if (selectedItem == 1 && Flashlightpickup.HasFlashlight && audioSource != null && clickSound != null)
+            {
+                audioSource.PlayOneShot(clickSound);
+            }
+
             UpdateEquipmentState();
         }
 
@@ -59,6 +80,8 @@ public class FlashlightController : MonoBehaviour
         if (selectedItem == 1 && isHoldingItem && flashlightInHand != null && flashlightInHand.activeSelf)
         {
             currentBattery -= activeDrainRate * Time.deltaTime;
+
+            HandleLightEffects();
 
             if (currentBattery <= 0)
             {
@@ -76,6 +99,30 @@ public class FlashlightController : MonoBehaviour
         if (BatteryUI_Flashlight.Instance != null)
         {
             BatteryUI_Flashlight.Instance.UpdateBatteryUI(currentBattery, maxBattery);
+        }
+    }
+
+    private void HandleLightEffects()
+    {
+        if (flashlightLightComponent == null) return;
+
+        float batteryPercent = currentBattery / maxBattery;
+
+        if (batteryPercent <= 0.20f)
+        {
+            float newIntensity = originalIntensity * (batteryPercent / 0.20f);
+
+            if (batteryPercent <= 0.15f)
+            {
+                float flicker = Random.Range(0.2f, 0.6f);
+                newIntensity *= flicker;
+            }
+
+            flashlightLightComponent.intensity = newIntensity;
+        }
+        else
+        {
+            flashlightLightComponent.intensity = originalIntensity;
         }
     }
 

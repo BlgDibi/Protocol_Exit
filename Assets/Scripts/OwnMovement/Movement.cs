@@ -23,15 +23,25 @@ public class OwnMovement : MonoBehaviour
     private Vector3 fallVelocity;
 
     [Header("Push Settings")]
-    public float pushForce = 1500f;
+    public Transform pushPoint;
+    public float pushForce = 3000f;
     public float pushDistance = 1.5f;
+    public float pushDelay = 0.3f;
+    private float pushTimer = 0f;
+
+    [Header("Footstep Audio")]
+    public AudioSource footstepAudioSource;
+    public AudioClip[] footstepClips;
 
     private float horizontal, vertical;
     private bool isRunning;
-
     private bool isPushingObject = false;
     private Rigidbody pushedRigidbody;
     private KeyCode currentPushKey;
+
+
+    private float lastFootstepTime = 0f;
+    public float footstepCooldown = 0.25f;
 
     void Start()
     {
@@ -54,14 +64,8 @@ public class OwnMovement : MonoBehaviour
 
         if (isPushingObject)
         {
-            if (Input.GetKey(currentPushKey))
-            {
-                ApplyContinuousPush();
-            }
-            else
-            {
-                StopPushing();
-            }
+            if (Input.GetKey(currentPushKey)) ApplyContinuousPush();
+            else StopPushing();
         }
     }
 
@@ -74,31 +78,37 @@ public class OwnMovement : MonoBehaviour
 
         if (isPushingObject)
         {
-            targetSpeed = walkSpeed * 0.5f;
-        }
-
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            controller.Move(moveDir.normalized * targetSpeed * Time.fixedDeltaTime);
-
-            if (!isPushingObject)
+            if (pushedRigidbody != null)
             {
-                animator.SetFloat("Speed", isRunning ? 1.0f : 0.5f, 0.1f, Time.fixedDeltaTime);
+                Vector3 boxVelocity = pushedRigidbody.linearVelocity;
+                boxVelocity.y = 0;
+                if (controller.isGrounded && fallVelocity.y < 0) fallVelocity.y = -2f;
+                fallVelocity.y += gravity * Time.fixedDeltaTime;
+                controller.Move((boxVelocity + fallVelocity) * Time.fixedDeltaTime);
             }
         }
         else
         {
-            animator.SetFloat("Speed", 0f, 0.15f, Time.fixedDeltaTime);
-        }
+            if (direction.magnitude >= 0.1f)
+            {
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
-        if (controller.isGrounded && fallVelocity.y < 0) fallVelocity.y = -2f;
-        fallVelocity.y += gravity * Time.fixedDeltaTime;
-        controller.Move(fallVelocity * Time.fixedDeltaTime);
+                Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+                controller.Move(moveDir.normalized * targetSpeed * Time.fixedDeltaTime);
+
+                animator.SetFloat("Speed", isRunning ? 1.0f : 0.5f, 0.1f, Time.fixedDeltaTime);
+            }
+            else
+            {
+                animator.SetFloat("Speed", 0f, 0.15f, Time.fixedDeltaTime);
+            }
+
+            if (controller.isGrounded && fallVelocity.y < 0) fallVelocity.y = -2f;
+            fallVelocity.y += gravity * Time.fixedDeltaTime;
+            controller.Move(fallVelocity * Time.fixedDeltaTime);
+        }
     }
 
     void LateUpdate()
@@ -110,14 +120,38 @@ public class OwnMovement : MonoBehaviour
         cameraRoot.rotation = Quaternion.Euler(cameraXAngle, cameraYAngle, 0f);
     }
 
+    public void PlayFootstepSound()
+    {
+        if (Time.time - lastFootstepTime < footstepCooldown) return;
+
+        if (footstepAudioSource != null && footstepClips.Length > 0 && controller.isGrounded)
+        {
+            lastFootstepTime = Time.time;
+
+            int index = Random.Range(0, footstepClips.Length);
+            footstepAudioSource.pitch = Random.Range(0.85f, 1.1f);
+            footstepAudioSource.PlayOneShot(footstepClips[index]);
+        }
+    }
+
     public void StartPushing(Rigidbody rb, KeyCode key)
     {
-        if (rb == null) return;
+        if (rb == null || isPushingObject) return;
 
         isPushingObject = true;
         pushedRigidbody = rb;
         currentPushKey = key;
+        pushTimer = 0f;
 
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 1f, transform.forward, out hit, 2f))
+        {
+            if (hit.rigidbody == rb)
+            {
+                Vector3 flatNormal = new Vector3(hit.normal.x, 0f, hit.normal.z).normalized;
+                if (flatNormal != Vector3.zero) transform.rotation = Quaternion.LookRotation(-flatNormal);
+            }
+        }
         animator.SetBool("isPushing", true);
     }
 
@@ -125,10 +159,17 @@ public class OwnMovement : MonoBehaviour
     {
         if (pushedRigidbody != null)
         {
-            Vector3 pushDirection = transform.forward;
-            pushDirection.y = 0; 
-
-            pushedRigidbody.AddForce(pushDirection * pushForce * Time.deltaTime, ForceMode.Force);
+            pushTimer += Time.deltaTime;
+            if (pushTimer >= pushDelay)
+            {
+                if (vertical > 0.1f)
+                {
+                    Vector3 pushDirection = transform.forward;
+                    pushDirection.y = 0;
+                    Vector3 applyPosition = pushPoint != null ? pushPoint.position : transform.position + Vector3.up * 1f;
+                    pushedRigidbody.AddForceAtPosition(pushDirection * pushForce * Time.deltaTime, applyPosition, ForceMode.Force);
+                }
+            }
         }
     }
 
@@ -136,12 +177,14 @@ public class OwnMovement : MonoBehaviour
     {
         isPushingObject = false;
         pushedRigidbody = null;
+        pushTimer = 0f;
         animator.SetBool("isPushing", false);
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position + Vector3.up * 1f, transform.forward * pushDistance);
+        Vector3 startPos = pushPoint != null ? pushPoint.position : transform.position + Vector3.up * 1f;
+        Gizmos.DrawRay(startPos, transform.forward * pushDistance);
     }
 }
