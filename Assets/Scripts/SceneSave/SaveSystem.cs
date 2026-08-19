@@ -6,8 +6,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-
-
 public class SaveSystem
 {
     public static int SelectedSkinIndex = 0;
@@ -20,6 +18,7 @@ public class SaveSystem
 
     private static List<string> _tempUnlockedDoors = new List<string>();
     private static List<string> _tempMetNPCs = new List<string>();
+    private static List<string> _tempPriedPlanks = new List<string>();
 
     static SaveSystem()
     {
@@ -37,6 +36,7 @@ public class SaveSystem
         if (_savedata.historicalKeyIds == null) _savedata.historicalKeyIds = new List<int>();
         if (_savedata.inkMemoryKeys == null) _savedata.inkMemoryKeys = new List<string>();
         if (_savedata.inkMemoryValues == null) _savedata.inkMemoryValues = new List<string>();
+        if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
     }
 
     [System.Serializable]
@@ -67,7 +67,8 @@ public class SaveSystem
         public string savedKeypadClue;
         public string savedDocumentText;
         public string savedSceneId;
-
+        public bool hasCrowbar;
+        public List<string> priedPlanks;
     }
 
     public static string KeypadFullCode = "";
@@ -82,6 +83,7 @@ public class SaveSystem
         HandleSaveData();
         _savedata.unlockedDoors = new List<string>(_tempUnlockedDoors);
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
+        _savedata.priedPlanks = new List<string>(_tempPriedPlanks);
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
         Debug.Log("<color=green>Succesfull save!</color>");
@@ -130,9 +132,9 @@ public class SaveSystem
                 _savedata.inkMemoryValues.Add(kvp.Value);
             }
         }
-        
-        _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
 
+        _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
+        _savedata.hasCrowbar = CrowbarPickup.HasCrowbar;
         _savedata.savedSkinIndex = SelectedSkinIndex;
 
         _savedata.savedKeypadFullCode = KeypadFullCode;
@@ -166,14 +168,18 @@ public class SaveSystem
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
 
             SelectedSkinIndex = _savedata.savedSkinIndex;
-            
+
             CurrentSceneIndex = _savedata.sceneIndex;
 
             KeypadFullCode = _savedata.savedKeypadFullCode;
             KeypadClue = _savedata.savedKeypadClue;
             CurrentDocumentText = _savedata.savedDocumentText;
             CurrentSceneId = _savedata.savedSceneId;
+            CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
+            _tempPriedPlanks = new List<string>(_savedata.priedPlanks ?? new List<string>());
 
+            UiManager.isMenuOpen = false;
+            Time.timeScale = 1f;
         }
         catch (Exception error)
         {
@@ -226,12 +232,16 @@ public class SaveSystem
         KeypadClue = "";
         CurrentDocumentText = "";
         CurrentSceneId = "";
+        _tempPriedPlanks.Clear();
+        if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
     }
 
     public static void SaveNPCMet(string npcID) { if (string.IsNullOrEmpty(npcID)) return; if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID); }
     public static bool WasNPCMet(string npcID) => _tempMetNPCs.Contains(npcID);
     public static void SaveDoorUnlocked(string doorID) { if (string.IsNullOrEmpty(doorID)) return; if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID); }
     public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
+    public static void SavePlankPried(string plankID) { if (string.IsNullOrEmpty(plankID)) return; if (!_tempPriedPlanks.Contains(plankID)) _tempPriedPlanks.Add(plankID); }
+    public static bool IsPlankPried(string plankID) => _tempPriedPlanks.Contains(plankID);
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
     public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
     public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();

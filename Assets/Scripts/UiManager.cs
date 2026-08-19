@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class UiManager : MonoBehaviour
 {
 
+    public static bool isMenuOpen = false;
+
     [SerializeField] private Transform keyPanel;
     [SerializeField] private GameObject keyImagePrefab;
 

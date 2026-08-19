@@ -47,6 +47,8 @@ public class KeyPadSystem : MonoBehaviour
    
     public void ShowKeypad()
     {
+        UiManager.isMenuOpen = true;
+
         if (playerController != null) playerController.enabled = false;
 
         keypadCanvas.SetActive(true);
@@ -61,6 +63,8 @@ public class KeyPadSystem : MonoBehaviour
  
     public void CloseKeypad()
     {
+        UiManager.isMenuOpen = false;
+
         keypadCanvas.SetActive(false);
 
         if (playerController != null) playerController.enabled = true;

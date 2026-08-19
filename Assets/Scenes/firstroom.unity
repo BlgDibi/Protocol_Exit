@@ -43,7 +43,7 @@ RenderSettings:
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 13
-  m_BakeOnSceneLoad: 0
+  m_BakeOnSceneLoad: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: d69d28fd33dfe5746afaac8800de5588, type: 2}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 1073e488d2907614dbb238404d2a3dcd, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -9124,7 +9124,7 @@ MonoBehaviour:
   flashlightInHand: {fileID: 30540289}
   crowbarInHand: {fileID: 0}
   cycleKey: 113
-  toggleKey: 323
+  toggleKey: 324
   maxBattery: 100
   activeDrainRate: 0.5
   passiveDrainRate: 0.25
@@ -17703,8 +17703,14 @@ MonoBehaviour:
   jumpHeight: 1.2
   turnSmoothTime: 0.15
   gravity: -9.81
+  pushPoint: {fileID: 0}
   pushForce: 1500
   pushDistance: 1.5
+  pushDelay: 0.3
+  footstepAudioSource: {fileID: 1700655014}
+  footstepClips:
+  - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
+  footstepCooldown: 0.25
 --- !u!137 &1700655010 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: -1713863184840326876, guid: 66a39e0edff17754ca72118dd9e28131, type: 3}

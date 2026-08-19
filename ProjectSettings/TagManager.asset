@@ -8,6 +8,7 @@ TagManager:
   - NPC
   - ending1
   - Boxes
+  - Pryable
   layers:
   - Default
   - TransparentFX

@@ -41,18 +41,18 @@ public class FlashlightController : MonoBehaviour
             originalIntensity = flashlightLightComponent.intensity;
         }
 
+        isHoldingItem = false;
+
         UpdateEquipmentState();
-
     }
-
     void Update()
     {
-        if (Input.GetKeyDown(cycleKey))
+        if (Input.GetKeyDown(cycleKey) && !UiManager.isMenuOpen)
         {
             CycleItems();
         }
 
-        if (Input.GetKeyDown(toggleKey))
+        if (Input.GetKeyDown(toggleKey) && !UiManager.isMenuOpen)
         {
             if (!isHoldingItem && selectedItem == 1 && currentBattery <= 0 && Flashlightpickup.HasFlashlight)
             {

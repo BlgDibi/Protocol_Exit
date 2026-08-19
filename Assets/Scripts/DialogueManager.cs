@@ -82,6 +82,8 @@ public class DialogueManager : MonoBehaviour
     {
         if (isDialoguePlaying) return;
 
+        UiManager.isMenuOpen = true;
+
         currentNPC = npc;
         currentInkAsset = specificInkFile;
         currentStory = new Story(specificInkFile.text);
@@ -184,6 +186,9 @@ public class DialogueManager : MonoBehaviour
 
     public void ExitDialogueMode()
     {
+
+        UiManager.isMenuOpen = false;
+
         if (currentStory != null && currentInkAsset != null)
         {
             inkMemory[currentInkAsset.name] = currentStory.state.ToJson();

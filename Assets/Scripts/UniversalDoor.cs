@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.Localization;
 
@@ -11,10 +12,13 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     [SerializeField] private float closeAngle = 0f;
     [SerializeField] private float rotationSpeed = 2f;
 
-    [Header("Lock")]
+    [Header("Lock & Planks Protection")]
     public bool isLocked = false;
     public Key requiredKey;
     public string requiredCondition;
+
+    [Header("Protecting Planks (Add Plank IDs here)")]
+    public List<string> protectingPlankIDs;
 
     [Header("Sounds")]
     [SerializeField] private AudioSource audioSource;
@@ -45,13 +49,18 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
         if (messagePanel != null) messagePanel.SetActive(false);
 
-        // Megnövelt várakozás a mentés betöltéséhez
         yield return new WaitForSeconds(0.1f);
 
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
 
-        // Ha az öreg már odaadta a kulcsot VAGY a mentés szerint nyitva van
+        bool planksCleared = ProtectingPlanksRemoved();
+
+        if (rewardState.ToLower() == "true" || wasUnlockedBySave || planksCleared)
+        {
+            isLocked = false;
+        }
+
         if (rewardState.ToLower() == "true" || wasUnlockedBySave)
         {
             isLocked = false;
@@ -78,16 +87,28 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
             }
         }
     }
+
     public void Interact()
     {
-        // 1. Ha már fel van oldva, csak nyitjuk-csukjuk
+        if (isLocked && ProtectingPlanksRemoved())
+        {
+            UnlockAndOpen();
+            return;
+        }
+
+        if (HasProtectingPlanks())
+        {
+            PlaySound(lockedSound);
+            ShowTemporaryMessage("The door is blocked by wooden boards.");
+            return;
+        }
+
         if (!isLocked)
         {
             ToggleDoor();
             return;
         }
 
-        // 2. HA ZÁRVA VAN (isLocked = true), nézzük meg, van-e kulcs/feltétel
         if (requiredKey != null)
         {
             if (KeyInventory.Instance.HasKey(requiredKey))
@@ -109,8 +130,27 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
             else { HandleLockedDoor(false); return; }
         }
 
-       
         HandleLockedDoor(false);
+    }
+
+    private bool HasProtectingPlanks()
+    {
+        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0) return false;
+        foreach (string id in protectingPlankIDs)
+        {
+            if (!SaveSystem.IsPlankPried(id)) return true;
+        }
+        return false;
+    }
+
+    private bool ProtectingPlanksRemoved()
+    {
+        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0) return false;
+        foreach (string id in protectingPlankIDs)
+        {
+            if (!SaveSystem.IsPlankPried(id)) return false;
+        }
+        return true;
     }
 
     private void UnlockAndOpen()
@@ -119,17 +159,9 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
         if (!string.IsNullOrEmpty(doorID))
         {
-            // 1. Betesszük a memóriába (a listába)
             SaveSystem.SaveDoorUnlocked(doorID);
-
-            // 2. AZONNAL kiíratjuk a fájlba a lemezre!
             SaveSystem.Save();
-
             Debug.Log("<color=cyan>AJTÓ SIKERESEN RÖGZÍTVE A FÁJLBA: </color>" + doorID);
-        }
-        else
-        {
-            Debug.LogError("HIÁNYZIK A doorID! Adj nevet az ajtónak az Inspectorban!");
         }
 
         ToggleDoor();
@@ -142,18 +174,13 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         isAnimating = true;
         PlaySound(isDoorOpen ? openSound : closeSound);
 
-        // BIZTONSÁGI MENTÉS: Ha kinyitottad, és nem volt zárolva, akkor is mentsük el az állapotát
         if (isDoorOpen && !isLocked && !string.IsNullOrEmpty(doorID))
         {
             SaveSystem.SaveDoorUnlocked(doorID);
-            // Itt nem hívunk Save-et, hogy ne szaggasson, de a lista frissül
         }
     }
 
-
     public string GetInteractText() => isDoorOpen ? textCloseDoor.GetLocalizedString() : textOpenDoor.GetLocalizedString();
-
-   
 
     private void PlaySound(AudioClip clip)
     {

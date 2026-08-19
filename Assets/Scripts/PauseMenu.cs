@@ -43,6 +43,8 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
+        UiManager.isMenuOpen = false;
+
         if (background != null) background.SetActive(false);
         pauseMenuParent.SetActive(false);
         savePanel.SetActive(false);
@@ -71,6 +73,8 @@ public class PauseMenu : MonoBehaviour
 
     void Pause()
     {
+        UiManager.isMenuOpen = true;
+
         pauseMenuParent.SetActive(true);
         if (background != null) background.SetActive(true);
         buttonsPanel.SetActive(true);

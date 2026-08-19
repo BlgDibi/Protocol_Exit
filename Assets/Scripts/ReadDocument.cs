@@ -16,6 +16,8 @@ public class ReadDocument : MonoBehaviour, InterfaceInteractable
     {
         if (isReading) return;
 
+        UiManager.isMenuOpen = true;
+
         isReading = true;
         documentUIPanel.SetActive(true);
         documentTextUI.text = SaveSystem.CurrentDocumentText;
@@ -32,6 +34,8 @@ public class ReadDocument : MonoBehaviour, InterfaceInteractable
 
     public void CloseDocument()
     {
+        UiManager.isMenuOpen = false;
+
         isReading = false;
         documentUIPanel.SetActive(false);
 
