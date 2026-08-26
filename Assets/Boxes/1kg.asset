@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3b322e911cedb749bcf5877696c082a, type: 3}
-  m_Name: 15kg
+  m_Name: 1kg
   m_EditorClassIdentifier: Assembly-CSharp::SulyDobozData
-  boxname: heavy
-  weight: 15
-  boxpicture: {fileID: 21300000, guid: 7c639e02a13f0be428abc8f04f37f3a6, type: 3}
-  boxprefab: {fileID: 85136575557469873, guid: 8988ae183fe2ab942b028d619354f930, type: 3}
+  boxname: light
+  weight: 1
+  boxpicture: {fileID: 21300000, guid: 66ba765232a741f46bf4a2a64b6ad227, type: 3}
+  boxprefab: {fileID: 3556403838979591924, guid: b2e6c8b3c4adb864e9991c9d58fa38ae, type: 3}

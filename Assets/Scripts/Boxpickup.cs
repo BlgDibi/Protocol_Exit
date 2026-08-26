@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Boxpickup : MonoBehaviour, InterfaceInteractable
 {
     [Header("Box info")]
-    [SerializeField] private SulyDobozData Boxdata;
+    public SulyDobozData Boxdata;
 
     [Header("Settings")]
     [SerializeField] private KeyCode interactkey = KeyCode.E;
@@ -26,7 +26,6 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
     IEnumerator CheckIfAlreadyCollected()
     {
         if (isPlaced) yield break;
-
         if (gameObject.name.Contains("_Placed")) yield break;
 
         yield return new WaitForSeconds(0.1f);
@@ -49,16 +48,32 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
                 {
                     gameObject.SetActive(false);
 
-                    GameObject newBox = Instantiate(Boxdata.boxprefab, placed.position, Quaternion.identity);
+                    GameObject newBox = Instantiate(Boxdata.boxprefab, placed.position, placed.rotation);
+                    newBox.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
                     newBox.name = Boxdata.boxname + "_Placed";
                     newBox.tag = "Boxes";
 
                     Rigidbody rb = newBox.GetComponent<Rigidbody>();
-                    if (rb != null) rb.mass = Boxdata.weight;
+                    if (rb != null)
+                    {
+                        rb.mass = Boxdata.weight;
 
-          
+                        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("ScaleSolved"))
+                        {
+                            rb.isKinematic = true;
+                        }
+                    }
+
                     Boxpickup spawnedScript = newBox.GetComponent<Boxpickup>();
-                    if (spawnedScript != null) spawnedScript.isPlaced = true;
+                    if (spawnedScript != null)
+                    {
+                        spawnedScript.isPlaced = true;
+
+                        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("ScaleSolved"))
+                        {
+                            spawnedScript.enabled = false;
+                        }
+                    }
 
                     yield break;
                 }

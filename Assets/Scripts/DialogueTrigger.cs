@@ -89,17 +89,10 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         bool hasMet = (metState != null && metState.ToLower() == "true") || SaveSystem.WasNPCMet(interactableID);
         bool hasFinished = (rewardState != null && rewardState.ToLower() == "true");
 
+     
         if (hasReachedPoint || hasMet || hasFinished)
         {
-          
-            if (hasMet || hasFinished)
-            {
-                DialogueManager.Instance.EnterDialogueMode(inkJSON, "told_everything", GetComponent<Talk>());
-            }
-            else
-            {
-                StartDialogue();
-            }
+            StartDialogue();
             return;
         }
 

@@ -9,16 +9,17 @@ using TMPro;
 public class SaveSystem
 {
     public static int SelectedSkinIndex = 0;
-
     public static int SlotToSaveAfterLoad = -1;
 
     private static SaveData _savedata = new SaveData();
     public static bool IsGameJustLoaded = false;
     public static int CurrentSceneIndex;
+    public static int CurrentSlot = 1;
 
     private static List<string> _tempUnlockedDoors = new List<string>();
     private static List<string> _tempMetNPCs = new List<string>();
     private static List<string> _tempPriedPlanks = new List<string>();
+    private static List<Savedobjectpos_save> _tempSavedTransforms = new List<Savedobjectpos_save>();
 
     static SaveSystem()
     {
@@ -37,6 +38,7 @@ public class SaveSystem
         if (_savedata.inkMemoryKeys == null) _savedata.inkMemoryKeys = new List<string>();
         if (_savedata.inkMemoryValues == null) _savedata.inkMemoryValues = new List<string>();
         if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
+        if (_savedata.savedTransforms == null) _savedata.savedTransforms = new List<Savedobjectpos_save>();
     }
 
     [System.Serializable]
@@ -44,6 +46,15 @@ public class SaveSystem
     {
         public string boxname;
         public Vector3 position;
+        public Quaternion rotation;
+    }
+
+    [System.Serializable]
+    public struct Savedobjectpos_save
+    {
+        public string objectID;
+        public Vector3 position;
+        public Quaternion rotation;
     }
 
     [System.Serializable]
@@ -69,6 +80,7 @@ public class SaveSystem
         public string savedSceneId;
         public bool hasCrowbar;
         public List<string> priedPlanks;
+        public List<Savedobjectpos_save> savedTransforms;
     }
 
     public static string KeypadFullCode = "";
@@ -84,6 +96,8 @@ public class SaveSystem
         _savedata.unlockedDoors = new List<string>(_tempUnlockedDoors);
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
         _savedata.priedPlanks = new List<string>(_tempPriedPlanks);
+        _savedata.savedTransforms = new List<Savedobjectpos_save>(_tempSavedTransforms);
+
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
         Debug.Log("<color=green>Succesfull save!</color>");
@@ -95,18 +109,36 @@ public class SaveSystem
         CurrentSceneIndex = _savedata.sceneIndex;
         PlayerSave playerScript = GameObject.FindFirstObjectByType<PlayerSave>();
         if (playerScript != null) playerScript.Save(ref _savedata.playerdata);
+
         if (BoxInventory.Instance != null) _savedata.InventoryBoxnames = BoxInventory.Instance.GetSavedBoxNames();
+
         _savedata.PlacedBoxes = new List<PlacedBoxData>();
         GameObject[] boxesInWorld = GameObject.FindGameObjectsWithTag("Boxes");
         foreach (GameObject box in boxesInWorld)
         {
             Boxpickup bp = box.GetComponent<Boxpickup>();
-            if (bp != null && bp.isPlaced)
+            if (bp != null && (bp.isPlaced || box.name.Contains("_Placed")))
             {
                 string cleanName = box.name.Replace("(Clone)", "").Replace("_Placed", "").Trim();
-                _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position });
+                _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position, rotation = box.transform.rotation });
             }
         }
+
+        _tempSavedTransforms.Clear();
+        ItemSave[] saveableObjects = GameObject.FindObjectsByType<ItemSave>(FindObjectsSortMode.None);
+        foreach (var obj in saveableObjects)
+        {
+            if (!string.IsNullOrEmpty(obj.itemID))
+            {
+                _tempSavedTransforms.Add(new Savedobjectpos_save
+                {
+                    objectID = obj.itemID,
+                    position = obj.transform.position,
+                    rotation = obj.transform.rotation
+                });
+            }
+        }
+
         if (KeyInventory.Instance != null)
         {
             _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
@@ -114,6 +146,7 @@ public class SaveSystem
         }
         Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
         if (stopwatch != null) _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
+
         _savedata.activatedSecrets = new List<string>();
         SecretRevealer[] secrets = GameObject.FindObjectsByType<SecretRevealer>(FindObjectsSortMode.None);
         foreach (var secret in secrets)
@@ -121,6 +154,7 @@ public class SaveSystem
             if (secret.isMoved && !string.IsNullOrEmpty(secret.secretID))
                 _savedata.activatedSecrets.Add(secret.secretID);
         }
+
         _savedata.inkMemoryKeys = new List<string>();
         _savedata.inkMemoryValues = new List<string>();
         var mem = DialogueManager.GetInkMemory();
@@ -143,6 +177,24 @@ public class SaveSystem
         _savedata.savedSceneId = CurrentSceneId;
     }
 
+    public static bool GetCupboardTransform(string id, out Vector3 pos, out Quaternion rot)
+    {
+        pos = Vector3.zero;
+        rot = Quaternion.identity;
+        if (_savedata.savedTransforms == null) return false;
+
+        foreach (var t in _savedata.savedTransforms)
+        {
+            if (t.objectID == id)
+            {
+                pos = t.position;
+                rot = t.rotation;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void Load(int slot = 1)
     {
         string path = SaveFileName(slot);
@@ -152,12 +204,17 @@ public class SaveSystem
             string json = File.ReadAllText(path);
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
             if (string.IsNullOrEmpty(json)) throw new Exception("Empty save!");
+            CurrentSlot = slot;
             ResetAllData();
             if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
             _savedata = loadedData;
             InitializeData();
+
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
+            _tempPriedPlanks = new List<string>(_savedata.priedPlanks ?? new List<string>());
+            _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms ?? new List<Savedobjectpos_save>());
+
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
                 Dictionary<string, string> dict = new Dictionary<string, string>();
@@ -166,9 +223,7 @@ public class SaveSystem
                 DialogueManager.SetInkMemory(dict);
             }
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
-
             SelectedSkinIndex = _savedata.savedSkinIndex;
-
             CurrentSceneIndex = _savedata.sceneIndex;
 
             KeypadFullCode = _savedata.savedKeypadFullCode;
@@ -176,7 +231,6 @@ public class SaveSystem
             CurrentDocumentText = _savedata.savedDocumentText;
             CurrentSceneId = _savedata.savedSceneId;
             CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
-            _tempPriedPlanks = new List<string>(_savedata.priedPlanks ?? new List<string>());
 
             UiManager.isMenuOpen = false;
             Time.timeScale = 1f;
@@ -193,13 +247,11 @@ public class SaveSystem
     {
         for (int i = 1; i <= maxSlots; i++)
         {
-            if (!File.Exists(SaveFileName(i)))
-            {
-                return i;
-            }
+            if (!File.Exists(SaveFileName(i))) return i;
         }
         return -1;
     }
+
     public static string GetOldestSaveFileName()
     {
         string folder = Application.persistentDataPath;
@@ -225,6 +277,8 @@ public class SaveSystem
         _savedata = new SaveData();
         _tempUnlockedDoors.Clear();
         _tempMetNPCs.Clear();
+        _tempPriedPlanks.Clear();
+        _tempSavedTransforms.Clear();
         InitializeData();
         IsGameJustLoaded = false;
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
@@ -232,7 +286,6 @@ public class SaveSystem
         KeypadClue = "";
         CurrentDocumentText = "";
         CurrentSceneId = "";
-        _tempPriedPlanks.Clear();
         if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
     }
 

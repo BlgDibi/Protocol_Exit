@@ -13,11 +13,11 @@ public class PersistentItem : MonoBehaviour
 
     private IEnumerator Start()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
 
         if (IsKeyAlreadyInInventory())
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             yield break;
         }
 
@@ -29,6 +29,13 @@ public class PersistentItem : MonoBehaviour
         {
             SetVisibility(false);
         }
+    }
+
+    public void RevealItem()
+    {
+        SaveSystem.SaveNPCMet(itemID);
+        SetVisibility(true);  
+        SaveSystem.Save(SaveSystem.CurrentSlot); 
     }
 
     public void SetVisibility(bool visible)

@@ -122,6 +122,9 @@ public class OwnMovement : MonoBehaviour
 
     public void PlayFootstepSound()
     {
+    
+        if (animator.GetFloat("Speed") < 0.1f || !controller.enabled) return;
+
         if (Time.time - lastFootstepTime < footstepCooldown) return;
 
         if (footstepAudioSource != null && footstepClips.Length > 0 && controller.isGrounded)
