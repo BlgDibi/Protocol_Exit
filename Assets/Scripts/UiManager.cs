@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+
 public class UiManager : MonoBehaviour
 {
-
     public static bool isMenuOpen = false;
 
     [SerializeField] private Transform keyPanel;
@@ -13,12 +13,10 @@ public class UiManager : MonoBehaviour
     [SerializeField] private GameObject boxImagePrefab;
     private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
 
-
-    private Dictionary<Key,GameObject> keyImages = new Dictionary<Key,GameObject>();
+    private Dictionary<Key, GameObject> keyImages = new Dictionary<Key, GameObject>();
 
     [SerializeField] private Sprite flashlightSprite;
     private GameObject flashlightUIInstance;
-
 
     [SerializeField] private Sprite crowbarSprite;
     private GameObject crowbarUIInstance;
@@ -36,6 +34,7 @@ public class UiManager : MonoBehaviour
     {
         RefreshAllUI();
     }
+
     public void RefreshAllUI()
     {
         if (Flashlightpickup.HasFlashlight)
@@ -53,11 +52,18 @@ public class UiManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) 
+        if (Instance == null)
         {
             Instance = this;
 
-            DontDestroyOnLoad(gameObject);
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("A UiManager objektum nem a Hierarchy tetején van!");
+            }
         }
         else
         {
@@ -67,33 +73,32 @@ public class UiManager : MonoBehaviour
 
     public void AddFlashlightToUI()
     {
-        if (flashlightUIInstance != null || flashlightSprite == null) return;
+        if (flashlightUIInstance != null || flashlightSprite == null || keyPanel == null) return;
 
         flashlightUIInstance = Instantiate(keyImagePrefab, keyPanel);
         flashlightUIInstance.GetComponent<Image>().sprite = flashlightSprite;
 
         Debug.Log("Flashlight added to UI!");
-
         Canvas.ForceUpdateCanvases();
     }
 
     public void AddCrowbarToUI()
     {
-        if (crowbarUIInstance != null || crowbarSprite == null) return;
+        if (crowbarUIInstance != null || crowbarSprite == null || keyPanel == null) return;
 
         crowbarUIInstance = Instantiate(keyImagePrefab, keyPanel);
         crowbarUIInstance.GetComponent<Image>().sprite = crowbarSprite;
 
         Debug.Log("Crowbar added to UI!");
-
         Canvas.ForceUpdateCanvases();
     }
+
     public void AddBoxToUI(SulyDobozData doboz)
     {
-        if (boxImages.ContainsKey(doboz)) return;
+        if (boxImages.ContainsKey(doboz) || keyPanel == null) return;
 
         GameObject boxImage = Instantiate(keyImagePrefab, keyPanel);
-        boxImage.GetComponent<UnityEngine.UI.Image>().sprite = doboz.boxpicture;
+        boxImage.GetComponent<Image>().sprite = doboz.boxpicture;
 
         boxImages[doboz] = boxImage;
     }
@@ -102,53 +107,50 @@ public class UiManager : MonoBehaviour
     {
         if (boxImages.ContainsKey(doboz))
         {
-            Destroy(boxImages[doboz]);
+            if (boxImages[doboz] != null)
+            {
+                Destroy(boxImages[doboz]);
+            }
             boxImages.Remove(doboz);
         }
     }
 
-
-
     public void AddKeyToUI(Key key)
     {
-        if (!keyImages.ContainsKey(key))
+        if (!keyImages.ContainsKey(key) && keyPanel != null)
         {
             GameObject keyImage = Instantiate(keyImagePrefab, keyPanel);
             keyImage.GetComponent<Image>().sprite = key.keysprite;
             keyImages[key] = keyImage;
 
             Debug.Log("Key added to UI: " + key.keysprite.name);
-
-
         }
-
     }
-
-
-
 
     public void RemoveKeyFromUI(Key key)
     {
         if (keyImages.ContainsKey(key))
         {
-            Destroy(keyImages[key]);
+            if (keyImages[key] != null)
+            {
+                Destroy(keyImages[key]);
+            }
             keyImages.Remove(key);
             Debug.Log("Key removed from UI: " + key.keysprite.name);
         }
     }
 
-
     public void ClearAllKeysFromUI()
     {
-
         if (keysParent == null) return;
 
         foreach (Transform child in keysParent)
         {
-            Destroy(child.gameObject);
+            if (child != null)
+            {
+                Destroy(child.gameObject);
+            }
         }
+        keyImages.Clear();
     }
-
-
-
 }
