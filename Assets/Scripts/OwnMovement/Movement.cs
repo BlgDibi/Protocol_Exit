@@ -52,9 +52,20 @@ public class OwnMovement : MonoBehaviour
 
     void Update()
     {
-        horizontal = Input.GetAxisRaw("Horizontal");
-        vertical = Input.GetAxisRaw("Vertical");
-        isRunning = Input.GetKey(KeyCode.LeftShift);
+        bool isLookingAround = Input.GetKey(KeyCode.C);
+
+        if (isLookingAround)
+        {
+            horizontal = 0f;
+            vertical = 0f;
+            isRunning = false;
+        }
+        else
+        {
+            horizontal = Input.GetAxisRaw("Horizontal");
+            vertical = Input.GetAxisRaw("Vertical");
+            isRunning = Input.GetKey(KeyCode.LeftShift);
+        }
 
         if (Input.GetButtonDown("Jump") && controller.isGrounded && !isPushingObject)
         {
@@ -116,7 +127,7 @@ public class OwnMovement : MonoBehaviour
         if (cameraRoot == null) return;
         cameraYAngle += Input.GetAxis("Mouse X") * mouseSensitivity;
         cameraXAngle -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        cameraXAngle = Mathf.Clamp(cameraXAngle, -30f, 70f);
+        cameraXAngle = Mathf.Clamp(cameraXAngle, -50f, 70f);
         cameraRoot.rotation = Quaternion.Euler(cameraXAngle, cameraYAngle, 0f);
     }
 

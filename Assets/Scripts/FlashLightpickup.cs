@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Localization;
+using System.Collections;
 
 public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 {
@@ -8,6 +9,9 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
 
     [Header("Flashlight Settings")]
     public GameObject flashlightOnTable;
+
+    [Header("Tutorial UI")]
+    public GameObject tutorialTextPanel;
 
     [Header("Settings")]
     [SerializeField] private Image crosshair;
@@ -39,6 +43,8 @@ public class Flashlightpickup : MonoBehaviour, InterfaceInteractable
         if (UiManager.Instance != null)
         {
             UiManager.Instance.AddFlashlightToUI();
+
+            UiManager.Instance.ShowTemporaryMessage(tutorialTextPanel, 5f);
         }
 
         FlashlightController equipSystem = FindFirstObjectByType<FlashlightController>();

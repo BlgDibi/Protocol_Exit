@@ -115,7 +115,7 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
 
         if (isViewing)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 ResetScale();
                 ClosePuzzle();
@@ -124,7 +124,7 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
     }
 
     public string GetInteractText() => isSolved ? "The scale is balanced." : "Examine Scale";
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()
     {
@@ -324,7 +324,6 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
         }
 
         SaveSystem.Save(SaveSystem.CurrentSlot);
-        Debug.Log($"<color=cyan>Mérleg megoldva -> Automatikus mentés a(z) {SaveSystem.CurrentSlot}. slotra!</color>");
 
         yield return new WaitForSeconds(2.0f);
         ClosePuzzle();

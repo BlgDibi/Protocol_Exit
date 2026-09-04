@@ -48,7 +48,7 @@ public class ReadDocument : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public KeyCode GetInteractKey() => KeyCode.F;
     public string GetInteractText()
     {
         if (isReading)

@@ -11,9 +11,6 @@ public class FlashlightController : MonoBehaviour
     [Tooltip("With this button you switch between items")]
     [SerializeField] private KeyCode cycleKey = KeyCode.Q;
 
-    [Tooltip("With this button you activate or deactivate the item")]
-    [SerializeField] private KeyCode toggleKey = KeyCode.U;
-
     [Header("Battery Settings")]
     public float maxBattery = 100f;
     public static float currentBattery = 100f;
@@ -22,6 +19,12 @@ public class FlashlightController : MonoBehaviour
     [Tooltip("How much drain while not active")]
     public float passiveDrainRate = 0.1f;
 
+    [Header("UV Light Settings")]
+    [Tooltip("Normal Light Color")]
+    public Color normalLightColor = Color.white;
+    [Tooltip("Uv Color")]
+    public Color uvLightColor = new Color(0.5f, 0f, 1f, 1f);
+    [HideInInspector] public bool isUVMode = false;
 
     [Header("Audio Settings")]
     public AudioSource audioSource;
@@ -39,12 +42,14 @@ public class FlashlightController : MonoBehaviour
         if (flashlightLightComponent != null)
         {
             originalIntensity = flashlightLightComponent.intensity;
+            flashlightLightComponent.color = normalLightColor;
         }
 
         isHoldingItem = false;
 
         UpdateEquipmentState();
     }
+
     void Update()
     {
         if (Input.GetKeyDown(cycleKey) && !UiManager.isMenuOpen)
@@ -52,7 +57,7 @@ public class FlashlightController : MonoBehaviour
             CycleItems();
         }
 
-        if (Input.GetKeyDown(toggleKey) && !UiManager.isMenuOpen)
+        if (Input.GetMouseButtonDown(1) && !UiManager.isMenuOpen)
         {
             if (!isHoldingItem && selectedItem == 1 && currentBattery <= 0 && Flashlightpickup.HasFlashlight)
             {
@@ -70,7 +75,28 @@ public class FlashlightController : MonoBehaviour
             UpdateEquipmentState();
         }
 
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0f && !UiManager.isMenuOpen && isHoldingItem && selectedItem == 1 && Flashlightpickup.HasFlashlight)
+        {
+            ToggleLightColor();
+        }
+
         HandleBattery();
+    }
+
+    private void ToggleLightColor()
+    {
+        isUVMode = !isUVMode;
+
+        if (flashlightLightComponent != null)
+        {
+            flashlightLightComponent.color = isUVMode ? uvLightColor : normalLightColor;
+        }
+
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
+        }
     }
 
     private void HandleBattery()

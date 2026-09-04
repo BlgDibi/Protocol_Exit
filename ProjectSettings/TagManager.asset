@@ -9,6 +9,7 @@ TagManager:
   - ending1
   - Boxes
   - Pryable
+  - Shadowpnumbers
   layers:
   - Default
   - TransparentFX

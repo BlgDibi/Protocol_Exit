@@ -33,7 +33,7 @@ public class PictureViewer : MonoBehaviour
     {
         if (isViewing)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 ClosePicture();
             }

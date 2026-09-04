@@ -3,12 +3,20 @@ using TMPro;
 
 public class KeyPadSystem : MonoBehaviour
 {
+    [Header("Code Settings")]
+    [Tooltip("Generated Code")]
+    public bool useGeneratedCode = false;
+
+    [Tooltip("Custom Code")]
+    public string customCode = "1234";
+
     [Header("UI Settings")]
     public GameObject keypadCanvas;
     public TMP_Text display;
 
     [Header("Target Door")]
-    public A1_Door doorToOpen;
+    public A1_Door doorToOpen_Old;
+    public UniversalDoor doorToOpen_New;
 
     [Header("Feedback Colors")]
     public Color successColor = Color.green;
@@ -102,7 +110,16 @@ public class KeyPadSystem : MonoBehaviour
 
         isProcessing = true;
 
-        string targetCode = string.IsNullOrEmpty(SaveSystem.KeypadFullCode) ? "0000" : SaveSystem.KeypadFullCode;
+        string targetCode = "";
+
+        if (useGeneratedCode)
+        {
+            targetCode = string.IsNullOrEmpty(SaveSystem.KeypadFullCode) ? "0000" : SaveSystem.KeypadFullCode;
+        }
+        else
+        {
+            targetCode = customCode;
+        }
 
         if (currentInput == targetCode)
         {
@@ -110,9 +127,14 @@ public class KeyPadSystem : MonoBehaviour
             display.text = "GRANTED";
             display.color = successColor;
 
-            if (doorToOpen != null)
+            if (doorToOpen_Old != null)
             {
-                doorToOpen.Unlock();
+                doorToOpen_Old.Unlock();
+            }
+
+            if (doorToOpen_New != null)
+            {
+                doorToOpen_New.UnlockAndOpen();
             }
 
             Invoke(nameof(CloseKeypad), 1f);

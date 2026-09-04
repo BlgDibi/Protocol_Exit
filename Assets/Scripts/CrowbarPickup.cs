@@ -7,7 +7,7 @@ public class CrowbarPickup : MonoBehaviour, InterfaceInteractable
     public static bool HasCrowbar = false;
 
     [Header("Crowbar Settings")]
-    public GameObject crowbarOnTable; 
+    public GameObject crowbarOnTable;
 
     [Header("Settings")]
     [SerializeField] private Image crosshair;
@@ -41,7 +41,6 @@ public class CrowbarPickup : MonoBehaviour, InterfaceInteractable
             UiManager.Instance.AddCrowbarToUI();
         }
 
-      
         FlashlightController equipSystem = FindFirstObjectByType<FlashlightController>();
         if (equipSystem != null)
         {

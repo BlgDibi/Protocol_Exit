@@ -4,6 +4,9 @@ using System.Collections;
 
 public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
 {
+    [Header("Save System")]
+    public string saveID = "PowerBox_StorageRoom";
+
     [Header("UI & Player References")]
     public GameObject puzzleUIPanel;
     public GameObject[] hudElementsToHide;
@@ -16,8 +19,8 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
     public int[] switchValues;
 
     [Header("Toggle Images")]
-    public Sprite switchOffSprite; // 01.png (Lefelé)
-    public Sprite switchOnSprite;  // 02.png (Felfelé)
+    public Sprite switchOffSprite;
+    public Sprite switchOnSprite;
 
     [Header("Lights (UI Images)")]
     public Image lightGreen;
@@ -54,18 +57,28 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
         {
             sw.onValueChanged.AddListener(delegate { CalculatePower(); });
         }
-        CalculatePower();
+
+        if (SaveSystem.IsPuzzleSolved(saveID))
+        {
+            isSolved = true;
+            currentPower = 100;
+            UpdateLights();
+            UpdateNeedle();
+        }
+        else
+        {
+            CalculatePower(); 
+        }
     }
 
     private void Update()
     {
-        if (isViewing && Input.GetKeyDown(KeyCode.E))
+        if (isViewing && Input.GetKeyDown(KeyCode.F))
         {
             ClosePuzzle();
         }
     }
 
-   
     private void UpdateLights()
     {
         lightGreen.color = offGreen;
@@ -88,6 +101,8 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
 
     public void CalculatePower()
     {
+        if (isSolved) return;
+
         currentPower = basePower;
 
         for (int i = 0; i < switches.Length; i++)
@@ -113,7 +128,9 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
         if (currentPower == 100)
         {
             isSolved = true;
-            Debug.Log("Rendszer túlterhelve! A mutató kiakadt. NYERTÉL!");
+
+            SaveSystem.SavePuzzleSolved(saveID);
+
             Invoke("ClosePuzzle", 1.5f);
         }
         else
@@ -128,15 +145,13 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
         if (needleTransform != null)
         {
             float percentage = (float)currentPower / 100f;
-
             float currentZAngle = Mathf.LerpUnclamped(minZAngle, -125f, percentage);
-
             needleTransform.localRotation = Quaternion.Euler(0f, 0f, currentZAngle);
         }
     }
 
     public string GetInteractText() => isSolved ? "System Overloaded" : "Open Power Box";
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()
     {

@@ -2,23 +2,48 @@ using UnityEngine;
 
 public class Lever_PowerPuzzle : MonoBehaviour, InterfaceInteractable
 {
+    [Header("Mentés (Save System)")]
+    public string saveID = "Lever_Basement_01";
+
     [Header("PowerBox")]
     public PowerBoxPuzzle powerBox;
 
     [Header("Animation")]
-    public Animator leverAnimator; 
+    public Animator leverAnimator;
     public string pullTrigger = "Pull";
+
+    [Tooltip("Animation name")]
+    public string pulledAnimationState = "LeverDown"; 
 
     [Header("Target Power")]
     public int targetPower = 100;
 
-    [Header("Objectstoturnon")]
+    [Header("Objects to turn on")]
     public GameObject[] objectsToTurnOn;
 
     public bool isPulled = false;
 
-    public string GetInteractText() => isPulled ? "System succesfully overloaded" : "Pull the Lever";
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public string GetInteractText() => isPulled ? "System successfully overloaded" : "Pull the Lever";
+    public KeyCode GetInteractKey() => KeyCode.F;
+
+    void Start()
+    {
+        if (SaveSystem.IsPuzzleSolved(saveID))
+        {
+            isPulled = true;
+            if (powerBox != null) powerBox.isSolved = true;
+
+            if (leverAnimator != null)
+            {
+                leverAnimator.Play(pulledAnimationState, 0, 1f);
+            }
+
+            foreach (GameObject obj in objectsToTurnOn)
+            {
+                if (obj != null) obj.SetActive(true);
+            }
+        }
+    }
 
     public void Interact()
     {
@@ -28,6 +53,8 @@ public class Lever_PowerPuzzle : MonoBehaviour, InterfaceInteractable
         {
             isPulled = true;
             powerBox.isSolved = true;
+
+            SaveSystem.SavePuzzleSolved(saveID);
 
             if (leverAnimator != null)
             {
@@ -42,11 +69,7 @@ public class Lever_PowerPuzzle : MonoBehaviour, InterfaceInteractable
                 }
             }
 
-            Debug.Log("<color=red>BUMM! Rendszer rövidre zárva! A Vetítõ áramot kapott!</color>");
         }
-        else
-        {
-            Debug.Log("<color=yellow>Hiba! Az áramszint nem megfelelõ!</color>");
-        }
+      
     }
 }

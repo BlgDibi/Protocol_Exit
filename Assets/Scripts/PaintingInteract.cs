@@ -8,7 +8,7 @@ public class PaintingInteract : MonoBehaviour, InterfaceInteractable
 
     [Header("UI Settings")]
     public string promptText = "Look";
-    public KeyCode interactKey = KeyCode.E;
+    public KeyCode interactKey = KeyCode.F;
 
 
     public string GetInteractText()

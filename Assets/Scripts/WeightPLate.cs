@@ -153,5 +153,5 @@ public class WeightPlate : MonoBehaviour, InterfaceInteractable
         return Mathf.Approximately(currentweight, optimalweight);
     }
 
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public KeyCode GetInteractKey() => KeyCode.F;
 }

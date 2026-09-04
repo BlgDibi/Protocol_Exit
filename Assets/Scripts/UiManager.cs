@@ -1,156 +1,141 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections; 
 using System.Collections.Generic;
 
 public class UiManager : MonoBehaviour
 {
     public static bool isMenuOpen = false;
 
+    [Header("UI References")]
     [SerializeField] private Transform keyPanel;
     [SerializeField] private GameObject keyImagePrefab;
-
     [SerializeField] private Transform boxPanel;
     [SerializeField] private GameObject boxImagePrefab;
-    private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
 
+    [Header("Sprites")]
+    [SerializeField] private Sprite flashlightSprite;
+    [SerializeField] private Sprite crowbarSprite;
+
+    private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
     private Dictionary<Key, GameObject> keyImages = new Dictionary<Key, GameObject>();
 
-    [SerializeField] private Sprite flashlightSprite;
     private GameObject flashlightUIInstance;
-
-    [SerializeField] private Sprite crowbarSprite;
     private GameObject crowbarUIInstance;
+
+    public Transform keysParent;
 
     public static UiManager Instance { get; private set; }
 
-    public Transform keysParent;
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
         RefreshAllUI();
     }
 
-    private void OnEnable()
-    {
-        RefreshAllUI();
-    }
-
     public void RefreshAllUI()
     {
-        if (Flashlightpickup.HasFlashlight)
+        if (keyPanel == null) return;
+
+        foreach (Transform child in keyPanel)
         {
-            AddFlashlightToUI();
+            Destroy(child.gameObject);
         }
 
-        if (CrowbarPickup.HasCrowbar)
-        {
-            AddCrowbarToUI();
-        }
+        flashlightUIInstance = null;
+        crowbarUIInstance = null;
+        boxImages.Clear();
+        keyImages.Clear();
+
+        if (Flashlightpickup.HasFlashlight) AddFlashlightToUI();
+        if (CrowbarPickup.HasCrowbar) AddCrowbarToUI();
 
         Canvas.ForceUpdateCanvases();
-    }
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-
-            if (transform.parent == null)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Debug.LogWarning("A UiManager objektum nem a Hierarchy tetején van!");
-            }
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
     }
 
     public void AddFlashlightToUI()
     {
-        if (flashlightUIInstance != null || flashlightSprite == null || keyPanel == null) return;
+        if (keyPanel == null || flashlightSprite == null) return;
+        if (flashlightUIInstance != null) return;
 
         flashlightUIInstance = Instantiate(keyImagePrefab, keyPanel);
         flashlightUIInstance.GetComponent<Image>().sprite = flashlightSprite;
-
-        Debug.Log("Flashlight added to UI!");
-        Canvas.ForceUpdateCanvases();
     }
 
     public void AddCrowbarToUI()
     {
-        if (crowbarUIInstance != null || crowbarSprite == null || keyPanel == null) return;
+        if (keyPanel == null || crowbarSprite == null) return;
+        if (crowbarUIInstance != null) return;
 
         crowbarUIInstance = Instantiate(keyImagePrefab, keyPanel);
         crowbarUIInstance.GetComponent<Image>().sprite = crowbarSprite;
-
-        Debug.Log("Crowbar added to UI!");
-        Canvas.ForceUpdateCanvases();
     }
 
     public void AddBoxToUI(SulyDobozData doboz)
     {
-        if (boxImages.ContainsKey(doboz) || keyPanel == null) return;
+        if (doboz == null || keyPanel == null) return;
+        if (boxImages.ContainsKey(doboz)) return;
 
         GameObject boxImage = Instantiate(keyImagePrefab, keyPanel);
         boxImage.GetComponent<Image>().sprite = doboz.boxpicture;
-
         boxImages[doboz] = boxImage;
     }
 
     public void RemoveBoxFromUI(SulyDobozData doboz)
     {
-        if (boxImages.ContainsKey(doboz))
-        {
-            if (boxImages[doboz] != null)
-            {
-                Destroy(boxImages[doboz]);
-            }
-            boxImages.Remove(doboz);
-        }
+        if (doboz == null || !boxImages.ContainsKey(doboz)) return;
+
+        if (boxImages[doboz] != null) Destroy(boxImages[doboz]);
+        boxImages.Remove(doboz);
     }
 
     public void AddKeyToUI(Key key)
     {
-        if (!keyImages.ContainsKey(key) && keyPanel != null)
-        {
-            GameObject keyImage = Instantiate(keyImagePrefab, keyPanel);
-            keyImage.GetComponent<Image>().sprite = key.keysprite;
-            keyImages[key] = keyImage;
+        if (key == null || keyPanel == null) return;
+        if (keyImages.ContainsKey(key)) return;
 
-            Debug.Log("Key added to UI: " + key.keysprite.name);
-        }
+        GameObject keyImage = Instantiate(keyImagePrefab, keyPanel);
+        keyImage.GetComponent<Image>().sprite = key.keysprite;
+        keyImages[key] = keyImage;
     }
 
     public void RemoveKeyFromUI(Key key)
     {
-        if (keyImages.ContainsKey(key))
-        {
-            if (keyImages[key] != null)
-            {
-                Destroy(keyImages[key]);
-            }
-            keyImages.Remove(key);
-            Debug.Log("Key removed from UI: " + key.keysprite.name);
-        }
+        if (key == null || !keyImages.ContainsKey(key)) return;
+
+        if (keyImages[key] != null) Destroy(keyImages[key]);
+        keyImages.Remove(key);
     }
 
     public void ClearAllKeysFromUI()
     {
-        if (keysParent == null) return;
-
-        foreach (Transform child in keysParent)
+        if (keysParent != null)
         {
-            if (child != null)
+            foreach (Transform child in keysParent)
             {
-                Destroy(child.gameObject);
+                if (child != null) Destroy(child.gameObject);
             }
         }
         keyImages.Clear();
+    }
+
+
+
+    public void ShowTemporaryMessage(GameObject messagePanel, float duration)
+    {
+        if (messagePanel == null) return;
+
+        StartCoroutine(TemporaryMessageRoutine(messagePanel, duration));
+    }
+
+    private IEnumerator TemporaryMessageRoutine(GameObject panel, float delay)
+    {
+        panel.SetActive(true);                
+        yield return new WaitForSeconds(delay); 
+        panel.SetActive(false);  
     }
 }

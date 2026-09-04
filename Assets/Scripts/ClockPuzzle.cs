@@ -43,7 +43,7 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
     {
         if (isViewing)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 ClosePuzzle();
             }
@@ -56,7 +56,7 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
     }
 
     public string GetInteractText() => isSolved ? "The clock is broken." : "Examine Clock";
-    public KeyCode GetInteractKey() => KeyCode.E;
+    public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()
     {

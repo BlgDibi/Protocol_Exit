@@ -17,7 +17,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     public Key requiredKey;
     public string requiredCondition;
 
-    [Header("Protecting Planks (Add Plank IDs here)")]
+    [Header("Protecting Planks ")]
     public List<string> protectingPlankIDs;
 
     [Header("Sounds")]
@@ -67,7 +67,6 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
             isDoorOpen = true;
             doorPivot.localRotation = Quaternion.Euler(0f, openAngle, 0f);
             targetRotation = doorPivot.localRotation;
-            Debug.Log($"<color=green>AJTÓ HELYREÁLLÍTVA: {doorID}</color>");
         }
         else
         {
@@ -153,7 +152,7 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         return true;
     }
 
-    private void UnlockAndOpen()
+    public void UnlockAndOpen()
     {
         isLocked = false;
 
@@ -161,7 +160,6 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         {
             SaveSystem.SaveDoorUnlocked(doorID);
             SaveSystem.Save();
-            Debug.Log("<color=cyan>AJTÓ SIKERESEN RÖGZÍTVE A FÁJLBA: </color>" + doorID);
         }
 
         ToggleDoor();

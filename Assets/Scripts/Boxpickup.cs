@@ -83,6 +83,11 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
+        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("ScaleSolved"))
+        {
+            return "";
+        }
+
         return interactionPrompt.GetLocalizedString();
     }
 
@@ -90,6 +95,11 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
+        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("ScaleSolved"))
+        {
+            return;
+        }
+
         if (Boxdata != null)
         {
             BoxInventory.Instance.AddBox(Boxdata);
@@ -108,6 +118,11 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
 
     void OnTriggerEnter(Collider other)
     {
+        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("ScaleSolved"))
+        {
+            return;
+        }
+
         if (other.CompareTag("Player")) HighlightCrosshair(true);
     }
 

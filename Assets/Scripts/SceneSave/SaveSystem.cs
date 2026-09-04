@@ -20,6 +20,7 @@ public class SaveSystem
     private static List<string> _tempMetNPCs = new List<string>();
     private static List<string> _tempPriedPlanks = new List<string>();
     private static List<Savedobjectpos_save> _tempSavedTransforms = new List<Savedobjectpos_save>();
+    private static List<string> _tempSolvedPuzzles = new List<string>();
 
     static SaveSystem()
     {
@@ -39,6 +40,7 @@ public class SaveSystem
         if (_savedata.inkMemoryValues == null) _savedata.inkMemoryValues = new List<string>();
         if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
         if (_savedata.savedTransforms == null) _savedata.savedTransforms = new List<Savedobjectpos_save>();
+        if (_savedata.solvedPuzzles == null) _savedata.solvedPuzzles = new List<string>(); 
     }
 
     [System.Serializable]
@@ -81,6 +83,7 @@ public class SaveSystem
         public bool hasCrowbar;
         public List<string> priedPlanks;
         public List<Savedobjectpos_save> savedTransforms;
+        public List<string> solvedPuzzles;
     }
 
     public static string KeypadFullCode = "";
@@ -97,6 +100,7 @@ public class SaveSystem
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
         _savedata.priedPlanks = new List<string>(_tempPriedPlanks);
         _savedata.savedTransforms = new List<Savedobjectpos_save>(_tempSavedTransforms);
+        _savedata.solvedPuzzles = new List<string>(_tempSolvedPuzzles);
 
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
@@ -205,7 +209,11 @@ public class SaveSystem
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
             if (string.IsNullOrEmpty(json)) throw new Exception("Empty save!");
             CurrentSlot = slot;
+
             ResetAllData();
+
+            IsGameJustLoaded = true;
+
             if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
             _savedata = loadedData;
             InitializeData();
@@ -214,6 +222,7 @@ public class SaveSystem
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
             _tempPriedPlanks = new List<string>(_savedata.priedPlanks ?? new List<string>());
             _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms ?? new List<Savedobjectpos_save>());
+            _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles ?? new List<string>());
 
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
@@ -222,6 +231,7 @@ public class SaveSystem
                     dict[_savedata.inkMemoryKeys[i]] = _savedata.inkMemoryValues[i];
                 DialogueManager.SetInkMemory(dict);
             }
+
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
             SelectedSkinIndex = _savedata.savedSkinIndex;
             CurrentSceneIndex = _savedata.sceneIndex;
@@ -231,6 +241,11 @@ public class SaveSystem
             CurrentDocumentText = _savedata.savedDocumentText;
             CurrentSceneId = _savedata.savedSceneId;
             CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
+
+            if (UiManager.Instance != null)
+            {
+                UiManager.Instance.RefreshAllUI();
+            }
 
             UiManager.isMenuOpen = false;
             Time.timeScale = 1f;
@@ -279,8 +294,11 @@ public class SaveSystem
         _tempMetNPCs.Clear();
         _tempPriedPlanks.Clear();
         _tempSavedTransforms.Clear();
+        _tempSolvedPuzzles.Clear();
+
         InitializeData();
         IsGameJustLoaded = false;
+
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
         KeypadFullCode = "";
         KeypadClue = "";
@@ -302,4 +320,8 @@ public class SaveSystem
     public static List<int> GetHistoricalKeys() => _savedata.historicalKeyIds ?? new List<int>();
     public static float GetSavedTime() => _savedata.savedElapsedTime;
     public static bool IsSecretActivated(string secretID) => _savedata.activatedSecrets != null && _savedata.activatedSecrets.Contains(secretID);
+
+    // PUZZLE Mentés lekérdezése / hozzáadása
+    public static void SavePuzzleSolved(string puzzleID) { if (string.IsNullOrEmpty(puzzleID)) return; if (!_tempSolvedPuzzles.Contains(puzzleID)) _tempSolvedPuzzles.Add(puzzleID); }
+    public static bool IsPuzzleSolved(string puzzleID) => _tempSolvedPuzzles.Contains(puzzleID);
 }
