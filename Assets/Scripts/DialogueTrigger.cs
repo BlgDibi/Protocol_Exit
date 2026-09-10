@@ -19,6 +19,17 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     [Header("Animation & Movement")]
     public Animator npcAnimator;
     public string startAnimParameter = "hasSatDown";
+
+    [Tooltip("Keep Anim Bool")]
+    public bool keepAnimBoolTrueAtEnd = true;
+
+    [Tooltip("End Anim trigger")]
+    public string endAnimTrigger = "";
+
+    [Header("Dialogue Look Settings")]
+    [Tooltip("Mechanic thick others dont")]
+    public bool turnToPlayerOnTalk = false;
+
     public string questVariableToWatch = "got_reward";
 
     [Header("Navigation Settings")]
@@ -69,13 +80,11 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             {
                 npcAnimator.SetBool(startAnimParameter, true);
             }
-            Debug.Log("NPC ÜLVE MARAD:" + interactableID);
         }
         else
         {
             hasReachedPoint = false;
             if (agent != null) agent.enabled = true;
-            Debug.Log("Új játék indult, az NPC elkezd sétálni: " + interactableID);
         }
     }
 
@@ -89,7 +98,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         bool hasMet = (metState != null && metState.ToLower() == "true") || SaveSystem.WasNPCMet(interactableID);
         bool hasFinished = (rewardState != null && rewardState.ToLower() == "true");
 
-     
         if (hasReachedPoint || hasMet || hasFinished)
         {
             StartDialogue();
@@ -112,7 +120,13 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         if (npcAnimator != null)
             npcAnimator.SetBool(startAnimParameter, true);
 
-        DialogueManager.Instance.EnterDialogueMode(inkJSON, inkKnotName, GetComponent<Talk>());
+        Talk talkScript = GetComponent<Talk>();
+        if (turnToPlayerOnTalk && talkScript != null)
+        {
+            talkScript.LookAtPlayer();
+        }
+
+        DialogueManager.Instance.EnterDialogueMode(inkJSON, inkKnotName, talkScript != null ? talkScript : GetComponent<Talk>());
     }
 
     private IEnumerator WalkToChairAndTalk()
@@ -154,8 +168,25 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     {
         if (npcAnimator != null)
         {
-            npcAnimator.SetBool(startAnimParameter, true);
+            npcAnimator.SetBool(startAnimParameter, keepAnimBoolTrueAtEnd);
+
+            if (!string.IsNullOrEmpty(endAnimTrigger))
+            {
+                npcAnimator.SetTrigger(endAnimTrigger);
+            }
         }
+
+        Talk talkScript = GetComponent<Talk>();
+        if (talkScript != null && talkScript.c4Item != null)
+        {
+            StartCoroutine(HideItemAfterDelay(talkScript));
+        }
+    }
+
+    private IEnumerator HideItemAfterDelay(Talk talkScript)
+    {
+        yield return new WaitForSeconds(talkScript.timeToAppear);
+        talkScript.HideItem();
     }
 
     private void Update()
