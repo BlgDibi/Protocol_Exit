@@ -40,7 +40,15 @@ MonoBehaviour:
       INTERACT:
 
       PICK
-      UP:'
+      UP:
+
+      USE ITEM:
+
+      SWITCH ITEM:
+
+      PUSH:
+
+      LOOK AROUND: '
     m_Metadata:
       m_Items: []
   - m_Id: 30064006125899776
@@ -56,7 +64,16 @@ MonoBehaviour:
 
       F
 
-      E'
+      E
+
+      MOUSE
+      0
+
+      Q
+
+      V
+
+      C'
     m_Metadata:
       m_Items: []
   references:

@@ -21,12 +21,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - Locale
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ec96909bc4c87af4a83847386e537ede
-    m_Address: Hungarian (hu)
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: bd76d0b2db60c9c4d82258e92a4dbaf7, type: 2}
   m_SchemaSet:
