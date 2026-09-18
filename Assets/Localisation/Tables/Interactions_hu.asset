@@ -63,6 +63,10 @@ MonoBehaviour:
     m_Localized: "Nyomd meg a(z) F bet\u0171t a pr\xF3b\xE1hoz"
     m_Metadata:
       m_Items: []
+  - m_Id: 89209126918950912
+    m_Localized: "Letev\xE9s"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

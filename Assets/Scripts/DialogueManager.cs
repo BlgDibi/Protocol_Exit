@@ -17,7 +17,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogueText;
 
     [Header("UI Prompts To Hide")]
-
     [SerializeField] private GameObject talkPromptUI;
 
     [Header("Answer Buttons")]
@@ -34,6 +33,7 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Rewards")]
     [SerializeField] private GameObject greenKey;
+    [SerializeField] private GameObject c4RewardObject;
 
     private static Dictionary<string, string> inkMemory = new Dictionary<string, string>();
     private TextAsset currentInkAsset;
@@ -172,6 +172,10 @@ public class DialogueManager : MonoBehaviour
             {
                 SpawnGreenKey();
             }
+            else if (tag == "spawn_c4")
+            {
+                SpawnC4();
+            }
             else if (tag.StartsWith("voice:"))
             {
                 if (currentNPC != null)
@@ -186,7 +190,6 @@ public class DialogueManager : MonoBehaviour
 
     public void ExitDialogueMode()
     {
-
         UiManager.isMenuOpen = false;
 
         if (currentStory != null && currentInkAsset != null)
@@ -212,7 +215,6 @@ public class DialogueManager : MonoBehaviour
 
         if (currentNPC != null)
         {
-            currentNPC.ResetRotation();
             currentNPC = null;
         }
     }
@@ -294,6 +296,43 @@ public class DialogueManager : MonoBehaviour
 
             SaveSystem.SaveNPCMet("green_key_spawned");
             Debug.Log("<color=yellow>Key Spawned!</color>");
+        }
+    }
+
+    public void SpawnC4()
+    {
+        if (c4RewardObject != null)
+        {
+            if (currentNPC != null)
+            {
+                Animator npcAnim = currentNPC.GetComponent<Animator>();
+                if (npcAnim != null)
+                {
+                    npcAnim.SetTrigger("GiveItem");
+                }
+
+                Talk talk = currentNPC.GetComponent<Talk>();
+                if (talk != null)
+                {
+                    talk.StartCoroutine(ShowC4RewardWithDelay(c4RewardObject, 1.0f));
+                }
+            }
+
+            if (ConditionManager.Instance != null)
+            {
+                ConditionManager.Instance.SetCondition("C4Spawned", true);
+            }
+
+            Debug.Log("<color=yellow>C4 GiveItem Animation Triggered & Delayed Spawn!</color>");
+        }
+    }
+
+    private IEnumerator ShowC4RewardWithDelay(GameObject c4Obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (c4Obj != null)
+        {
+            c4Obj.SetActive(true);
         }
     }
 }

@@ -112,9 +112,17 @@ public class KeyPadSystem : MonoBehaviour
 
         string targetCode = "";
 
-        if (useGeneratedCode)
+        if (useGeneratedCode == true)
         {
-            targetCode = string.IsNullOrEmpty(SaveSystem.KeypadFullCode) ? "0000" : SaveSystem.KeypadFullCode;
+            
+            if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode) == true)
+            {
+                targetCode = "0000";
+            }
+            else
+            {
+                targetCode = SaveSystem.KeypadFullCode;
+            }
         }
         else
         {

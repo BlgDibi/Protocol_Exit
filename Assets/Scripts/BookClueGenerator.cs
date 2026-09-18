@@ -76,40 +76,48 @@ public class BookClueGenerator : MonoBehaviour
         string documentTitle = "";
         string documentText = "";
 
-        if (pattern == 0)
+        int hiddenIndex = Random.Range(0, 4);
+
+        if (pattern == 0) 
         {
-            digits[0] = Random.Range(0, 7);
-            for (int i = 1; i < 4; i++) digits[i] = digits[i - 1] + 1;
+            digits[0] = Random.Range(1, 6);
+            for (int i = 1; i < 4; i++) 
+                digits[i] = digits[i - 1] + 1;
+
             documentTitle = "Journal Entry - The Girl";
-            documentText = $"She arrived at room {digits[0]}. Every day, she moves exactly one door down the hall. Tomorrow, she will move again. She is searching for something she lost long ago.";
+            documentText = "She is methodical. She never skips a room, always moving to the very next door down the hall. Every step is exactly one higher than the last. If you know where she was, you know where she is going.";
         }
         else if (pattern == 1)
         {
             digits[0] = Random.Range(1, 4);
-            for (int i = 1; i < 4; i++) digits[i] = digits[i - 1] + 2;
+            for (int i = 1; i < 4; i++) 
+                digits[i] = digits[i - 1] + 2;
+
             documentTitle = "Old Maintenance Note";
-            documentText = $"The old system needs a specific sequence. I set the first dial to {digits[0]}. Then, I turn it exactly two clicks forward each time. It's the only way to keep the lights on.";
+            documentText = "The mechanism is jammed. To keep it turning, the dial must jump forward by exactly two clicks every single time. Any other sequence will lock it permanently.";
         }
         else if (pattern == 2)
         {
             digits[0] = Random.Range(1, 9);
             digits[1] = 9 - digits[0];
             digits[2] = digits[0];
-            digits[3] = 9 - digits[0];
+            digits[3] = digits[1];
+
             documentTitle = "Torn Diary Page";
-            documentText = $"I look in the mirror. I wrote a {digits[0]} on the glass. The reflection shows the opposite. Together, we always make nine. The pattern repeats over and over.";
+            documentText = "The reflection is flawed but consistent. The first and third marks are identical. The second and fourth match as well. Together, the first pair always totals exactly nine.";
         }
         else
         {
             digits[0] = Random.Range(4, 10);
-            for (int i = 1; i < 4; i++) digits[i] = digits[i - 1] - 1;
+            for (int i = 1; i < 4; i++) 
+                digits[i] = digits[i - 1] - 1;
+
             documentTitle = "Doctor's Note";
-            documentText = $"We started the countdown at {digits[0]}. Every hour, the number drops by exactly one. When it reaches the end, she will finally wake up. She is the only one left here.";
+            documentText = "The protocol is a strict countdown. With each step, the value drops by exactly one. Do not break the descending sequence, or the lock will reset forever.";
         }
 
         SaveSystem.KeypadFullCode = $"{digits[0]}{digits[1]}{digits[2]}{digits[3]}";
 
-        int hiddenIndex = Random.Range(0, 4);
         string[] clueParts = new string[4];
         for (int i = 0; i < 4; i++)
         {
@@ -117,6 +125,7 @@ public class BookClueGenerator : MonoBehaviour
         }
 
         SaveSystem.KeypadClue = $"{clueParts[0]}   {clueParts[1]}   {clueParts[2]}   {clueParts[3]}";
+
         SaveSystem.CurrentDocumentText = $"<b>{documentTitle}</b>\n\n{documentText}";
     }
 }

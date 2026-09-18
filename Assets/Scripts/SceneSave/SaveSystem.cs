@@ -40,7 +40,7 @@ public class SaveSystem
         if (_savedata.inkMemoryValues == null) _savedata.inkMemoryValues = new List<string>();
         if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
         if (_savedata.savedTransforms == null) _savedata.savedTransforms = new List<Savedobjectpos_save>();
-        if (_savedata.solvedPuzzles == null) _savedata.solvedPuzzles = new List<string>(); 
+        if (_savedata.solvedPuzzles == null) _savedata.solvedPuzzles = new List<string>();
     }
 
     [System.Serializable]
@@ -72,7 +72,14 @@ public class SaveSystem
         public List<string> activatedSecrets;
         public List<string> inkMemoryKeys;
         public List<string> inkMemoryValues;
+
         public bool hasFlashlight;
+        public float savedBatteryLevel;
+        public bool hasCrowbar;
+        public bool hasDetonator;
+        public bool hasC4;
+        public bool isBarricadeDestroyed; 
+
         public List<string> unlockedDoors;
         public List<string> metNPCs;
         public int savedSkinIndex;
@@ -80,7 +87,6 @@ public class SaveSystem
         public string savedKeypadClue;
         public string savedDocumentText;
         public string savedSceneId;
-        public bool hasCrowbar;
         public List<string> priedPlanks;
         public List<Savedobjectpos_save> savedTransforms;
         public List<string> solvedPuzzles;
@@ -104,7 +110,7 @@ public class SaveSystem
 
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
-        Debug.Log("<color=green>Succesfull save!</color>");
+        Debug.Log("<color=green>Successful save!</color>");
     }
 
     private static void HandleSaveData()
@@ -149,7 +155,8 @@ public class SaveSystem
             _savedata.historicalKeyIds = KeyInventory.Instance.GetHistoricalKeyIds();
         }
         Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
-        if (stopwatch != null) _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
+        if (stopwatch != null)
+            _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
 
         _savedata.activatedSecrets = new List<string>();
         SecretRevealer[] secrets = GameObject.FindObjectsByType<SecretRevealer>(FindObjectsSortMode.None);
@@ -172,9 +179,18 @@ public class SaveSystem
         }
 
         _savedata.hasFlashlight = Flashlightpickup.HasFlashlight;
-        _savedata.hasCrowbar = CrowbarPickup.HasCrowbar;
-        _savedata.savedSkinIndex = SelectedSkinIndex;
+        _savedata.savedBatteryLevel = FlashlightController.currentBattery;
 
+        _savedata.hasCrowbar = CrowbarPickup.HasCrowbar;
+        _savedata.hasDetonator = Detonator_Pickup.HasDetonator;
+        _savedata.hasC4 = C4_Pickup.HasC4;
+
+        if (ConditionManager.Instance != null)
+        {
+            _savedata.isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
+        }
+
+        _savedata.savedSkinIndex = SelectedSkinIndex;
         _savedata.savedKeypadFullCode = KeypadFullCode;
         _savedata.savedKeypadClue = KeypadClue;
         _savedata.savedDocumentText = CurrentDocumentText;
@@ -207,7 +223,8 @@ public class SaveSystem
         {
             string json = File.ReadAllText(path);
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
-            if (string.IsNullOrEmpty(json)) throw new Exception("Empty save!");
+            if (string.IsNullOrEmpty(json))
+                throw new Exception("Empty save!");
             CurrentSlot = slot;
 
             ResetAllData();
@@ -215,14 +232,33 @@ public class SaveSystem
             IsGameJustLoaded = true;
 
             if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
+            if (!json.Contains("savedBatteryLevel"))
+            {
+                loadedData.savedBatteryLevel = 100f;
+            }
+
             _savedata = loadedData;
             InitializeData();
 
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
-            _tempPriedPlanks = new List<string>(_savedata.priedPlanks ?? new List<string>());
+            if (_savedata.priedPlanks != null)
+            {
+                _tempPriedPlanks = new List<string>(_savedata.priedPlanks);
+            }
+            else
+            {
+                _tempPriedPlanks = new List<string>();
+            }
             _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms ?? new List<Savedobjectpos_save>());
-            _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles ?? new List<string>());
+            if (_savedata.solvedPuzzles != null)
+            {
+                _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles);
+            }
+            else
+            {
+                _tempSolvedPuzzles = new List<string>();
+            }
 
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
@@ -233,6 +269,22 @@ public class SaveSystem
             }
 
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
+            FlashlightController.currentBattery = _savedata.savedBatteryLevel;
+
+            CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
+            Detonator_Pickup.HasDetonator = _savedata.hasDetonator;
+            C4_Pickup.HasC4 = _savedata.hasC4;
+
+            if (ConditionManager.Instance != null)
+            {
+                ConditionManager.Instance.SetCondition("BarricadeDestroyed", _savedata.isBarricadeDestroyed);
+            }
+
+            if (_savedata.isBarricadeDestroyed)
+            {
+                Detonator_Pickup.HasDetonator = false;
+            }
+
             SelectedSkinIndex = _savedata.savedSkinIndex;
             CurrentSceneIndex = _savedata.sceneIndex;
 
@@ -240,7 +292,6 @@ public class SaveSystem
             KeypadClue = _savedata.savedKeypadClue;
             CurrentDocumentText = _savedata.savedDocumentText;
             CurrentSceneId = _savedata.savedSceneId;
-            CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
 
             if (UiManager.Instance != null)
             {
@@ -270,17 +321,45 @@ public class SaveSystem
     public static string GetOldestSaveFileName()
     {
         string folder = Application.persistentDataPath;
-        var files = Directory.GetFiles(folder, "save_*.json");
-        return files.Length > 0 ? Path.GetFileName(files.OrderBy(f => File.GetLastWriteTime(f)).First()) : null;
+        string[] files = Directory.GetFiles(folder, "save_*.json");
+
+        if (files.Length == 0) return null;
+
+        string oldestFile = files[0];
+        System.DateTime oldestTime = File.GetLastWriteTime(oldestFile);
+
+        for (int i = 1; i < files.Length; i++)
+        {
+            System.DateTime currentTime = File.GetLastWriteTime(files[i]);
+            if (currentTime < oldestTime)
+            {
+                oldestTime = currentTime;
+                oldestFile = files[i];
+            }
+        }
+        return Path.GetFileName(oldestFile);
     }
 
     public static void DeleteOldestSaveFile()
     {
         string folder = Application.persistentDataPath;
-        var files = Directory.GetFiles(folder, "save_*.json");
+        string[] files = Directory.GetFiles(folder, "save_*.json");
+
         if (files.Length > 0)
         {
-            string oldestFile = files.OrderBy(f => File.GetLastWriteTime(f)).First();
+            string oldestFile = files[0];
+            System.DateTime oldestTime = File.GetLastWriteTime(oldestFile);
+
+            for (int i = 1; i < files.Length; i++)
+            {
+                System.DateTime currentTime = File.GetLastWriteTime(files[i]);
+                if (currentTime < oldestTime)
+                {
+                    oldestTime = currentTime;
+                    oldestFile = files[i];
+                }
+            }
+
             File.Delete(oldestFile);
             ResetAllData();
             Debug.Log("Oldest save deleted: " + oldestFile);
@@ -300,19 +379,40 @@ public class SaveSystem
         IsGameJustLoaded = false;
 
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
+
+        FlashlightController.currentBattery = 100f;
+
+        if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
+        if (Detonator_Pickup.HasDetonator) Detonator_Pickup.HasDetonator = false;
+        if (C4_Pickup.HasC4) C4_Pickup.HasC4 = false;
+
         KeypadFullCode = "";
         KeypadClue = "";
         CurrentDocumentText = "";
         CurrentSceneId = "";
-        if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
     }
 
-    public static void SaveNPCMet(string npcID) { if (string.IsNullOrEmpty(npcID)) return; if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID); }
+    public static void SaveNPCMet(string npcID)
+    {
+        if (string.IsNullOrEmpty(npcID)) return;
+        if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID);
+    }
     public static bool WasNPCMet(string npcID) => _tempMetNPCs.Contains(npcID);
-    public static void SaveDoorUnlocked(string doorID) { if (string.IsNullOrEmpty(doorID)) return; if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID); }
+
+    public static void SaveDoorUnlocked(string doorID)
+    {
+        if (string.IsNullOrEmpty(doorID)) return;
+        if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID);
+    }
     public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
-    public static void SavePlankPried(string plankID) { if (string.IsNullOrEmpty(plankID)) return; if (!_tempPriedPlanks.Contains(plankID)) _tempPriedPlanks.Add(plankID); }
+
+    public static void SavePlankPried(string plankID)
+    {
+        if (string.IsNullOrEmpty(plankID)) return;
+        if (!_tempPriedPlanks.Contains(plankID)) _tempPriedPlanks.Add(plankID);
+    }
     public static bool IsPlankPried(string plankID) => _tempPriedPlanks.Contains(plankID);
+
     public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
     public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
     public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();
@@ -321,7 +421,10 @@ public class SaveSystem
     public static float GetSavedTime() => _savedata.savedElapsedTime;
     public static bool IsSecretActivated(string secretID) => _savedata.activatedSecrets != null && _savedata.activatedSecrets.Contains(secretID);
 
-    // PUZZLE Mentés lekérdezése / hozzáadása
-    public static void SavePuzzleSolved(string puzzleID) { if (string.IsNullOrEmpty(puzzleID)) return; if (!_tempSolvedPuzzles.Contains(puzzleID)) _tempSolvedPuzzles.Add(puzzleID); }
-    public static bool IsPuzzleSolved(string puzzleID) => _tempSolvedPuzzles.Contains(puzzleID);
+    public static void SavePuzzleSolved(string puzzleID)
+    {
+        if (string.IsNullOrEmpty(puzzleID)) return;
+        if (!_tempSolvedPuzzles.Contains(puzzleID)) _tempSolvedPuzzles.Add(puzzleID);
+    }
+    public static bool IsPuzzleSolved(string puzzleID) => _savedata.solvedPuzzles != null && _savedata.solvedPuzzles.Contains(puzzleID);
 }

@@ -26,12 +26,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     [Tooltip("End Anim trigger")]
     public string endAnimTrigger = "";
 
-    [Header("Dialogue Look Settings")]
-    [Tooltip("Mechanic thick others dont")]
-    public bool turnToPlayerOnTalk = false;
-
-    public string questVariableToWatch = "got_reward";
-
     [Header("Navigation Settings")]
     public Transform interactionPoint;
     public Transform[] patrolPoints;
@@ -40,6 +34,9 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     private bool isMovingToPoint = false;
     private bool hasReachedPoint = false;
     private int currentPatrolIndex = -1;
+
+    [Header("Quest Settings")]
+    public string questVariableToWatch = "got_reward";
 
     private void Start()
     {
@@ -60,15 +57,18 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     private IEnumerator InitializeNPCState()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
 
         bool metInSaveList = SaveSystem.WasNPCMet(interactableID);
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState(questVariableToWatch) : "false";
 
-        if (metInSaveList || rewardState.ToLower() == "true")
+        bool hasC4Already = C4_Pickup.HasC4 || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
+
+        if (metInSaveList || rewardState.ToLower() == "true" || hasC4Already)
         {
             hasReachedPoint = true;
-            if (agent != null) agent.enabled = false;
+            if (agent != null)
+                agent.enabled = false;
 
             if (interactionPoint != null)
             {
@@ -79,12 +79,15 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             if (npcAnimator != null)
             {
                 npcAnimator.SetBool(startAnimParameter, true);
+
+                npcAnimator.Play("breathing", -1, 0f);
             }
         }
         else
         {
             hasReachedPoint = false;
-            if (agent != null) agent.enabled = true;
+            if (agent != null)
+                agent.enabled = true;
         }
     }
 
@@ -93,7 +96,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         if (isMovingToPoint || DialogueManager.Instance == null || inkJSON == null) return;
 
         string metState = DialogueManager.Instance.GetVariableState("met_npc");
-        string rewardState = DialogueManager.Instance.GetVariableState(questVariableToWatch);
+        string rewardState = DialogueManager.Instance.GetVariableState("got_reward");
 
         bool hasMet = (metState != null && metState.ToLower() == "true") || SaveSystem.WasNPCMet(interactableID);
         bool hasFinished = (rewardState != null && rewardState.ToLower() == "true");
@@ -115,18 +118,40 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     private void StartDialogue()
     {
-        SaveSystem.SaveNPCMet(interactableID);
-
         if (npcAnimator != null)
-            npcAnimator.SetBool(startAnimParameter, true);
-
-        Talk talkScript = GetComponent<Talk>();
-        if (turnToPlayerOnTalk && talkScript != null)
         {
-            talkScript.LookAtPlayer();
+            npcAnimator.SetBool(startAnimParameter, true);
         }
 
-        DialogueManager.Instance.EnterDialogueMode(inkJSON, inkKnotName, talkScript != null ? talkScript : GetComponent<Talk>());
+        Talk talkScript = GetComponent<Talk>();
+        string currentKnot = inkKnotName;
+
+        if (DialogueManager.Instance != null)
+        {
+            string inkHasC4 = DialogueManager.Instance.GetVariableState("HasC4");
+            string inkHasDetonator = DialogueManager.Instance.GetVariableState("HasDetonator");
+
+            bool hasDetonator = Detonator_Pickup.HasDetonator || (inkHasDetonator != null && inkHasDetonator.ToLower() == "true");
+            bool hasC4 = C4_Pickup.HasC4 || (inkHasC4 != null && inkHasC4.ToLower() == "true") || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
+            bool hasMetBefore = SaveSystem.WasNPCMet(interactableID);
+
+            if (hasC4)
+            {
+                currentKnot = "mechanic_leave_me";
+            }
+            else if (hasDetonator)
+            {
+                currentKnot = "mechanic_done";
+            }
+            else if (hasMetBefore)
+            {
+                currentKnot = "mechanic_waiting";
+            }
+        }
+
+        SaveSystem.SaveNPCMet(interactableID);
+
+        DialogueManager.Instance.EnterDialogueMode(inkJSON, currentKnot, talkScript);
     }
 
     private IEnumerator WalkToChairAndTalk()
@@ -175,18 +200,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
                 npcAnimator.SetTrigger(endAnimTrigger);
             }
         }
-
-        Talk talkScript = GetComponent<Talk>();
-        if (talkScript != null && talkScript.c4Item != null)
-        {
-            StartCoroutine(HideItemAfterDelay(talkScript));
-        }
-    }
-
-    private IEnumerator HideItemAfterDelay(Talk talkScript)
-    {
-        yield return new WaitForSeconds(talkScript.timeToAppear);
-        talkScript.HideItem();
     }
 
     private void Update()
@@ -202,5 +215,15 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     }
 
     public KeyCode GetInteractKey() => interactionKey;
-    public string GetInteractText() => isMovingToPoint ? "" : interactionPrompt.GetLocalizedString();
+    public string GetInteractText()
+    {
+        if (isMovingToPoint == true)
+        {
+            return "";
+        }
+        else
+        {
+            return interactionPrompt.GetLocalizedString();
+        }
+    }
 }

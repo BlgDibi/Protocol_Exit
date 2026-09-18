@@ -51,7 +51,18 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
         yield return new WaitForSeconds(0.1f);
 
-        string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
+        string rewardState;
+
+        if (DialogueManager.Instance != null)
+        {
+            rewardState = DialogueManager.Instance.GetVariableState("got_reward");
+        }
+        else
+        {
+          
+            rewardState = "";
+        }
+
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
 
         bool planksCleared = ProtectingPlanksRemoved();
@@ -116,7 +127,11 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
                 UnlockAndOpen();
                 return;
             }
-            else { HandleLockedDoor(true); return; }
+            else 
+            { 
+                HandleLockedDoor(true); 
+                return; 
+            }
         }
 
         if (!string.IsNullOrEmpty(requiredCondition))
@@ -126,7 +141,11 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
                 UnlockAndOpen();
                 return;
             }
-            else { HandleLockedDoor(false); return; }
+            else 
+            { 
+                HandleLockedDoor(false); 
+                return; 
+            }
         }
 
         HandleLockedDoor(false);
@@ -134,20 +153,24 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
 
     private bool HasProtectingPlanks()
     {
-        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0) return false;
+        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0)
+            return false;
         foreach (string id in protectingPlankIDs)
         {
-            if (!SaveSystem.IsPlankPried(id)) return true;
+            if (!SaveSystem.IsPlankPried(id)) 
+                return true;
         }
         return false;
     }
 
     private bool ProtectingPlanksRemoved()
     {
-        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0) return false;
+        if (protectingPlankIDs == null || protectingPlankIDs.Count == 0)
+            return false;
         foreach (string id in protectingPlankIDs)
         {
-            if (!SaveSystem.IsPlankPried(id)) return false;
+            if (!SaveSystem.IsPlankPried(id)) 
+                return false;
         }
         return true;
     }
@@ -168,27 +191,65 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     private void ToggleDoor()
     {
         isDoorOpen = !isDoorOpen;
-        targetRotation = Quaternion.Euler(0f, isDoorOpen ? openAngle : closeAngle, 0f);
-        isAnimating = true;
-        PlaySound(isDoorOpen ? openSound : closeSound);
 
-        if (isDoorOpen && !isLocked && !string.IsNullOrEmpty(doorID))
+        if (isDoorOpen == true)
+        {
+            targetRotation = Quaternion.Euler(0f, openAngle, 0f);
+            PlaySound(openSound);
+        }
+        else
+        {
+            targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
+            PlaySound(closeSound);
+        }
+
+        isAnimating = true;
+
+        if (isDoorOpen == true && isLocked == false && string.IsNullOrEmpty(doorID) == false)
         {
             SaveSystem.SaveDoorUnlocked(doorID);
         }
     }
 
-    public string GetInteractText() => isDoorOpen ? textCloseDoor.GetLocalizedString() : textOpenDoor.GetLocalizedString();
-
+    public string GetInteractText()
+    {
+        if (isDoorOpen == true)
+        {
+            return textCloseDoor.GetLocalizedString();
+        }
+        else
+        {
+            return textOpenDoor.GetLocalizedString();
+        }
+    }
     private void PlaySound(AudioClip clip)
     {
-        if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
+        if (audioSource != null && clip != null) 
+            audioSource.PlayOneShot(clip);
     }
 
     private void HandleLockedDoor(bool isKeyMissing)
     {
         PlaySound(lockedSound);
-        string msg = isKeyMissing ? "Locked! I need a key." : (lockedMessageKey.IsEmpty ? "Locked." : lockedMessageKey.GetLocalizedString());
+
+        string msg; 
+
+        if (isKeyMissing == true)
+        {
+            msg = "Locked! I need a key.";
+        }
+        else
+        {
+            
+            if (lockedMessageKey.IsEmpty == true)
+            {
+                msg = "Locked.";
+            }
+            else
+            {
+                msg = lockedMessageKey.GetLocalizedString();
+            }
+        }
         ShowTemporaryMessage(msg);
     }
 
@@ -206,7 +267,8 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     private IEnumerator HideMessageAfterDelay()
     {
         yield return new WaitForSeconds(messageDuration);
-        if (messagePanel != null) messagePanel.SetActive(false);
+        if (messagePanel != null) 
+            messagePanel.SetActive(false);
     }
 
     public KeyCode GetInteractKey() => interactionKey;

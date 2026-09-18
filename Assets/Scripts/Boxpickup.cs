@@ -26,11 +26,13 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
     IEnumerator CheckIfAlreadyCollected()
     {
         if (isPlaced) yield break;
-        if (gameObject.name.Contains("_Placed")) yield break;
+        if (gameObject.name.Contains("_Placed")) 
+            yield break;
 
         yield return new WaitForSeconds(0.1f);
 
-        if (Boxdata == null) yield break;
+        if (Boxdata == null) 
+            yield break;
 
         List<string> mentettInventory = SaveSystem.GetInventoryBoxes();
         if (mentettInventory != null && mentettInventory.Contains(Boxdata.boxname))
@@ -123,16 +125,28 @@ public class Boxpickup : MonoBehaviour, InterfaceInteractable
             return;
         }
 
-        if (other.CompareTag("Player")) HighlightCrosshair(true);
+        if (other.CompareTag("Player")) 
+            HighlightCrosshair(true);
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player")) HighlightCrosshair(false);
+        if (other.CompareTag("Player")) 
+            HighlightCrosshair(false);
     }
 
     void HighlightCrosshair(bool on)
     {
-        if (crosshair != null) crosshair.color = on ? Color.red : Color.white;
+        if (crosshair != null)
+        {
+            if (on == true)
+            {
+                crosshair.color = Color.red;
+            }
+            else
+            {
+                crosshair.color = Color.white;
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections; 
+using System.Collections;
 using System.Collections.Generic;
 
 public class UiManager : MonoBehaviour
@@ -16,12 +16,16 @@ public class UiManager : MonoBehaviour
     [Header("Sprites")]
     [SerializeField] private Sprite flashlightSprite;
     [SerializeField] private Sprite crowbarSprite;
+    [SerializeField] private Sprite detonatorSprite;
+    [SerializeField] private Sprite c4Sprite;
 
     private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
     private Dictionary<Key, GameObject> keyImages = new Dictionary<Key, GameObject>();
 
     private GameObject flashlightUIInstance;
     private GameObject crowbarUIInstance;
+    private GameObject detonatorUIInstance;
+    private GameObject c4UIInstance;
 
     public Transform keysParent;
 
@@ -48,11 +52,15 @@ public class UiManager : MonoBehaviour
 
         flashlightUIInstance = null;
         crowbarUIInstance = null;
+        detonatorUIInstance = null;
+        c4UIInstance = null;
         boxImages.Clear();
         keyImages.Clear();
 
         if (Flashlightpickup.HasFlashlight) AddFlashlightToUI();
         if (CrowbarPickup.HasCrowbar) AddCrowbarToUI();
+        if (Detonator_Pickup.HasDetonator) AddDetonatorToUI();
+        if (C4_Pickup.HasC4) AddC4ToUI();
 
         Canvas.ForceUpdateCanvases();
     }
@@ -73,6 +81,24 @@ public class UiManager : MonoBehaviour
 
         crowbarUIInstance = Instantiate(keyImagePrefab, keyPanel);
         crowbarUIInstance.GetComponent<Image>().sprite = crowbarSprite;
+    }
+
+    public void AddDetonatorToUI()
+    {
+        if (keyPanel == null || detonatorSprite == null) return;
+        if (detonatorUIInstance != null) return;
+
+        detonatorUIInstance = Instantiate(keyImagePrefab, keyPanel);
+        detonatorUIInstance.GetComponent<Image>().sprite = detonatorSprite;
+    }
+
+    public void AddC4ToUI()
+    {
+        if (keyPanel == null || c4Sprite == null) return;
+        if (c4UIInstance != null) return;
+
+        c4UIInstance = Instantiate(keyImagePrefab, keyPanel);
+        c4UIInstance.GetComponent<Image>().sprite = c4Sprite;
     }
 
     public void AddBoxToUI(SulyDobozData doboz)
@@ -123,6 +149,23 @@ public class UiManager : MonoBehaviour
         keyImages.Clear();
     }
 
+    public void RemoveC4FromUI()
+    {
+        if (c4UIInstance != null)
+        {
+            Destroy(c4UIInstance);
+            c4UIInstance = null;
+        }
+    }
+
+    public void RemoveDetonatorFromUI()
+    {
+        if (detonatorUIInstance != null)
+        {
+            Destroy(detonatorUIInstance);
+            detonatorUIInstance = null;
+        }
+    }
 
 
     public void ShowTemporaryMessage(GameObject messagePanel, float duration)
@@ -134,8 +177,8 @@ public class UiManager : MonoBehaviour
 
     private IEnumerator TemporaryMessageRoutine(GameObject panel, float delay)
     {
-        panel.SetActive(true);                
-        yield return new WaitForSeconds(delay); 
-        panel.SetActive(false);  
+        panel.SetActive(true);
+        yield return new WaitForSeconds(delay);
+        panel.SetActive(false);
     }
 }

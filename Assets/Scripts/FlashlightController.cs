@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using System.Collections;
 
 public class FlashlightController : MonoBehaviour
 {
@@ -8,21 +9,23 @@ public class FlashlightController : MonoBehaviour
     public GameObject crowbarInHand;
 
     [Header("Key Bindings")]
-    [Tooltip("With this button you switch between items")]
     [SerializeField] private KeyCode cycleKey = KeyCode.Q;
+
+    [Header("Animation Settings")]
+    public Animator characterAnimator;
+    public string drawFlashlightTrigger = "DrawingItem";
+    public string drawCrowbarTrigger = "DrawingItemLeft";
+    public float drawDelay = 0.5f;
+    private bool isChangingItem = false;
 
     [Header("Battery Settings")]
     public float maxBattery = 100f;
     public static float currentBattery = 100f;
-    [Tooltip("How much drain while active")]
     public float activeDrainRate = 2.0f;
-    [Tooltip("How much drain while not active")]
     public float passiveDrainRate = 0.1f;
 
     [Header("UV Light Settings")]
-    [Tooltip("Normal Light Color")]
     public Color normalLightColor = Color.white;
-    [Tooltip("Uv Color")]
     public Color uvLightColor = new Color(0.5f, 0f, 1f, 1f);
     [HideInInspector] public bool isUVMode = false;
 
@@ -36,6 +39,7 @@ public class FlashlightController : MonoBehaviour
 
     private int selectedItem = 1;
     private bool isHoldingItem = true;
+    private bool isLightOn = true;
 
     void Start()
     {
@@ -46,12 +50,13 @@ public class FlashlightController : MonoBehaviour
         }
 
         isHoldingItem = false;
-
-        UpdateEquipmentState();
+        ApplyEquipmentVisibility();
     }
 
     void Update()
     {
+        if (isChangingItem) return;
+
         if (Input.GetKeyDown(cycleKey) && !UiManager.isMenuOpen)
         {
             CycleItems();
@@ -65,18 +70,38 @@ public class FlashlightController : MonoBehaviour
                 return;
             }
 
-            isHoldingItem = !isHoldingItem;
-
-            if (selectedItem == 1 && Flashlightpickup.HasFlashlight && audioSource != null && clickSound != null)
+            if ((selectedItem == 1 && Flashlightpickup.HasFlashlight) || (selectedItem == 2 && CrowbarPickup.HasCrowbar))
             {
-                audioSource.PlayOneShot(clickSound);
-            }
+                isHoldingItem = !isHoldingItem;
 
-            UpdateEquipmentState();
+                if (audioSource != null && clickSound != null)
+                {
+                    audioSource.PlayOneShot(clickSound);
+                }
+
+                UpdateEquipmentState();
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0) && !UiManager.isMenuOpen)
+        {
+            if (isHoldingItem && selectedItem == 1 && Flashlightpickup.HasFlashlight)
+            {
+                if (currentBattery > 0)
+                {
+                    isLightOn = !isLightOn;
+
+                    if (flashlightLightComponent != null)
+                        flashlightLightComponent.enabled = isLightOn;
+
+                    if (audioSource != null && clickSound != null)
+                        audioSource.PlayOneShot(clickSound);
+                }
+            }
         }
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0f && !UiManager.isMenuOpen && isHoldingItem && selectedItem == 1 && Flashlightpickup.HasFlashlight)
+        if (scroll != 0f && !UiManager.isMenuOpen && isHoldingItem && selectedItem == 1 && Flashlightpickup.HasFlashlight && isLightOn)
         {
             ToggleLightColor();
         }
@@ -87,33 +112,27 @@ public class FlashlightController : MonoBehaviour
     private void ToggleLightColor()
     {
         isUVMode = !isUVMode;
-
         if (flashlightLightComponent != null)
         {
             flashlightLightComponent.color = isUVMode ? uvLightColor : normalLightColor;
         }
-
-        if (audioSource != null && clickSound != null)
-        {
-            audioSource.PlayOneShot(clickSound);
-        }
+        if (audioSource != null && clickSound != null) audioSource.PlayOneShot(clickSound);
     }
 
     private void HandleBattery()
     {
         if (!Flashlightpickup.HasFlashlight) return;
 
-        if (selectedItem == 1 && isHoldingItem && flashlightInHand != null && flashlightInHand.activeSelf)
+        if (selectedItem == 1 && isHoldingItem && isLightOn && flashlightInHand != null && flashlightInHand.activeSelf)
         {
             currentBattery -= activeDrainRate * Time.deltaTime;
-
             HandleLightEffects();
 
             if (currentBattery <= 0)
             {
                 currentBattery = 0;
-                isHoldingItem = false;
-                UpdateEquipmentState();
+                isLightOn = false;
+                if (flashlightLightComponent != null) flashlightLightComponent.enabled = false;
             }
         }
         else
@@ -131,19 +150,16 @@ public class FlashlightController : MonoBehaviour
     private void HandleLightEffects()
     {
         if (flashlightLightComponent == null) return;
-
         float batteryPercent = currentBattery / maxBattery;
 
         if (batteryPercent <= 0.20f)
         {
             float newIntensity = originalIntensity * (batteryPercent / 0.20f);
-
             if (batteryPercent <= 0.15f)
             {
                 float flicker = Random.Range(0.2f, 0.6f);
                 newIntensity *= flicker;
             }
-
             flashlightLightComponent.intensity = newIntensity;
         }
         else
@@ -155,11 +171,14 @@ public class FlashlightController : MonoBehaviour
     public void AddBattery(float amount)
     {
         currentBattery += amount;
-        if (currentBattery > maxBattery) currentBattery = maxBattery;
+        if (currentBattery > maxBattery)
+            currentBattery = maxBattery;
     }
 
     public void EquipItemAutomatically(int itemIndex)
     {
+        if (!this.enabled) return;
+
         selectedItem = itemIndex;
         isHoldingItem = true;
 
@@ -180,21 +199,27 @@ public class FlashlightController : MonoBehaviour
 
         isHoldingItem = true;
 
-        if (selectedItem == 1)
+        if (selectedItem == 1 && hasCrowbar)
         {
-            if (hasCrowbar) selectedItem = 2;
+            selectedItem = 2;
         }
-        else if (selectedItem == 2)
+        else if (selectedItem == 2 && hasFlashlight)
         {
-            if (hasFlashlight) selectedItem = 1;
+            selectedItem = 1;
         }
-
-        if (selectedItem == 1 && !hasFlashlight && hasCrowbar) selectedItem = 2;
-        if (selectedItem == 2 && !hasCrowbar && hasFlashlight) selectedItem = 1;
+        else
+        {
+            return;
+        }
 
         if (selectedItem == 1 && currentBattery <= 0)
         {
             isHoldingItem = false;
+        }
+
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
         }
 
         UpdateEquipmentState();
@@ -202,9 +227,35 @@ public class FlashlightController : MonoBehaviour
 
     public void UpdateEquipmentState()
     {
+        StartCoroutine(AnimateItemRoutine());
+    }
+
+    private IEnumerator AnimateItemRoutine()
+    {
+        isChangingItem = true;
+
+        if (characterAnimator != null && isHoldingItem)
+        {
+            ApplyEquipmentVisibility();
+            if (flashlightInHand != null) flashlightInHand.SetActive(false);
+            if (crowbarInHand != null) crowbarInHand.SetActive(false);
+
+            if (selectedItem == 1) characterAnimator.SetTrigger(drawFlashlightTrigger);
+            else if (selectedItem == 2) characterAnimator.SetTrigger(drawCrowbarTrigger);
+
+            yield return new WaitForSeconds(drawDelay);
+        }
+
+        ApplyEquipmentVisibility();
+
+        isChangingItem = false;
+    }
+
+    private void ApplyEquipmentVisibility()
+    {
         if (flashlightInHand != null) flashlightInHand.SetActive(false);
         if (crowbarInHand != null) crowbarInHand.SetActive(false);
-
+        if (flashlightLightComponent != null) flashlightLightComponent.enabled = false;
         if (BatteryUI_Flashlight.Instance != null) BatteryUI_Flashlight.Instance.SetVisible(false);
 
         if (!isHoldingItem) return;
@@ -212,12 +263,20 @@ public class FlashlightController : MonoBehaviour
         if (selectedItem == 1 && Flashlightpickup.HasFlashlight && flashlightInHand != null)
         {
             flashlightInHand.SetActive(true);
-
+            if (flashlightLightComponent != null) flashlightLightComponent.enabled = isLightOn && (currentBattery > 0);
             if (BatteryUI_Flashlight.Instance != null) BatteryUI_Flashlight.Instance.SetVisible(true);
         }
         else if (selectedItem == 2 && CrowbarPickup.HasCrowbar && crowbarInHand != null)
         {
             crowbarInHand.SetActive(true);
         }
+    }
+
+    public void ForceHideItems()
+    {
+        StopAllCoroutines();
+        isHoldingItem = false;
+        isChangingItem = false;
+        ApplyEquipmentVisibility();
     }
 }

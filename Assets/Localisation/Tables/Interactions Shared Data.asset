@@ -59,6 +59,10 @@ MonoBehaviour:
     m_Key: Press F to try
     m_Metadata:
       m_Items: []
+  - m_Id: 89209126918950912
+    m_Key: Plant
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -44,11 +44,14 @@ MonoBehaviour:
 
       USE ITEM:
 
+      EQUIP/HIDE ITEM:
+
       SWITCH ITEM:
 
       PUSH:
 
-      LOOK AROUND: '
+      LOOK
+      AROUND: '
     m_Metadata:
       m_Items: []
   - m_Id: 30064006125899776
@@ -68,6 +71,8 @@ MonoBehaviour:
 
       MOUSE
       0
+
+      MOUSE 1
 
       Q
 

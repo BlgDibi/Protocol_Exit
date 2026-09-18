@@ -85,15 +85,29 @@ public class OwnMovement : MonoBehaviour
         if (controller == null || animator == null) return;
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-        float targetSpeed = isRunning ? runSpeed : walkSpeed;
 
-        if (isPushingObject)
+        float targetSpeed;
+        if (isRunning == true)
+        {
+            targetSpeed = runSpeed;
+        }
+        else
+        {
+            targetSpeed = walkSpeed;
+        }
+
+        if (isPushingObject == true)
         {
             if (pushedRigidbody != null)
             {
                 Vector3 boxVelocity = pushedRigidbody.linearVelocity;
                 boxVelocity.y = 0;
-                if (controller.isGrounded && fallVelocity.y < 0) fallVelocity.y = -2f;
+
+                if (controller.isGrounded == true && fallVelocity.y < 0)
+                {
+                    fallVelocity.y = -2f;
+                }
+
                 fallVelocity.y += gravity * Time.fixedDeltaTime;
                 controller.Move((boxVelocity + fallVelocity) * Time.fixedDeltaTime);
             }
@@ -109,14 +123,24 @@ public class OwnMovement : MonoBehaviour
                 Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
                 controller.Move(moveDir.normalized * targetSpeed * Time.fixedDeltaTime);
 
-                animator.SetFloat("Speed", isRunning ? 1.0f : 0.5f, 0.1f, Time.fixedDeltaTime);
+                if (isRunning == true)
+                {
+                    animator.SetFloat("Speed", 1.0f, 0.1f, Time.fixedDeltaTime);
+                }
+                else
+                {
+                    animator.SetFloat("Speed", 0.5f, 0.1f, Time.fixedDeltaTime);
+                }
             }
             else
             {
                 animator.SetFloat("Speed", 0f, 0.15f, Time.fixedDeltaTime);
             }
 
-            if (controller.isGrounded && fallVelocity.y < 0) fallVelocity.y = -2f;
+            if (controller.isGrounded == true && fallVelocity.y < 0)
+            {
+                fallVelocity.y = -2f;
+            }
             fallVelocity.y += gravity * Time.fixedDeltaTime;
             controller.Move(fallVelocity * Time.fixedDeltaTime);
         }
@@ -180,7 +204,17 @@ public class OwnMovement : MonoBehaviour
                 {
                     Vector3 pushDirection = transform.forward;
                     pushDirection.y = 0;
-                    Vector3 applyPosition = pushPoint != null ? pushPoint.position : transform.position + Vector3.up * 1f;
+
+                    Vector3 applyPosition;
+                    if (pushPoint != null)
+                    {
+                        applyPosition = pushPoint.position;
+                    }
+                    else
+                    {
+                        applyPosition = transform.position + (Vector3.up * 1f);
+                    }
+
                     pushedRigidbody.AddForceAtPosition(pushDirection * pushForce * Time.deltaTime, applyPosition, ForceMode.Force);
                 }
             }
@@ -198,7 +232,17 @@ public class OwnMovement : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Vector3 startPos = pushPoint != null ? pushPoint.position : transform.position + Vector3.up * 1f;
+
+        Vector3 startPos;
+        if (pushPoint != null)
+        {
+            startPos = pushPoint.position;
+        }
+        else
+        {
+            startPos = transform.position + (Vector3.up * 1f);
+        }
+
         Gizmos.DrawRay(startPos, transform.forward * pushDistance);
     }
 }

@@ -28,11 +28,12 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 21521605644288
     m_Localized: "MOZG\xC1S:\nFUT\xC1S:\nUGR\xC1S:\nN\xC9Z\xC9S:\nBESZ\xC9D:\nINTERAKCI\xD3:\nFELV\xC9TEL:\nT\xC1RGY
-      HASZN\xC1LAT:\nT\xC1RGY CSER\xC9L\xC9S:\nL\xD6K\xC9S:\nK\xD6R\xDCLN\xC9Z\xC9S:\n"
+      HASZN\xC1LAT:\nT\xC1RGY EL\u0150V\xC9TEL/ELTEV\xC9S:\nT\xC1RGY CSER\xC9L\xC9S:\nL\xD6K\xC9S:\nK\xD6R\xDCLN\xC9Z\xC9S:\n"
     m_Metadata:
       m_Items: []
   - m_Id: 30064006125899776
-    m_Localized: "WASD\nSHIFT\nSPACE\nEG\xC9R\nT\nF\nE\nEG\xC9R BAL KLIKK\nQ\nV\nC"
+    m_Localized: "WASD\nSHIFT\nSPACE\nEG\xC9R\nT\nF\nE\nEG\xC9R BAL KLIKK\nEG\xC9R
+      JOBB KLIKK\nQ\nV\nC"
     m_Metadata:
       m_Items: []
   references:

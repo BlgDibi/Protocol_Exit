@@ -4835,8 +4835,8 @@ Light:
   m_Color: {r: 0.9019608, g: 0.49411765, b: 0.13333334, a: 1}
   m_Intensity: 30
   m_Range: 5.2192607
-  m_SpotAngle: 46.82946
-  m_InnerSpotAngle: 12.681873
+  m_SpotAngle: 58.15689
+  m_InnerSpotAngle: 37.904037
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
     m_Type: 2
@@ -9740,7 +9740,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Range
-      value: 500
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Cookie
@@ -9760,7 +9760,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Intensity
-      value: 12
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_SpotAngle
@@ -11752,7 +11752,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Range
-      value: 1
+      value: 2.9
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Cookie
@@ -11772,7 +11772,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_Intensity
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 108193847085089844, guid: 958521058a9c74341bcc8323137f68b1, type: 3}
       propertyPath: m_SpotAngle
@@ -18023,7 +18023,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.057
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -20637,6 +20637,9 @@ MonoBehaviour:
   interactableID: bookfirstroom
   npcAnimator: {fileID: 0}
   startAnimParameter: 
+  keepAnimBoolTrueAtEnd: 1
+  endAnimTrigger: 
+  turnToPlayerOnTalk: 0
   questVariableToWatch: 
   interactionPoint: {fileID: 0}
   patrolPoints: []

@@ -6598,7 +6598,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "WASD\nSHIFT\nSPACE\nMOUSE\nT\nF\nE\nMOUSE 0\n Q\nV\nC"
+  m_text: "WASD\nSHIFT\nSPACE\nMOUSE\nT\nF\nE\nMOUSE 0\nMOUSE 1\n Q\nV\nC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6664,7 +6664,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -43.63636, y: 9.445135, z: -100.90551, w: -63.413834}
+  m_margin: {x: 425.93137, y: 9.445135, z: -175.03537, w: -63.413834}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -6949,11 +6949,14 @@ MonoBehaviour:
 
     USE ITEM:
 
+    EQUIP/HIDE ITEM:
+
     SWITCH ITEM:
 
     PUSH:
 
-    LOOK AROUND:'
+    LOOK
+    AROUND:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7019,7 +7022,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -43.63636, y: 9.445135, z: -100.90551, w: -63.413834}
+  m_margin: {x: -43.63636, y: 9.445135, z: -38.68457, w: -63.413834}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

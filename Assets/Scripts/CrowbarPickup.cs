@@ -48,11 +48,29 @@ public class CrowbarPickup : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    void OnTriggerEnter(Collider other) { if (other.CompareTag("Player")) HighlightCrosshair(true); }
-    void OnTriggerExit(Collider other) { if (other.CompareTag("Player")) HighlightCrosshair(false); }
+    void OnTriggerEnter(Collider other) 
+    { 
+        if (other.CompareTag("Player")) 
+            HighlightCrosshair(true); 
+    }
+    void OnTriggerExit(Collider other) 
+    { 
+        if (other.CompareTag("Player")) 
+            HighlightCrosshair(false); 
+    }
 
     void HighlightCrosshair(bool on)
     {
-        if (crosshair != null) crosshair.color = on ? Color.red : Color.white;
+        if (crosshair != null)
+        {
+            if (on == true)
+            {
+                crosshair.color = Color.red;
+            }
+            else
+            {
+                crosshair.color = Color.white;
+            }
+        }
     }
 }
