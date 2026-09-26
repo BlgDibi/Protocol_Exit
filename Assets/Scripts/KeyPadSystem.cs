@@ -26,6 +26,11 @@ public class KeyPadSystem : MonoBehaviour
     [Tooltip("OwnMovement script")]
     public OwnMovement playerController;
 
+    [Header("Animation Settings")]
+    public Animator playerAnimator;
+    public string typeAnimTrigger = "TypeCode";
+    public float typeAnimLength = 2.0f;
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip buttonClickSound;
@@ -50,9 +55,14 @@ public class KeyPadSystem : MonoBehaviour
         {
             keypadCanvas.SetActive(false);
         }
+
+        if (playerAnimator == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null) playerAnimator = player.GetComponentInChildren<Animator>();
+        }
     }
 
-   
     public void ShowKeypad()
     {
         UiManager.isMenuOpen = true;
@@ -68,11 +78,9 @@ public class KeyPadSystem : MonoBehaviour
         UpdateDisplay();
     }
 
- 
     public void CloseKeypad()
     {
         UiManager.isMenuOpen = false;
-
         keypadCanvas.SetActive(false);
 
         if (playerController != null) playerController.enabled = true;
@@ -81,10 +89,8 @@ public class KeyPadSystem : MonoBehaviour
         Cursor.visible = false;
     }
 
- 
     public void ButtonPress(string digit)
     {
-
         if (isProcessing) return;
 
         if (currentInput.Length < 4)
@@ -95,7 +101,6 @@ public class KeyPadSystem : MonoBehaviour
         }
     }
 
- 
     public void ClearInput()
     {
         if (isProcessing) return;
@@ -109,12 +114,10 @@ public class KeyPadSystem : MonoBehaviour
         if (isProcessing || currentInput.Length == 0) return;
 
         isProcessing = true;
-
         string targetCode = "";
 
         if (useGeneratedCode == true)
         {
-            
             if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode) == true)
             {
                 targetCode = "0000";
@@ -135,17 +138,13 @@ public class KeyPadSystem : MonoBehaviour
             display.text = "GRANTED";
             display.color = successColor;
 
-            if (doorToOpen_Old != null)
-            {
-                doorToOpen_Old.Unlock();
-            }
+            Invoke(nameof(HideUIForAnimation), 0.5f);
 
-            if (doorToOpen_New != null)
-            {
-                doorToOpen_New.UnlockAndOpen();
-            }
+            Invoke(nameof(PlayTypingAnimation), 0.0f);
 
-            Invoke(nameof(CloseKeypad), 1f);
+            Invoke(nameof(OpenLinkedDoors), 0.5f + typeAnimLength);
+
+            Invoke(nameof(EnablePlayerMovement), 0.5f + typeAnimLength);
         }
         else
         {
@@ -157,11 +156,49 @@ public class KeyPadSystem : MonoBehaviour
         }
     }
 
+    private void HideUIForAnimation()
+    {
+        UiManager.isMenuOpen = false;
+        keypadCanvas.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void EnablePlayerMovement()
+    {
+        if (playerController != null)
+        {
+            playerController.enabled = true;
+        }
+    }
+
+    private void PlayTypingAnimation()
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger(typeAnimTrigger);
+        }
+    }
+
+    private void OpenLinkedDoors()
+    {
+        if (doorToOpen_Old != null)
+        {
+            doorToOpen_Old.Unlock();
+        }
+
+        if (doorToOpen_New != null)
+        {
+            doorToOpen_New.UnlockAndOpen();
+        }
+    }
+
     private void ResetAfterError()
     {
         currentInput = "";
         UpdateDisplay();
-        isProcessing = false; 
+        isProcessing = false;
     }
 
     private void UpdateDisplay()

@@ -63,6 +63,14 @@ MonoBehaviour:
     m_Key: Plant
     m_Metadata:
       m_Items: []
+  - m_Id: 91634287278428160
+    m_Key: Place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 92381571079344128
+    m_Key: Empty Valve
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

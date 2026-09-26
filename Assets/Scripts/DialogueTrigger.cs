@@ -14,6 +14,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
     [Header("Settings")]
     [SerializeField] private KeyCode interactionKey = KeyCode.T;
+    [Tooltip("Id")]
     public string interactableID = "npc1";
 
     [Header("Animation & Movement")]
@@ -79,7 +80,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
             if (npcAnimator != null)
             {
                 npcAnimator.SetBool(startAnimParameter, true);
-
                 npcAnimator.Play("breathing", -1, 0f);
             }
         }
@@ -128,24 +128,50 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
 
         if (DialogueManager.Instance != null)
         {
-            string inkHasC4 = DialogueManager.Instance.GetVariableState("HasC4");
-            string inkHasDetonator = DialogueManager.Instance.GetVariableState("HasDetonator");
-
-            bool hasDetonator = Detonator_Pickup.HasDetonator || (inkHasDetonator != null && inkHasDetonator.ToLower() == "true");
-            bool hasC4 = C4_Pickup.HasC4 || (inkHasC4 != null && inkHasC4.ToLower() == "true") || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
             bool hasMetBefore = SaveSystem.WasNPCMet(interactableID);
 
-            if (hasC4)
+            if (interactableID == "npc1" || interactableID == "mechanic")
             {
-                currentKnot = "mechanic_leave_me";
+                string inkHasC4 = DialogueManager.Instance.GetVariableState("HasC4");
+                string inkHasDetonator = DialogueManager.Instance.GetVariableState("HasDetonator");
+
+                bool hasDetonator = Detonator_Pickup.HasDetonator || (inkHasDetonator != null && inkHasDetonator.ToLower() == "true");
+                bool hasC4 = C4_Pickup.HasC4 || (inkHasC4 != null && inkHasC4.ToLower() == "true") || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
+
+                if (hasC4)
+                {
+                    currentKnot = "mechanic_leave_me";
+                }
+                else if (hasDetonator)
+                {
+                    currentKnot = "mechanic_done";
+                }
+                else if (hasMetBefore)
+                {
+                    currentKnot = "mechanic_waiting";
+                }
             }
-            else if (hasDetonator)
+
+            else if (interactableID == "chef")
             {
-                currentKnot = "mechanic_done";
-            }
-            else if (hasMetBefore)
-            {
-                currentKnot = "mechanic_waiting";
+                bool hasValve = (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasValve"));
+
+                if (hasValve)
+                {
+                    currentKnot = "chef_leave_me";
+                }
+                else if (DiningPuzzle.IsTableSet)
+                {
+                    currentKnot = "chef_done";
+                }
+                else if (hasMetBefore)
+                {
+                    currentKnot = "chef_waiting";
+                }
+                else
+                {
+                    currentKnot = inkKnotName;
+                }
             }
         }
 
@@ -217,7 +243,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
     public KeyCode GetInteractKey() => interactionKey;
     public string GetInteractText()
     {
-        if (isMovingToPoint == true)
+        if (isMovingToPoint)
         {
             return "";
         }

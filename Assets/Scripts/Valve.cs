@@ -1,12 +1,22 @@
 using UnityEngine;
 using UnityEngine.Localization;
+
 public class Valve : MonoBehaviour, InterfaceInteractable
 {
     [Header("Settings")]
-    public string conditionName;
+    public string conditionName = "GasVented";
+    public string placedCondition = "ValvePlaced";
+
+    [Tooltip("Valve")]
+    public GameObject valveMeshToEnable;
+
+    [Tooltip("Wheel")]
+    public Transform wheelToRotate;
 
     [Header("Localization")]
+    public LocalizedString textPlaceValve;
     public LocalizedString textTurnValve;
+    public LocalizedString textMissingValve;
 
     [SerializeField] private float rotationAngle = -90f;
     [SerializeField] private float rotationSpeed = 3f;
@@ -15,6 +25,7 @@ public class Valve : MonoBehaviour, InterfaceInteractable
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip turnSound;
 
+    private bool isPlaced = false;
     private bool isTurned = false;
     private bool isAnimating = false;
     private Quaternion targetRotation;
@@ -22,26 +33,55 @@ public class Valve : MonoBehaviour, InterfaceInteractable
     private void Start()
     {
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
-        targetRotation = transform.localRotation * Quaternion.Euler(0, 0, rotationAngle);
+
+        if (wheelToRotate != null)
+            targetRotation = wheelToRotate.localRotation * Quaternion.Euler(0, 0, rotationAngle);
+       
+
+        if (ConditionManager.Instance != null)
+        {
+            if (!string.IsNullOrEmpty(conditionName) && ConditionManager.Instance.CheckCondition(conditionName))
+            {
+                isPlaced = true;
+                isTurned = true;
+
+                if (wheelToRotate != null)
+                    wheelToRotate.localRotation = targetRotation;
+                else
+                    transform.localRotation = targetRotation;
+
+                if (valveMeshToEnable != null) valveMeshToEnable.SetActive(true);
+            }
+            else if (!string.IsNullOrEmpty(placedCondition) && ConditionManager.Instance.CheckCondition(placedCondition))
+            {
+                isPlaced = true;
+                isTurned = false;
+                if (valveMeshToEnable != null) valveMeshToEnable.SetActive(true);
+            }
+            else
+            {
+                if (valveMeshToEnable != null) valveMeshToEnable.SetActive(false);
+            }
+        }
     }
 
     private void Update()
     {
         if (isAnimating)
         {
-            transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * rotationSpeed);
+            Transform targetTransform = wheelToRotate != null ? wheelToRotate : transform;
 
-            
-            if (Quaternion.Angle(transform.localRotation, targetRotation) < 1f)
+            targetTransform.localRotation = Quaternion.Lerp(targetTransform.localRotation, targetRotation, Time.deltaTime * rotationSpeed);
+
+            if (Quaternion.Angle(targetTransform.localRotation, targetRotation) < 1f)
             {
-                transform.localRotation = targetRotation;
+                targetTransform.localRotation = targetRotation;
                 isAnimating = false;
 
                 if (audioSource != null && audioSource.isPlaying)
                 {
                     audioSource.Stop();
                 }
-               
             }
         }
     }
@@ -50,24 +90,41 @@ public class Valve : MonoBehaviour, InterfaceInteractable
     {
         if (isTurned) return;
 
-        isTurned = true;
-        isAnimating = true;
-
-        
-        if (audioSource != null && turnSound != null)
+        if (!isPlaced)
         {
-            audioSource.clip = turnSound;
-            audioSource.loop = true;
-            audioSource.Play();
-        }
-      
+            if (!ValvePickup.HasValve)
+                return;
 
-        if (!string.IsNullOrEmpty(conditionName))
-        {
+            isPlaced = true;
+            ValvePickup.HasValve = false;
+
+            if (valveMeshToEnable != null)
+                valveMeshToEnable.SetActive(true);
+
+            if (UiManager.Instance != null)
+                UiManager.Instance.RemoveValveFromUI();
+
             if (ConditionManager.Instance != null)
+                ConditionManager.Instance.SetCondition(placedCondition, true);
+        }
+        else
+        {
+            isTurned = true;
+            isAnimating = true;
+
+            if (audioSource != null && turnSound != null)
             {
-                ConditionManager.Instance.SetCondition(conditionName, true);
-                Debug.Log($"Szelep eltekerve: {conditionName}");
+                audioSource.clip = turnSound;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+
+            if (!string.IsNullOrEmpty(conditionName))
+            {
+                if (ConditionManager.Instance != null)
+                {
+                    ConditionManager.Instance.SetCondition(conditionName, true);
+                }
             }
         }
     }
@@ -75,18 +132,25 @@ public class Valve : MonoBehaviour, InterfaceInteractable
     public string GetInteractText()
     {
         if (isTurned)
-        {
             return "";
+
+        if (!isPlaced)
+        {
+            return
+                ValvePickup.HasValve ? textPlaceValve.GetLocalizedString() : (textMissingValve != null && !textMissingValve.IsEmpty ? textMissingValve.GetLocalizedString() : "Missing Valve");
         }
         else
         {
-            return textTurnValve.GetLocalizedString();
+            return
+                textTurnValve.GetLocalizedString();
         }
     }
 
     public KeyCode GetInteractKey()
     {
-        return KeyCode.F;
+        if (!isPlaced)
+            return KeyCode.Mouse0;
+        else
+            return KeyCode.F;
     }
-
 }

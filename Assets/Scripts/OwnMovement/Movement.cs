@@ -6,14 +6,17 @@ public class OwnMovement : MonoBehaviour
     public CharacterController controller;
     public Animator animator;
 
-    [Header("Camera Settings")]
+    [Header("Health reference")]
+    public HP playerHP; 
+
+    [Header("Camera settings")]
     public Transform mainCamera;
     public Transform cameraRoot;
     public float mouseSensitivity = 2f;
     private float cameraXAngle;
     private float cameraYAngle;
 
-    [Header("Movement Settings")]
+    [Header("Movement settings")]
     public float walkSpeed = 2.0f;
     public float runSpeed = 5.0f;
     public float jumpHeight = 1.2f;
@@ -21,6 +24,13 @@ public class OwnMovement : MonoBehaviour
     private float turnSmoothVelocity;
     public float gravity = -9.81f;
     private Vector3 fallVelocity;
+
+    [Header("Fall damage settings")]
+    public float safeFallSpeed = -12f;
+    public float fallDamageMultiplier = 1.5f;
+
+    private bool wasGrounded = true;
+    private float highestFallSpeed = 0f;
 
     [Header("Push Settings")]
     public Transform pushPoint;
@@ -33,12 +43,14 @@ public class OwnMovement : MonoBehaviour
     public AudioSource footstepAudioSource;
     public AudioClip[] footstepClips;
 
+    [Header("Typing Sound")]
+    public AudioClip typingSound;
+
     private float horizontal, vertical;
     private bool isRunning;
     private bool isPushingObject = false;
     private Rigidbody pushedRigidbody;
     private KeyCode currentPushKey;
-
 
     private float lastFootstepTime = 0f;
     public float footstepCooldown = 0.25f;
@@ -54,7 +66,7 @@ public class OwnMovement : MonoBehaviour
     {
         bool isLookingAround = Input.GetKey(KeyCode.C);
 
-        if (isLookingAround)
+        if (isLookingAround == true)
         {
             horizontal = 0f;
             vertical = 0f;
@@ -67,26 +79,46 @@ public class OwnMovement : MonoBehaviour
             isRunning = Input.GetKey(KeyCode.LeftShift);
         }
 
-        if (Input.GetButtonDown("Jump") && controller.isGrounded && !isPushingObject)
+        if (Input.GetButtonDown("Jump") == true)
         {
-            fallVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            animator.SetTrigger("Jump");
+            if (controller.isGrounded == true)
+            {
+                if (isPushingObject == false)
+                {
+                    fallVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                    animator.SetTrigger("Jump");
+                }
+            }
         }
 
-        if (isPushingObject)
+        if (isPushingObject == true)
         {
-            if (Input.GetKey(currentPushKey)) ApplyContinuousPush();
-            else StopPushing();
+            if (Input.GetKey(currentPushKey) == true)
+            {
+                ApplyContinuousPush();
+            }
+            else
+            {
+                StopPushing();
+            }
         }
     }
 
     void FixedUpdate()
     {
-        if (controller == null || animator == null) return;
+        if (controller == null)
+        {
+            return;
+        }
+
+        if (animator == null)
+        {
+            return;
+        }
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+        float targetSpeed = 0f;
 
-        float targetSpeed;
         if (isRunning == true)
         {
             targetSpeed = runSpeed;
@@ -103,9 +135,12 @@ public class OwnMovement : MonoBehaviour
                 Vector3 boxVelocity = pushedRigidbody.linearVelocity;
                 boxVelocity.y = 0;
 
-                if (controller.isGrounded == true && fallVelocity.y < 0)
+                if (controller.isGrounded == true)
                 {
-                    fallVelocity.y = -2f;
+                    if (fallVelocity.y < 0)
+                    {
+                        fallVelocity.y = -2f;
+                    }
                 }
 
                 fallVelocity.y += gravity * Time.fixedDeltaTime;
@@ -137,18 +172,57 @@ public class OwnMovement : MonoBehaviour
                 animator.SetFloat("Speed", 0f, 0.15f, Time.fixedDeltaTime);
             }
 
-            if (controller.isGrounded == true && fallVelocity.y < 0)
+            if (controller.isGrounded == true)
             {
-                fallVelocity.y = -2f;
+                if (fallVelocity.y < 0)
+                {
+                    fallVelocity.y = -2f;
+                }
             }
+
             fallVelocity.y += gravity * Time.fixedDeltaTime;
             controller.Move(fallVelocity * Time.fixedDeltaTime);
         }
+
+
+        if (wasGrounded == false)
+        {
+            if (controller.isGrounded == true)
+            {
+
+                if (highestFallSpeed < safeFallSpeed)
+                {
+                    float damage = (safeFallSpeed - highestFallSpeed) * fallDamageMultiplier;
+
+                    if (playerHP != null)
+                    {
+                        playerHP.TakeDamage(damage);
+                    }
+                    
+                }
+
+                highestFallSpeed = 0f;
+            }
+        }
+
+        if (controller.isGrounded == false)
+        {
+            if (fallVelocity.y < highestFallSpeed)
+            {
+                highestFallSpeed = fallVelocity.y;
+            }
+        }
+
+        wasGrounded = controller.isGrounded;
     }
 
     void LateUpdate()
     {
-        if (cameraRoot == null) return;
+        if (cameraRoot == null)
+        {
+            return;
+        }
+
         cameraYAngle += Input.GetAxis("Mouse X") * mouseSensitivity;
         cameraXAngle -= Input.GetAxis("Mouse Y") * mouseSensitivity;
         cameraXAngle = Mathf.Clamp(cameraXAngle, -50f, 70f);
@@ -157,24 +231,59 @@ public class OwnMovement : MonoBehaviour
 
     public void PlayFootstepSound()
     {
-    
-        if (animator.GetFloat("Speed") < 0.1f || !controller.enabled) return;
-
-        if (Time.time - lastFootstepTime < footstepCooldown) return;
-
-        if (footstepAudioSource != null && footstepClips.Length > 0 && controller.isGrounded)
+        if (animator.GetFloat("Speed") < 0.1f)
         {
-            lastFootstepTime = Time.time;
+            return;
+        }
 
-            int index = Random.Range(0, footstepClips.Length);
-            footstepAudioSource.pitch = Random.Range(0.85f, 1.1f);
-            footstepAudioSource.PlayOneShot(footstepClips[index]);
+        if (controller.enabled == false)
+        {
+            return;
+        }
+
+        if (Time.time - lastFootstepTime < footstepCooldown)
+        {
+            return;
+        }
+
+        if (footstepAudioSource != null)
+        {
+            if (footstepClips.Length > 0)
+            {
+                if (controller.isGrounded == true)
+                {
+                    lastFootstepTime = Time.time;
+                    int index = Random.Range(0, footstepClips.Length);
+                    footstepAudioSource.pitch = Random.Range(0.85f, 1.1f);
+                    footstepAudioSource.PlayOneShot(footstepClips[index]);
+                }
+            }
+        }
+    }
+
+    public void PlayTypingSound()
+    {
+        if (footstepAudioSource != null)
+        {
+            if (typingSound != null)
+            {
+                footstepAudioSource.pitch = Random.Range(0.9f, 1.1f);
+                footstepAudioSource.PlayOneShot(typingSound);
+            }
         }
     }
 
     public void StartPushing(Rigidbody rb, KeyCode key)
     {
-        if (rb == null || isPushingObject) return;
+        if (rb == null)
+        {
+            return;
+        }
+
+        if (isPushingObject == true)
+        {
+            return;
+        }
 
         isPushingObject = true;
         pushedRigidbody = rb;
@@ -187,7 +296,10 @@ public class OwnMovement : MonoBehaviour
             if (hit.rigidbody == rb)
             {
                 Vector3 flatNormal = new Vector3(hit.normal.x, 0f, hit.normal.z).normalized;
-                if (flatNormal != Vector3.zero) transform.rotation = Quaternion.LookRotation(-flatNormal);
+                if (flatNormal != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(-flatNormal);
+                }
             }
         }
         animator.SetBool("isPushing", true);

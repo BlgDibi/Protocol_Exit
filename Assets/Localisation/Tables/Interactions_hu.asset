@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6167441502162944
-    m_Localized: "Elteker\xE9s"
+    m_Localized: "Szelep elteker\xE9se"
     m_Metadata:
       m_Items: []
   - m_Id: 6183305790148608
@@ -64,7 +64,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 89209126918950912
-    m_Localized: "Letev\xE9s"
+    m_Localized: "Lehelyez\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91634287278428160
+    m_Localized: "Elhelyez\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 92381571079344128
+    m_Localized: "Szelep hi\xE1nyzik"
     m_Metadata:
       m_Items: []
   references:

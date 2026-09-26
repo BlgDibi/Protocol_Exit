@@ -18,6 +18,13 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Sprite crowbarSprite;
     [SerializeField] private Sprite detonatorSprite;
     [SerializeField] private Sprite c4Sprite;
+    [SerializeField] private Sprite valveSprite;
+
+    [Header("Dining Puzzle Sprites")]
+    [SerializeField] private Sprite silverKnifeSprite;
+    [SerializeField] private Sprite woodenSpoonSprite;
+    [SerializeField] private Sprite chippedGlassSprite;
+    [SerializeField] private Sprite porcelainPlateSprite;
 
     private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
     private Dictionary<Key, GameObject> keyImages = new Dictionary<Key, GameObject>();
@@ -26,6 +33,12 @@ public class UiManager : MonoBehaviour
     private GameObject crowbarUIInstance;
     private GameObject detonatorUIInstance;
     private GameObject c4UIInstance;
+    private GameObject valveUIInstance;
+
+    private GameObject silverKnifeUIInstance;
+    private GameObject woodenSpoonUIInstance;
+    private GameObject chippedGlassUIInstance;
+    private GameObject porcelainPlateUIInstance;
 
     public Transform keysParent;
 
@@ -54,6 +67,13 @@ public class UiManager : MonoBehaviour
         crowbarUIInstance = null;
         detonatorUIInstance = null;
         c4UIInstance = null;
+        valveUIInstance = null;
+
+        silverKnifeUIInstance = null;
+        woodenSpoonUIInstance = null;
+        chippedGlassUIInstance = null;
+        porcelainPlateUIInstance = null;
+
         boxImages.Clear();
         keyImages.Clear();
 
@@ -61,8 +81,68 @@ public class UiManager : MonoBehaviour
         if (CrowbarPickup.HasCrowbar) AddCrowbarToUI();
         if (Detonator_Pickup.HasDetonator) AddDetonatorToUI();
         if (C4_Pickup.HasC4) AddC4ToUI();
+        if (ValvePickup.HasValve) AddValveToUI();
+
+        if (DiningItemsPickup.CollectedDiningItems != null)
+        {
+            foreach (string itemID in DiningItemsPickup.CollectedDiningItems)
+            {
+                AddDiningItemToUI(itemID);
+            }
+        }
 
         Canvas.ForceUpdateCanvases();
+    }
+
+
+    public void AddDiningItemToUI(string itemID)
+    {
+        if (keyPanel == null) return;
+
+        if (itemID == "silverknife" && silverKnifeUIInstance == null && silverKnifeSprite != null)
+        {
+            silverKnifeUIInstance = Instantiate(keyImagePrefab, keyPanel);
+            silverKnifeUIInstance.GetComponent<Image>().sprite = silverKnifeSprite;
+        }
+        else if (itemID == "woodenspoon" && woodenSpoonUIInstance == null && woodenSpoonSprite != null)
+        {
+            woodenSpoonUIInstance = Instantiate(keyImagePrefab, keyPanel);
+            woodenSpoonUIInstance.GetComponent<Image>().sprite = woodenSpoonSprite;
+        }
+        else if (itemID == "chippedglass" && chippedGlassUIInstance == null && chippedGlassSprite != null)
+        {
+            chippedGlassUIInstance = Instantiate(keyImagePrefab, keyPanel);
+            chippedGlassUIInstance.GetComponent<Image>().sprite = chippedGlassSprite;
+        }
+        else if (itemID == "porcelainplate" && porcelainPlateUIInstance == null && porcelainPlateSprite != null)
+        {
+            porcelainPlateUIInstance = Instantiate(keyImagePrefab, keyPanel);
+            porcelainPlateUIInstance.GetComponent<Image>().sprite = porcelainPlateSprite;
+        }
+    }
+
+    public void RemoveDiningItemFromUI(string itemID)
+    {
+        if (itemID == "silverknife" && silverKnifeUIInstance != null)
+        {
+            Destroy(silverKnifeUIInstance);
+            silverKnifeUIInstance = null;
+        }
+        else if (itemID == "woodenspoon" && woodenSpoonUIInstance != null)
+        {
+            Destroy(woodenSpoonUIInstance);
+            woodenSpoonUIInstance = null;
+        }
+        else if (itemID == "chippedglass" && chippedGlassUIInstance != null)
+        {
+            Destroy(chippedGlassUIInstance);
+            chippedGlassUIInstance = null;
+        }
+        else if (itemID == "porcelainplate" && porcelainPlateUIInstance != null)
+        {
+            Destroy(porcelainPlateUIInstance);
+            porcelainPlateUIInstance = null;
+        }
     }
 
     public void AddFlashlightToUI()
@@ -99,6 +179,24 @@ public class UiManager : MonoBehaviour
 
         c4UIInstance = Instantiate(keyImagePrefab, keyPanel);
         c4UIInstance.GetComponent<Image>().sprite = c4Sprite;
+    }
+
+    public void AddValveToUI()
+    {
+        if (keyPanel == null || valveSprite == null) return;
+        if (valveUIInstance != null) return;
+
+        valveUIInstance = Instantiate(keyImagePrefab, keyPanel);
+        valveUIInstance.GetComponent<Image>().sprite = valveSprite;
+    }
+
+    public void RemoveValveFromUI()
+    {
+        if (valveUIInstance != null)
+        {
+            Destroy(valveUIInstance);
+            valveUIInstance = null;
+        }
     }
 
     public void AddBoxToUI(SulyDobozData doboz)
@@ -166,7 +264,6 @@ public class UiManager : MonoBehaviour
             detonatorUIInstance = null;
         }
     }
-
 
     public void ShowTemporaryMessage(GameObject messagePanel, float duration)
     {

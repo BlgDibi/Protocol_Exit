@@ -7746,6 +7746,7 @@ MonoBehaviour:
   playerInteraction: {fileID: 1311821346}
   typingSpeed: 0.04
   greenKey: {fileID: 0}
+  c4RewardObject: {fileID: 0}
 --- !u!114 &739067976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8020,6 +8021,11 @@ PrefabInstance:
 --- !u!224 &765931165 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 673443802061339864, guid: e5faa6e7714c5244ba63d9f5b4eb1ef8, type: 3}
+  m_PrefabInstance: {fileID: 765931164}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &765931166 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6158374365641071647, guid: e5faa6e7714c5244ba63d9f5b4eb1ef8, type: 3}
   m_PrefabInstance: {fileID: 765931164}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &802559646
@@ -9442,6 +9448,13 @@ MonoBehaviour:
   flashlightInHand: {fileID: 30540289}
   crowbarInHand: {fileID: 0}
   cycleKey: 113
+  characterAnimator: {fileID: 1700655008}
+  drawFlashlightTrigger: DrawItem
+  drawCrowbarTrigger: DrawItemLeft
+  hideFlashlightTrigger: HideItem
+  hideCrowbarTrigger: HideItemLeft
+  drawDelay: 0.5
+  hideDelay: 0.3
   maxBattery: 100
   activeDrainRate: 0.5
   passiveDrainRate: 0.25
@@ -9886,9 +9899,13 @@ MonoBehaviour:
   - {fileID: 1617657480}
   - {fileID: 576901917}
   - {fileID: 24706225}
-  - {fileID: 0}
+  - {fileID: 1029477592}
   - {fileID: 23851397}
   - {fileID: 978474565}
+  - {fileID: 1390986455}
+  - {fileID: 658506453}
+  - {fileID: 1759606635}
+  - {fileID: 765931166}
   scriptsToDisable:
   - {fileID: 417178435}
   background: {fileID: 1610208464}
@@ -10682,6 +10699,9 @@ MonoBehaviour:
   successColor: {r: 0, g: 0.5176471, b: 0, a: 1}
   errorColor: {r: 1, g: 0, b: 0, a: 1}
   playerController: {fileID: 1700655009}
+  playerAnimator: {fileID: 1700655008}
+  typeAnimTrigger: TypeCode
+  typeAnimLength: 6
   audioSource: {fileID: 1029477598}
   buttonClickSound: {fileID: 8300000, guid: 8df927c105c5466419c59aa1bb63100a, type: 3}
   grantedSound: {fileID: 8300000, guid: 54ccf978c7886364c980d9f84ff32bd3, type: 3}
@@ -17973,6 +17993,7 @@ MonoBehaviour:
   footstepAudioSource: {fileID: 1700655014}
   footstepClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
+  typingSound: {fileID: 8300000, guid: 8df927c105c5466419c59aa1bb63100a, type: 3}
   footstepCooldown: 0.25
 --- !u!137 &1700655010 stripped
 SkinnedMeshRenderer:
@@ -20639,10 +20660,9 @@ MonoBehaviour:
   startAnimParameter: 
   keepAnimBoolTrueAtEnd: 1
   endAnimTrigger: 
-  turnToPlayerOnTalk: 0
-  questVariableToWatch: 
   interactionPoint: {fileID: 0}
   patrolPoints: []
+  questVariableToWatch: 
   references:
     version: 2
     RefIds: []

@@ -13,9 +13,12 @@ public class FlashlightController : MonoBehaviour
 
     [Header("Animation Settings")]
     public Animator characterAnimator;
-    public string drawFlashlightTrigger = "DrawingItem";
-    public string drawCrowbarTrigger = "DrawingItemLeft";
+    public string drawFlashlightTrigger = "DrawItem";
+    public string drawCrowbarTrigger = "DrawItemLeft";
+    public string hideFlashlightTrigger = "HideItem";      
+    public string hideCrowbarTrigger = "HideItemLeft";
     public float drawDelay = 0.5f;
+    public float hideDelay = 0.3f;
     private bool isChangingItem = false;
 
     [Header("Battery Settings")]
@@ -234,21 +237,47 @@ public class FlashlightController : MonoBehaviour
     {
         isChangingItem = true;
 
-        if (characterAnimator != null && isHoldingItem)
+        if (characterAnimator != null)
+        {
+            if (isHoldingItem)
+            {
+                ApplyEquipmentVisibilityNoInstant();
+                if (flashlightInHand != null) flashlightInHand.SetActive(false);
+                if (crowbarInHand != null) crowbarInHand.SetActive(false);
+
+                if (selectedItem == 1) characterAnimator.SetTrigger(drawFlashlightTrigger);
+                else if (selectedItem == 2) characterAnimator.SetTrigger(drawCrowbarTrigger);
+
+                yield return new WaitForSeconds(drawDelay);
+                ApplyEquipmentVisibility();
+            }
+            else
+            {
+                if (flashlightLightComponent != null) flashlightLightComponent.enabled = false;
+                if (BatteryUI_Flashlight.Instance != null) BatteryUI_Flashlight.Instance.SetVisible(false);
+
+                if (selectedItem == 1) characterAnimator.SetTrigger(hideFlashlightTrigger);
+                else if (selectedItem == 2) characterAnimator.SetTrigger(hideCrowbarTrigger);
+
+                yield return new WaitForSeconds(hideDelay);
+
+                ApplyEquipmentVisibility();
+            }
+        }
+        else
         {
             ApplyEquipmentVisibility();
-            if (flashlightInHand != null) flashlightInHand.SetActive(false);
-            if (crowbarInHand != null) crowbarInHand.SetActive(false);
-
-            if (selectedItem == 1) characterAnimator.SetTrigger(drawFlashlightTrigger);
-            else if (selectedItem == 2) characterAnimator.SetTrigger(drawCrowbarTrigger);
-
-            yield return new WaitForSeconds(drawDelay);
         }
 
-        ApplyEquipmentVisibility();
-
         isChangingItem = false;
+    }
+
+    private void ApplyEquipmentVisibilityNoInstant()
+    {
+        if (flashlightInHand != null) flashlightInHand.SetActive(false);
+        if (crowbarInHand != null) crowbarInHand.SetActive(false);
+        if (flashlightLightComponent != null) flashlightLightComponent.enabled = false;
+        if (BatteryUI_Flashlight.Instance != null) BatteryUI_Flashlight.Instance.SetVisible(false);
     }
 
     private void ApplyEquipmentVisibility()

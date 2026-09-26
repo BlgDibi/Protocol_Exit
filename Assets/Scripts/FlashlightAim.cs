@@ -6,14 +6,14 @@ public class FlashlightAim : MonoBehaviour
     public Camera mainCam;
     public Transform playerBody;
 
-    [Header("Angle")]
-    public float maxUpDown = 50f;    
+    [Header("Angle Limits")]
+    public float maxUpDown = 50f;
     public float maxLeftRight = 50f;
 
     void Start()
     {
         if (mainCam == null) mainCam = Camera.main;
-        if (playerBody == null && transform.parent != null) 
+        if (playerBody == null && transform.parent != null)
             playerBody = transform.parent;
     }
 
@@ -22,32 +22,32 @@ public class FlashlightAim : MonoBehaviour
         if (mainCam == null || playerBody == null) return;
 
         Quaternion localCamRotation = Quaternion.Inverse(playerBody.rotation) * mainCam.transform.rotation;
-        Vector3 euler = localCamRotation.eulerAngles;
+        Vector3 cameraAngles = localCamRotation.eulerAngles;
 
-        float pitchX;
-        if (euler.x > 180)
+        float currentUpDownAngle;
+        if (cameraAngles.x > 180)
         {
-            pitchX = euler.x - 360;
+            currentUpDownAngle = cameraAngles.x - 360;
         }
         else
         {
-            pitchX = euler.x;
+            currentUpDownAngle = cameraAngles.x;
         }
 
-        float yawY;
-        if (euler.y > 180)
+        float currentLeftRightAngle;
+        if (cameraAngles.y > 180)
         {
-            yawY = euler.y - 360;
+            currentLeftRightAngle = cameraAngles.y - 360;
         }
         else
         {
-            yawY = euler.y;
+            currentLeftRightAngle = cameraAngles.y;
         }
 
-        pitchX = Mathf.Clamp(pitchX, -maxUpDown, maxUpDown);
-        yawY = Mathf.Clamp(yawY, -maxLeftRight, maxLeftRight);
+        currentUpDownAngle = Mathf.Clamp(currentUpDownAngle, -maxUpDown, maxUpDown);
+        currentLeftRightAngle = Mathf.Clamp(currentLeftRightAngle, -maxLeftRight, maxLeftRight);
 
-        Quaternion clampedLocalRotation = Quaternion.Euler(pitchX, yawY, 0f);
+        Quaternion clampedLocalRotation = Quaternion.Euler(currentUpDownAngle, currentLeftRightAngle, 0f);
         transform.rotation = playerBody.rotation * clampedLocalRotation;
     }
 }

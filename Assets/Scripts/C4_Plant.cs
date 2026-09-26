@@ -14,7 +14,14 @@ public class C4_Plant : MonoBehaviour
     public ParticleSystem explosionEffect;
     public float explosionDuration = 2.0f;
 
-    [Header("UI & Animation Extras")]
+    [Header("Explosion damage and sound")]
+    public AudioClip explosionSound;
+    [Tooltip("Radius")]
+    public float explosionRadius = 5.0f;
+    [Tooltip("Damage")]
+    public float explosionDamage = 100f;
+
+    [Header("UI and animation")]
     public GameObject useDetonatorPrompt;
     public Animator characterAnimator;
     public string drawAnimationTrigger = "DrawItem";
@@ -114,7 +121,6 @@ public class C4_Plant : MonoBehaviour
 
         yield return new WaitForSeconds(drawDelay);
 
-     
         if (isC4Planted && detonatorInHand != null)
         {
             detonatorInHand.SetActive(true);
@@ -132,10 +138,29 @@ public class C4_Plant : MonoBehaviour
         if (useDetonatorPrompt != null)
             useDetonatorPrompt.SetActive(false);
 
+        if (explosionSound != null)
+        {
+            AudioSource.PlayClipAtPoint(explosionSound, c4WorldModel != null ? c4WorldModel.transform.position : transform.position);
+        }
+
+        Vector3 explosionCenter = c4WorldModel != null ? c4WorldModel.transform.position : transform.position;
+        Collider[] hitColliders = Physics.OverlapSphere(explosionCenter, explosionRadius);
+        foreach (Collider hit in hitColliders)
+        {
+            if (hit.CompareTag("Player"))
+            {
+                HP playerHP = hit.GetComponent<HP>();
+                if (playerHP != null && !playerHP.isDead)
+                {
+                    playerHP.TakeDamage(explosionDamage);
+                }
+            }
+        }
+
         if (explosionEffect != null)
         {
             explosionEffect.gameObject.SetActive(true);
-            explosionEffect.transform.position = c4WorldModel.transform.position;
+            explosionEffect.transform.position = explosionCenter;
             explosionEffect.Play();
             StartCoroutine(DisableExplosionRoutine());
         }
@@ -156,7 +181,6 @@ public class C4_Plant : MonoBehaviour
         }
 
         isHoldingDetonator = false;
-
         Detonator_Pickup.HasDetonator = false;
 
         if (flashlightController != null)
@@ -175,5 +199,18 @@ public class C4_Plant : MonoBehaviour
         }
 
         this.enabled = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        if (c4WorldModel != null)
+        {
+            Gizmos.DrawWireSphere(c4WorldModel.transform.position, explosionRadius);
+        }
+        else
+        {
+            Gizmos.DrawWireSphere(transform.position, explosionRadius);
+        }
     }
 }

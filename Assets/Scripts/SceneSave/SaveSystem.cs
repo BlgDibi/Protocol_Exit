@@ -41,6 +41,7 @@ public class SaveSystem
         if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
         if (_savedata.savedTransforms == null) _savedata.savedTransforms = new List<Savedobjectpos_save>();
         if (_savedata.solvedPuzzles == null) _savedata.solvedPuzzles = new List<string>();
+        if (_savedata.savedDiningItems == null) _savedata.savedDiningItems = new List<string>();
     }
 
     [System.Serializable]
@@ -78,7 +79,16 @@ public class SaveSystem
         public bool hasCrowbar;
         public bool hasDetonator;
         public bool hasC4;
-        public bool isBarricadeDestroyed; 
+        public bool hasValve;
+        public bool isBarricadeDestroyed;
+
+        public bool hasCabinetAccess;
+        public List<string> savedDiningItems;
+        public string slotNorthItem;
+        public string slotSouthItem;
+        public string slotEastItem;
+        public string slotWestItem;
+        public bool isDiningTableSet;
 
         public List<string> unlockedDoors;
         public List<string> metNPCs;
@@ -90,12 +100,20 @@ public class SaveSystem
         public List<string> priedPlanks;
         public List<Savedobjectpos_save> savedTransforms;
         public List<string> solvedPuzzles;
+        public bool isValvePlaced;
+        public bool isGasCompleted;
     }
 
     public static string KeypadFullCode = "";
     public static string KeypadClue = "";
     public static string CurrentDocumentText = "";
     public static string CurrentSceneId = "";
+
+    public static string SlotNorthItem = "";
+    public static string SlotSouthItem = "";
+    public static string SlotEastItem = "";
+    public static string SlotWestItem = "";
+    public static bool IsDiningTableSet = false;
 
     public static string SaveFileName(int slot = 1) => Application.persistentDataPath + "/save_" + slot + ".json";
 
@@ -182,19 +200,42 @@ public class SaveSystem
         _savedata.savedBatteryLevel = FlashlightController.currentBattery;
 
         _savedata.hasCrowbar = CrowbarPickup.HasCrowbar;
+
         _savedata.hasDetonator = Detonator_Pickup.HasDetonator;
         _savedata.hasC4 = C4_Pickup.HasC4;
+
+        _savedata.hasValve = ValvePickup.HasValve;
+
+        _savedata.hasCabinetAccess = CabinetDrawer.HasCabinetAccess;
+
+        if (ConditionManager.Instance != null)
+        {
+            _savedata.isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
+
+            _savedata.isGasCompleted = ConditionManager.Instance.CheckCondition("GasCompleted");
+        }
 
         if (ConditionManager.Instance != null)
         {
             _savedata.isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
         }
+        _savedata.isValvePlaced = ConditionManager.Instance.CheckCondition("ValvePlaced");
+        _savedata.savedDiningItems = new List<string>(DiningItemsPickup.CollectedDiningItems);
 
         _savedata.savedSkinIndex = SelectedSkinIndex;
         _savedata.savedKeypadFullCode = KeypadFullCode;
         _savedata.savedKeypadClue = KeypadClue;
         _savedata.savedDocumentText = CurrentDocumentText;
         _savedata.savedSceneId = CurrentSceneId;
+
+        if (DiningPuzzle.Instance != null)
+        {
+            _savedata.isDiningTableSet = DiningPuzzle.IsTableSet;
+            _savedata.slotNorthItem = DiningPuzzle.Instance.slotNorth.currentPlacedItemID;
+            _savedata.slotSouthItem = DiningPuzzle.Instance.slotSouth.currentPlacedItemID;
+            _savedata.slotEastItem = DiningPuzzle.Instance.slotEast.currentPlacedItemID;
+            _savedata.slotWestItem = DiningPuzzle.Instance.slotWest.currentPlacedItemID;
+        }
     }
 
     public static bool GetCupboardTransform(string id, out Vector3 pos, out Quaternion rot)
@@ -272,12 +313,29 @@ public class SaveSystem
             FlashlightController.currentBattery = _savedata.savedBatteryLevel;
 
             CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
+
             Detonator_Pickup.HasDetonator = _savedata.hasDetonator;
             C4_Pickup.HasC4 = _savedata.hasC4;
+
+            ValvePickup.HasValve = _savedata.hasValve;
+
+            CabinetDrawer.HasCabinetAccess = _savedata.hasCabinetAccess;
+
+            if (_savedata.savedDiningItems != null)
+            {
+                DiningItemsPickup.CollectedDiningItems = new List<string>(_savedata.savedDiningItems);
+            }
+            else
+            {
+                DiningItemsPickup.CollectedDiningItems.Clear();
+            }
 
             if (ConditionManager.Instance != null)
             {
                 ConditionManager.Instance.SetCondition("BarricadeDestroyed", _savedata.isBarricadeDestroyed);
+
+                ConditionManager.Instance.SetCondition("GasCompleted", _savedata.isGasCompleted);
+                ConditionManager.Instance.SetCondition("ValvePlaced", _savedata.isValvePlaced);
             }
 
             if (_savedata.isBarricadeDestroyed)
@@ -292,6 +350,12 @@ public class SaveSystem
             KeypadClue = _savedata.savedKeypadClue;
             CurrentDocumentText = _savedata.savedDocumentText;
             CurrentSceneId = _savedata.savedSceneId;
+
+            IsDiningTableSet = _savedata.isDiningTableSet;
+            SlotNorthItem = _savedata.slotNorthItem;
+            SlotSouthItem = _savedata.slotSouthItem;
+            SlotEastItem = _savedata.slotEastItem;
+            SlotWestItem = _savedata.slotWestItem;
 
             if (UiManager.Instance != null)
             {
@@ -374,7 +438,7 @@ public class SaveSystem
         _tempPriedPlanks.Clear();
         _tempSavedTransforms.Clear();
         _tempSolvedPuzzles.Clear();
-
+        DiningItemsPickup.CollectedDiningItems.Clear();
         InitializeData();
         IsGameJustLoaded = false;
 
@@ -385,11 +449,20 @@ public class SaveSystem
         if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
         if (Detonator_Pickup.HasDetonator) Detonator_Pickup.HasDetonator = false;
         if (C4_Pickup.HasC4) C4_Pickup.HasC4 = false;
+        if (ValvePickup.HasValve) ValvePickup.HasValve = false;
+
+        CabinetDrawer.HasCabinetAccess = false;
 
         KeypadFullCode = "";
         KeypadClue = "";
         CurrentDocumentText = "";
         CurrentSceneId = "";
+
+        IsDiningTableSet = false;
+        SlotNorthItem = "";
+        SlotSouthItem = "";
+        SlotEastItem = "";
+        SlotWestItem = "";
     }
 
     public static void SaveNPCMet(string npcID)

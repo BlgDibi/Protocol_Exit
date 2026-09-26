@@ -176,6 +176,11 @@ public class DialogueManager : MonoBehaviour
             {
                 SpawnC4();
             }
+            else if (tag == "give_cabinet_access")
+            {
+                CabinetDrawer.HasCabinetAccess = true;
+                Debug.Log("<color=green>Cabinet access granted by Chef!</color>");
+            }
             else if (tag.StartsWith("voice:"))
             {
                 if (currentNPC != null)

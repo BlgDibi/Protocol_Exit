@@ -22,6 +22,9 @@ public class PauseMenu : MonoBehaviour
     [Header("Background Image")]
     public GameObject background;
 
+    private bool[] previousCanvasStates;
+    private bool previousCrosshairState;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -53,9 +56,31 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         GameIsPaused = false;
         ToggleScripts(true);
-        if (crosshair != null) crosshair.SetActive(true);
 
-        if (DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying)
+        if (crosshair != null)
+        {
+            crosshair.SetActive(previousCrosshairState);
+        }
+
+        bool isAnyCustomUIOpen = false;
+
+        if (previousCanvasStates != null)
+        {
+            for (int i = 0; i < canvasesToHide.Length; i++)
+            {
+                if (canvasesToHide[i] != null)
+                {
+                    canvasesToHide[i].SetActive(previousCanvasStates[i]);
+
+                    if (previousCanvasStates[i] == true)
+                    {
+                        isAnyCustomUIOpen = true;
+                    }
+                }
+            }
+        }
+
+        if ((DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying) || isAnyCustomUIOpen)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -64,10 +89,6 @@ public class PauseMenu : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-        }
-        foreach (GameObject canvasObj in canvasesToHide)
-        {
-            if (canvasObj != null) canvasObj.SetActive(true);
         }
     }
 
@@ -84,14 +105,25 @@ public class PauseMenu : MonoBehaviour
 
         Time.timeScale = 0f;
         GameIsPaused = true;
-        if (crosshair != null) crosshair.SetActive(false);
         ToggleScripts(false);
+
+        if (crosshair != null)
+        {
+            previousCrosshairState = crosshair.activeSelf;
+            crosshair.SetActive(false);
+        }
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        foreach (GameObject canvasObj in canvasesToHide)
+
+        previousCanvasStates = new bool[canvasesToHide.Length];
+        for (int i = 0; i < canvasesToHide.Length; i++)
         {
-            if (canvasObj != null) canvasObj.SetActive(false);
+            if (canvasesToHide[i] != null)
+            {
+                previousCanvasStates[i] = canvasesToHide[i].activeSelf;
+                canvasesToHide[i].SetActive(false);
+            }
         }
     }
 
@@ -132,7 +164,6 @@ public class PauseMenu : MonoBehaviour
         SaveSystem.Load(slotIndex);
 
         AsyncLoader.IsLoadingFromSave = true;
-
         AsyncLoader.TargetSceneIndex = SaveSystem.CurrentSceneIndex;
 
         SceneManager.LoadScene(1);

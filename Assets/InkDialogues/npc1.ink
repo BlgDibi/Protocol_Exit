@@ -5,7 +5,7 @@ EXTERNAL is_scale_solved()
 
 === npc_intro ===
 ~ met_npc = true
-// Első körben ellenőrizzük, megkapta-e már a jutalmat (hogy üljön maradjon)
+
 { 
     - got_reward: 
         -> told_everything
@@ -48,7 +48,7 @@ The red crates are the heaviest of all. But red alone won't work. You need to mi
     -> npc_end
 
 === npc_solved ===
-// Ha véletlenül idekerülne, de már megvan a jutalom, irányítsuk át
+
 { 
     - got_reward: 
         -> told_everything 
@@ -61,7 +61,7 @@ Wow... The scale is perfectly balanced! You actually did it. #voice:npc_solved_0
     -> npc_end
 
 === told_everything ===
-// Ezt hívjuk meg, ha már minden kész, és az NPC csak ül a székben
+
 I told you everything I know. The path is clear now. #voice:npc_done_01
 -> DONE
 
