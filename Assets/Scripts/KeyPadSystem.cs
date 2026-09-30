@@ -37,7 +37,7 @@ public class KeyPadSystem : MonoBehaviour
     public AudioClip grantedSound;
     public AudioClip deniedSound;
 
-    private string currentInput = "";
+    public string currentInput = "";
     private Color originalColor;
     private bool isProcessing = false;
 

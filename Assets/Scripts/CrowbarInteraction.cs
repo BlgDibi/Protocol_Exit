@@ -25,7 +25,7 @@ public class CrowbarInteraction : MonoBehaviour
 
             if (crowbarInHand == null || !crowbarInHand.activeSelf)
             {
-                Debug.Log("A feszítõvasnak a kézben kell lennie a feszítéshez!");
+                Debug.Log("Crowbar must be in hand!");
                 return;
             }
 
