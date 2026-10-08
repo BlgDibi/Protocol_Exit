@@ -115,6 +115,7 @@ public class GameOverMenu : MonoBehaviour
         }
 
         if (crosshair != null) crosshair.SetActive(true);
+        SaveSystem.ResetAllData();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -127,6 +128,7 @@ public class GameOverMenu : MonoBehaviour
         if (youDiedCanvasGroup != null) youDiedCanvasGroup.alpha = 0f;
         if (buttonPanelCanvasGroup != null) buttonPanelCanvasGroup.alpha = 0f;
 
+        SaveSystem.ResetAllData();
         SceneManager.LoadScene("MENU");
     }
 

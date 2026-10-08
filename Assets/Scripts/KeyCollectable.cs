@@ -61,7 +61,6 @@ public class KeyCollectable : MonoBehaviour, InterfaceInteractable
             }
 
             gameObject.SetActive(false);
-            SaveSystem.Save(SaveSystem.CurrentSlot);
         }
     }
 

@@ -4,6 +4,9 @@ using System.Collections;
 
 public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
 {
+    [Header("Save & Puzzle ID")]
+    public string puzzleID = "ClockPuzzle";
+
     [Header("UI & Camera References")]
     public GameObject viewerPanel;
     public Camera mainPlayerCamera;
@@ -20,13 +23,21 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
     public Interaction playerInteraction;
 
     [Header("Clock Parts")]
-    public Transform hourHandPivot;   
-    public Transform minuteHandPivot; 
+    public Transform hourHandPivot;
+    public Transform minuteHandPivot;
 
     [Header("Puzzle Settings")]
-    public float targetHourAngle = 90f;   
+    public float targetHourAngle = 90f;
     public float targetMinuteAngle = 90f;
     public float tolerance = 15f;
+
+    [Header("Doors to unlock")]
+    public UniversalDoor[] doorsToUnlock;
+    public float delayBeforeUnlock = 1f;
+    [Range(0f, 1f)] public float doorOpenVolume = 0.5f;
+
+    [Header("Audio Events")]
+    public AudioSource bedroomRadio;
 
     private bool isViewing = false;
     public bool isSolved = false;
@@ -36,7 +47,46 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
         if (viewerPanel != null && viewerPanel != gameObject) viewerPanel.SetActive(false);
         if (puzzleCamera != null) puzzleCamera.gameObject.SetActive(false);
 
-       
+        StartCoroutine(CheckStatusAfterLoad());
+    }
+
+    private IEnumerator CheckStatusAfterLoad()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        if (SaveSystem.IsPuzzleSolved(puzzleID))
+        {
+            isSolved = true;
+
+            if (doorsToUnlock != null)
+            {
+                foreach (UniversalDoor door in doorsToUnlock)
+                {
+                    if (door != null)
+                    {
+                        door.UnlockOnly();
+                    }
+                }
+            }
+
+            bool clueAlreadySeen = ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("SawBedroomClue");
+
+            if (bedroomRadio != null)
+            {
+                if (!clueAlreadySeen)
+                {
+                    if (!bedroomRadio.isPlaying)
+                    {
+                        bedroomRadio.time = 0f;
+                        bedroomRadio.Play();
+                    }
+                }
+                else
+                {
+                    bedroomRadio.Stop();
+                }
+            }
+        }
     }
 
     private void Update()
@@ -55,7 +105,7 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public string GetInteractText() => isSolved ? "The clock is broken." : "Examine Clock";
+    public string GetInteractText() => isSolved ? "The clock is working." : "Examine the clock";
     public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()
@@ -132,6 +182,7 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
         if (hourDiff <= tolerance && minuteDiff <= tolerance)
         {
             isSolved = true;
+            SaveSystem.SavePuzzleSolved(puzzleID);
             StartCoroutine(PuzzleSolvedRoutine());
         }
     }
@@ -140,15 +191,38 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
     {
         if (feedbackText != null)
         {
-            feedbackText.text = "*LOUD CLICKING NOISE*";
+            feedbackText.text = "Loud clicking noise";
             feedbackText.color = Color.red;
         }
 
+        yield return new WaitForSeconds(delayBeforeUnlock);
+
+        if (doorsToUnlock != null)
+        {
+            foreach (UniversalDoor door in doorsToUnlock)
+            {
+                if (door != null)
+                {
+                    AudioSource doorAudio = door.GetComponent<AudioSource>();
+                    if (doorAudio != null)
+                    {
+                        doorAudio.volume = doorOpenVolume*0.5f;
+                        doorAudio.spatialBlend = 1.0f;
+                    }
+
+                    door.UnlockAndPlaySound();
+                }
+            }
+        }
+
+        if (bedroomRadio != null)
+        {
+            bedroomRadio.time = 0f;
+            bedroomRadio.Play();
+        }
 
         yield return new WaitForSeconds(1.5f);
 
-        ClosePuzzle(); 
-
-        Debug.Log("<color=orange>A titkos járat kinyílt!</color>");
+        ClosePuzzle();
     }
 }

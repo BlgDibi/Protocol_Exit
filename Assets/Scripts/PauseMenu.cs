@@ -62,8 +62,6 @@ public class PauseMenu : MonoBehaviour
             crosshair.SetActive(previousCrosshairState);
         }
 
-        bool isAnyCustomUIOpen = false;
-
         if (previousCanvasStates != null)
         {
             for (int i = 0; i < canvasesToHide.Length; i++)
@@ -71,16 +69,11 @@ public class PauseMenu : MonoBehaviour
                 if (canvasesToHide[i] != null)
                 {
                     canvasesToHide[i].SetActive(previousCanvasStates[i]);
-
-                    if (previousCanvasStates[i] == true)
-                    {
-                        isAnyCustomUIOpen = true;
-                    }
                 }
             }
         }
 
-        if ((DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying) || isAnyCustomUIOpen)
+        if (DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -172,6 +165,7 @@ public class PauseMenu : MonoBehaviour
     public void LoadMenuScene()
     {
         Time.timeScale = 1f;
+        SaveSystem.ResetAllData();
         SceneManager.LoadScene(0);
     }
 

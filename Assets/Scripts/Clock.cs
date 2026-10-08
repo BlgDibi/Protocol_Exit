@@ -24,8 +24,6 @@ public class Clock : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                Debug.Log("<color=yellow>Az egér ezt találta el: " + hit.collider.gameObject.name + "</color>");
-
                 if (hit.collider.gameObject == gameObject)
                 {
                     isDragging = true;

@@ -50,7 +50,9 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (messagePanel != null) messagePanel.SetActive(false);
 
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
+
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
+        bool wasOpenedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorOpen(doorID);
         bool planksCleared = ProtectingPlanksRemoved();
 
         if (rewardState.ToLower() == "true" || wasUnlockedBySave || planksCleared)
@@ -58,21 +60,22 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
             isLocked = false;
         }
 
-        if (rewardState.ToLower() == "true" || wasUnlockedBySave)
+        if (wasOpenedBySave)
         {
-            isLocked = false;
             isDoorOpen = true;
             if (doorPivot != null)
             {
-                doorPivot.localRotation = Quaternion.Euler(0f, openAngle, 0f);
-                targetRotation = doorPivot.localRotation;
+                targetRotation = Quaternion.Euler(0f, openAngle, 0f);
+                doorPivot.localRotation = targetRotation;
             }
         }
         else
         {
+            isDoorOpen = false;
             if (doorPivot != null)
             {
                 targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
+                doorPivot.localRotation = targetRotation;
             }
         }
     }
@@ -169,9 +172,31 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (!string.IsNullOrEmpty(doorID))
         {
             SaveSystem.SaveDoorUnlocked(doorID);
-            SaveSystem.Save();
         }
         ToggleDoor();
+    }
+
+    public void UnlockOnly()
+    {
+        isLocked = false;
+        if (!string.IsNullOrEmpty(doorID))
+        {
+            SaveSystem.SaveDoorUnlocked(doorID);
+        }
+    }
+
+    public void UnlockAndPlaySound()
+    {
+        isLocked = false;
+        if (!string.IsNullOrEmpty(doorID))
+        {
+            SaveSystem.SaveDoorUnlocked(doorID);
+        }
+
+        if (audioSource != null && openSound != null)
+        {
+            audioSource.PlayOneShot(openSound);
+        }
     }
 
     private void ToggleDoor()
@@ -181,9 +206,14 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         PlaySound(isDoorOpen ? openSound : closeSound);
         isAnimating = true;
 
-        if (isDoorOpen && !isLocked && !string.IsNullOrEmpty(doorID))
+        if (!string.IsNullOrEmpty(doorID))
         {
-            SaveSystem.SaveDoorUnlocked(doorID);
+            SaveSystem.SaveDoorOpenState(doorID, isDoorOpen);
+
+            if (isDoorOpen && !isLocked)
+            {
+                SaveSystem.SaveDoorUnlocked(doorID);
+            }
         }
     }
 

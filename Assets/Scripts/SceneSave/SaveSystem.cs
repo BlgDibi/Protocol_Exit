@@ -17,6 +17,7 @@ public class SaveSystem
     public static int CurrentSlot = 1;
 
     private static List<string> _tempUnlockedDoors = new List<string>();
+    private static List<string> _tempOpenDoors = new List<string>();
     private static List<string> _tempMetNPCs = new List<string>();
     private static List<string> _tempPriedPlanks = new List<string>();
     private static List<Savedobjectpos_save> _tempSavedTransforms = new List<Savedobjectpos_save>();
@@ -30,6 +31,7 @@ public class SaveSystem
     private static void InitializeData()
     {
         if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
+        if (_savedata.openDoors == null) _savedata.openDoors = new List<string>();
         if (_savedata.metNPCs == null) _savedata.metNPCs = new List<string>();
         if (_savedata.activatedSecrets == null) _savedata.activatedSecrets = new List<string>();
         if (_savedata.InventoryBoxnames == null) _savedata.InventoryBoxnames = new List<string>();
@@ -91,6 +93,7 @@ public class SaveSystem
         public bool isDiningTableSet;
 
         public List<string> unlockedDoors;
+        public List<string> openDoors;
         public List<string> metNPCs;
         public int savedSkinIndex;
         public string savedKeypadFullCode;
@@ -100,8 +103,11 @@ public class SaveSystem
         public List<string> priedPlanks;
         public List<Savedobjectpos_save> savedTransforms;
         public List<string> solvedPuzzles;
+
         public bool isValvePlaced;
         public bool isGasCompleted;
+        public bool isBedroomClueSeen;
+        public bool isMirrorClueSeen;
     }
 
     public static string KeypadFullCode = "";
@@ -121,6 +127,7 @@ public class SaveSystem
     {
         HandleSaveData();
         _savedata.unlockedDoors = new List<string>(_tempUnlockedDoors);
+        _savedata.openDoors = new List<string>(_tempOpenDoors);
         _savedata.metNPCs = new List<string>(_tempMetNPCs);
         _savedata.priedPlanks = new List<string>(_tempPriedPlanks);
         _savedata.savedTransforms = new List<Savedobjectpos_save>(_tempSavedTransforms);
@@ -200,26 +207,20 @@ public class SaveSystem
         _savedata.savedBatteryLevel = FlashlightController.currentBattery;
 
         _savedata.hasCrowbar = CrowbarPickup.HasCrowbar;
-
         _savedata.hasDetonator = Detonator_Pickup.HasDetonator;
         _savedata.hasC4 = C4_Pickup.HasC4;
-
         _savedata.hasValve = ValvePickup.HasValve;
-
         _savedata.hasCabinetAccess = CabinetDrawer.HasCabinetAccess;
 
         if (ConditionManager.Instance != null)
         {
             _savedata.isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
-
             _savedata.isGasCompleted = ConditionManager.Instance.CheckCondition("GasCompleted");
+            _savedata.isValvePlaced = ConditionManager.Instance.CheckCondition("ValvePlaced");
+            _savedata.isBedroomClueSeen = ConditionManager.Instance.CheckCondition("SawBedroomClue");
+            _savedata.isMirrorClueSeen = ConditionManager.Instance.CheckCondition("SawMirrorClue");
         }
 
-        if (ConditionManager.Instance != null)
-        {
-            _savedata.isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
-        }
-        _savedata.isValvePlaced = ConditionManager.Instance.CheckCondition("ValvePlaced");
         _savedata.savedDiningItems = new List<string>(DiningItemsPickup.CollectedDiningItems);
 
         _savedata.savedSkinIndex = SelectedSkinIndex;
@@ -282,24 +283,16 @@ public class SaveSystem
             InitializeData();
 
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
+            _tempOpenDoors = new List<string>(_savedata.openDoors ?? new List<string>());
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
-            if (_savedata.priedPlanks != null)
-            {
-                _tempPriedPlanks = new List<string>(_savedata.priedPlanks);
-            }
-            else
-            {
-                _tempPriedPlanks = new List<string>();
-            }
+
+            if (_savedata.priedPlanks != null) _tempPriedPlanks = new List<string>(_savedata.priedPlanks);
+            else _tempPriedPlanks = new List<string>();
+
             _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms ?? new List<Savedobjectpos_save>());
-            if (_savedata.solvedPuzzles != null)
-            {
-                _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles);
-            }
-            else
-            {
-                _tempSolvedPuzzles = new List<string>();
-            }
+
+            if (_savedata.solvedPuzzles != null) _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles);
+            else _tempSolvedPuzzles = new List<string>();
 
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
@@ -311,37 +304,25 @@ public class SaveSystem
 
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
             FlashlightController.currentBattery = _savedata.savedBatteryLevel;
-
             CrowbarPickup.HasCrowbar = _savedata.hasCrowbar;
-
             Detonator_Pickup.HasDetonator = _savedata.hasDetonator;
             C4_Pickup.HasC4 = _savedata.hasC4;
-
             ValvePickup.HasValve = _savedata.hasValve;
-
             CabinetDrawer.HasCabinetAccess = _savedata.hasCabinetAccess;
 
-            if (_savedata.savedDiningItems != null)
-            {
-                DiningItemsPickup.CollectedDiningItems = new List<string>(_savedata.savedDiningItems);
-            }
-            else
-            {
-                DiningItemsPickup.CollectedDiningItems.Clear();
-            }
+            if (_savedata.savedDiningItems != null) DiningItemsPickup.CollectedDiningItems = new List<string>(_savedata.savedDiningItems);
+            else DiningItemsPickup.CollectedDiningItems.Clear();
 
             if (ConditionManager.Instance != null)
             {
                 ConditionManager.Instance.SetCondition("BarricadeDestroyed", _savedata.isBarricadeDestroyed);
-
                 ConditionManager.Instance.SetCondition("GasCompleted", _savedata.isGasCompleted);
                 ConditionManager.Instance.SetCondition("ValvePlaced", _savedata.isValvePlaced);
+                ConditionManager.Instance.SetCondition("SawBedroomClue", _savedata.isBedroomClueSeen);
+                ConditionManager.Instance.SetCondition("SawMirrorClue", _savedata.isMirrorClueSeen);
             }
 
-            if (_savedata.isBarricadeDestroyed)
-            {
-                Detonator_Pickup.HasDetonator = false;
-            }
+            if (_savedata.isBarricadeDestroyed) Detonator_Pickup.HasDetonator = false;
 
             SelectedSkinIndex = _savedata.savedSkinIndex;
             CurrentSceneIndex = _savedata.sceneIndex;
@@ -357,10 +338,7 @@ public class SaveSystem
             SlotEastItem = _savedata.slotEastItem;
             SlotWestItem = _savedata.slotWestItem;
 
-            if (UiManager.Instance != null)
-            {
-                UiManager.Instance.RefreshAllUI();
-            }
+            if (UiManager.Instance != null) UiManager.Instance.RefreshAllUI();
 
             UiManager.isMenuOpen = false;
             Time.timeScale = 1f;
@@ -386,7 +364,6 @@ public class SaveSystem
     {
         string folder = Application.persistentDataPath;
         string[] files = Directory.GetFiles(folder, "save_*.json");
-
         if (files.Length == 0) return null;
 
         string oldestFile = files[0];
@@ -434,6 +411,7 @@ public class SaveSystem
     {
         _savedata = new SaveData();
         _tempUnlockedDoors.Clear();
+        _tempOpenDoors.Clear();
         _tempMetNPCs.Clear();
         _tempPriedPlanks.Clear();
         _tempSavedTransforms.Clear();
@@ -443,14 +421,11 @@ public class SaveSystem
         IsGameJustLoaded = false;
 
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
-
         FlashlightController.currentBattery = 100f;
-
         if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
         if (Detonator_Pickup.HasDetonator) Detonator_Pickup.HasDetonator = false;
         if (C4_Pickup.HasC4) C4_Pickup.HasC4 = false;
         if (ValvePickup.HasValve) ValvePickup.HasValve = false;
-
         CabinetDrawer.HasCabinetAccess = false;
 
         KeypadFullCode = "";
@@ -478,6 +453,16 @@ public class SaveSystem
         if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID);
     }
     public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
+
+    public static void SaveDoorOpenState(string doorID, bool isOpen)
+    {
+        if (string.IsNullOrEmpty(doorID)) return;
+        if (isOpen && !_tempOpenDoors.Contains(doorID))
+            _tempOpenDoors.Add(doorID);
+        else if (!isOpen && _tempOpenDoors.Contains(doorID))
+            _tempOpenDoors.Remove(doorID);
+    }
+    public static bool IsDoorOpen(string doorID) => _tempOpenDoors.Contains(doorID);
 
     public static void SavePlankPried(string plankID)
     {

@@ -8,14 +8,14 @@ public class CustomLogger : MonoBehaviour
 
     void Awake()
     {
-        logFilePath = Application.persistentDataPath + "/Tesztelo_Log.txt";
+        logFilePath = Application.persistentDataPath + "/Test_Log.txt";
 
         if (File.Exists(logFilePath))
         {
             File.Delete(logFilePath);
         }
 
-        File.AppendAllText(logFilePath, $"--- Játék elindítva: {DateTime.Now} ---\n\n");
+        File.AppendAllText(logFilePath, $" Game started at: {DateTime.Now}\n\n");
     }
 
     void OnEnable()
