@@ -6,6 +6,9 @@ public class PushInteractable : MonoBehaviour, InterfaceInteractable
     public string promptText = "Push";
     public KeyCode interactKey = KeyCode.V;
 
+    [Header("Puzzle Link")]
+    public ClassroomPuzzleManager puzzleManager;
+
     private Rigidbody rb;
 
     private void Start()
@@ -15,6 +18,7 @@ public class PushInteractable : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
+        if (puzzleManager != null && !puzzleManager.hasReadRiddle) return "";
         return promptText;
     }
 
@@ -25,16 +29,13 @@ public class PushInteractable : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
+        if (puzzleManager != null && !puzzleManager.hasReadRiddle) return;
+
         OwnMovement player = FindFirstObjectByType<OwnMovement>();
 
         if (player != null && rb != null)
         {
             player.StartPushing(rb, interactKey);
-        }
-        else
-        {
-            if (player == null) Debug.LogError("There is no OwnMovement script found!");
-            if (rb == null) Debug.LogError("There is no Rigidbody on the interactable object!");
         }
     }
 }

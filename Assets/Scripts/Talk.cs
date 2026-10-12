@@ -25,12 +25,12 @@ public class Talk : MonoBehaviour
     {
         if (npcAnimator != null)
         {
-            if (fileName == "mech_intro_2")
+            if (fileName == "janitor_intro_2")
             {
                 npcAnimator.SetTrigger("ShowItem");
                 StartCoroutine(ShowItemRoutine(timeToAppear));
             }
-            else if (fileName == "mech_bye")
+            else if (fileName == "janitor_bye")
             {
                 npcAnimator.SetTrigger("PutAwayItem");
                 StartCoroutine(HideItemRoutine(timeToHide));

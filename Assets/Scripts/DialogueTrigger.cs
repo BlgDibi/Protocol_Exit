@@ -130,7 +130,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         {
             bool hasMetBefore = SaveSystem.WasNPCMet(interactableID);
 
-            if (interactableID == "npc1" || interactableID == "mechanic")
+            if (interactableID == "npc1" || interactableID == "mechanic" || interactableID == "janitor")
             {
                 string inkHasC4 = DialogueManager.Instance.GetVariableState("HasC4");
                 string inkHasDetonator = DialogueManager.Instance.GetVariableState("HasDetonator");
@@ -151,7 +151,13 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
                     currentKnot = "mechanic_waiting";
                 }
             }
-
+            else if (interactableID == "receptionist")
+            {
+                if (hasMetBefore)
+                {
+                    currentKnot = "told_everything";
+                }
+            }
             else if (interactableID == "chef")
             {
                 bool hasValve = (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasValve"));
@@ -176,7 +182,6 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         }
 
         SaveSystem.SaveNPCMet(interactableID);
-
         DialogueManager.Instance.EnterDialogueMode(inkJSON, currentKnot, talkScript);
     }
 

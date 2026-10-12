@@ -40,6 +40,9 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     public string doorID;
     [SerializeField] private KeyCode interactionKey = KeyCode.F;
 
+    [Header("Puzzle Integration")]
+    public ClassroomPuzzleManager puzzleManager;
+
     private bool isDoorOpen = false;
     private bool isAnimating = false;
     private Quaternion targetRotation;
@@ -50,7 +53,6 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (messagePanel != null) messagePanel.SetActive(false);
 
         string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
-
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
         bool wasOpenedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorOpen(doorID);
         bool planksCleared = ProtectingPlanksRemoved();
@@ -169,64 +171,74 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     public void UnlockAndOpen()
     {
         isLocked = false;
-        if (!string.IsNullOrEmpty(doorID))
-        {
-            SaveSystem.SaveDoorUnlocked(doorID);
-        }
+        if (!string.IsNullOrEmpty(doorID)) SaveSystem.SaveDoorUnlocked(doorID);
         ToggleDoor();
     }
 
     public void UnlockOnly()
     {
         isLocked = false;
-        if (!string.IsNullOrEmpty(doorID))
-        {
-            SaveSystem.SaveDoorUnlocked(doorID);
-        }
+        if (!string.IsNullOrEmpty(doorID)) SaveSystem.SaveDoorUnlocked(doorID);
     }
 
     public void UnlockAndPlaySound()
     {
         isLocked = false;
-        if (!string.IsNullOrEmpty(doorID))
-        {
-            SaveSystem.SaveDoorUnlocked(doorID);
-        }
-
-        if (audioSource != null && openSound != null)
-        {
-            audioSource.PlayOneShot(openSound);
-        }
+        if (!string.IsNullOrEmpty(doorID)) SaveSystem.SaveDoorUnlocked(doorID);
+        if (audioSource != null && openSound != null) audioSource.PlayOneShot(openSound);
     }
 
     private void ToggleDoor()
     {
+        if (puzzleManager != null)
+        {
+            if (!puzzleManager.InteractWithDoor(!isDoorOpen)) return;
+        }
+
         isDoorOpen = !isDoorOpen;
-        targetRotation = Quaternion.Euler(0f, isDoorOpen ? openAngle : closeAngle, 0f);
-        PlaySound(isDoorOpen ? openSound : closeSound);
+
+        if (isDoorOpen)
+        {
+            targetRotation = Quaternion.Euler(0f, openAngle, 0f);
+            PlaySound(openSound);
+        }
+        else
+        {
+            targetRotation = Quaternion.Euler(0f, closeAngle, 0f);
+            PlaySound(closeSound);
+        }
+
         isAnimating = true;
 
         if (!string.IsNullOrEmpty(doorID))
         {
             SaveSystem.SaveDoorOpenState(doorID, isDoorOpen);
-
-            if (isDoorOpen && !isLocked)
-            {
-                SaveSystem.SaveDoorUnlocked(doorID);
-            }
+            if (isDoorOpen && !isLocked) SaveSystem.SaveDoorUnlocked(doorID);
         }
     }
 
     private void HandleLockedDoor(bool isKeyMissing)
     {
         PlaySound(lockedSound);
-        string msg = isKeyMissing ? "Locked! I need a key." : (lockedMessageKey.IsEmpty ? "Locked." : lockedMessageKey.GetLocalizedString());
+
+        string msg = "";
+        if (isKeyMissing) msg = "Locked! I need a key.";
+        else msg = lockedMessageKey.IsEmpty ? "Locked." : lockedMessageKey.GetLocalizedString();
+
         ShowTemporaryMessage(msg);
     }
 
     public string GetInteractText()
     {
-        return isDoorOpen ? textCloseDoor.GetLocalizedString() : textOpenDoor.GetLocalizedString();
+
+        if (isDoorOpen)
+        {
+            return textCloseDoor.GetLocalizedString();
+        }
+        else
+        {
+            return textOpenDoor.GetLocalizedString();
+        }
     }
 
     private void PlaySound(AudioClip clip)
@@ -252,4 +264,10 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     }
 
     public KeyCode GetInteractKey() => interactionKey;
+    public bool IsOpen() => isDoorOpen;
+
+    public void ForceOpen()
+    {
+        if (!isDoorOpen) ToggleDoor();
+    }
 }

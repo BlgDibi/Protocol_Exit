@@ -108,6 +108,10 @@ public class SaveSystem
         public bool isGasCompleted;
         public bool isBedroomClueSeen;
         public bool isMirrorClueSeen;
+        public bool isSinkOpen;
+        public bool isSinkFilled;
+        public float sinkWaterLevel;
+
     }
 
     public static string KeypadFullCode = "";
@@ -120,6 +124,9 @@ public class SaveSystem
     public static string SlotEastItem = "";
     public static string SlotWestItem = "";
     public static bool IsDiningTableSet = false;
+    public static bool IsSinkOpen = false;
+    public static bool IsSinkFilled = false;
+    public static float SinkWaterLevel = 0.1f;
 
     public static string SaveFileName(int slot = 1) => Application.persistentDataPath + "/save_" + slot + ".json";
 
@@ -237,6 +244,10 @@ public class SaveSystem
             _savedata.slotEastItem = DiningPuzzle.Instance.slotEast.currentPlacedItemID;
             _savedata.slotWestItem = DiningPuzzle.Instance.slotWest.currentPlacedItemID;
         }
+
+        _savedata.isSinkOpen = IsSinkOpen;
+        _savedata.isSinkFilled = IsSinkFilled;
+        _savedata.sinkWaterLevel = SinkWaterLevel;
     }
 
     public static bool GetCupboardTransform(string id, out Vector3 pos, out Quaternion rot)
@@ -338,6 +349,10 @@ public class SaveSystem
             SlotEastItem = _savedata.slotEastItem;
             SlotWestItem = _savedata.slotWestItem;
 
+            IsSinkOpen = _savedata.isSinkOpen;
+            IsSinkFilled = _savedata.isSinkFilled;
+            SinkWaterLevel = _savedata.sinkWaterLevel == 0 ? 0.1f : _savedata.sinkWaterLevel;
+
             if (UiManager.Instance != null) UiManager.Instance.RefreshAllUI();
 
             UiManager.isMenuOpen = false;
@@ -438,6 +453,10 @@ public class SaveSystem
         SlotSouthItem = "";
         SlotEastItem = "";
         SlotWestItem = "";
+
+        IsSinkOpen = false;
+        IsSinkFilled = false;
+        SinkWaterLevel = 0.1f;
     }
 
     public static void SaveNPCMet(string npcID)
