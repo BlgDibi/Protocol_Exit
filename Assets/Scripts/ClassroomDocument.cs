@@ -13,6 +13,9 @@ public class ClassroomDocument : MonoBehaviour, InterfaceInteractable
     [Header("Puzzle Link")]
     public ClassroomPuzzleManager puzzleManager;
 
+    [Header("TV Event Link")]
+    public TV_Event tvEvent;
+
     private bool isReading = false;
 
     private string noteText = "<b>Protocol:Exit - The four acts</b>\n\n Subject: Test Subject #42\r\nSupervisor: The Professor\n\nTo leave this room, you must undo the lessons it taught you. Do not break the chain, or the room will forget your progress.\n\nI. Let the dry metal weep.\r\nII. Turn the green field into a void.\r\nIII. Leave the outside world behind.\r\nIV. Close the master's place.";
@@ -20,6 +23,8 @@ public class ClassroomDocument : MonoBehaviour, InterfaceInteractable
     public void Interact()
     {
         if (isReading) return;
+
+        if (tvEvent != null && !tvEvent.isEventFinished) return;
 
         UiManager.isMenuOpen = true;
         isReading = true;
@@ -64,13 +69,10 @@ public class ClassroomDocument : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        if (isReading)
-        {
-            return "";
-        }
-        else
-        {
-            return "Read the riddle";
-        }
+        if (isReading) return "";
+
+        if (tvEvent != null && !tvEvent.isEventFinished) return "";
+
+        return "Read the riddle";
     }
 }

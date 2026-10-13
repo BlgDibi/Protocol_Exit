@@ -18,6 +18,8 @@ public class TV_Event : MonoBehaviour
 
     private bool hasTriggered = false;
 
+    public bool isEventFinished = false;
+
     void Start()
     {
         StartCoroutine(CheckStatusAfterLoad());
@@ -34,6 +36,8 @@ public class TV_Event : MonoBehaviour
             if (savedKeys != null && savedKeys.Contains(keyThatTriggersThis.id))
             {
                 hasTriggered = true;
+                isEventFinished = true;
+
                 if (tvScreenRenderer != null && ClassroomMaterial != null)
                 {
                     tvScreenRenderer.material = ClassroomMaterial;
@@ -73,6 +77,9 @@ public class TV_Event : MonoBehaviour
         if (VoiceSound != null && tvAudioSource != null)
         {
             tvAudioSource.PlayOneShot(VoiceSound);
+            yield return new WaitForSeconds(VoiceSound.length);
         }
+
+        isEventFinished = true;
     }
 }

@@ -130,7 +130,7 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         {
             bool hasMetBefore = SaveSystem.WasNPCMet(interactableID);
 
-            if (interactableID == "npc1" || interactableID == "mechanic" || interactableID == "janitor")
+            if (interactableID == "mechanic" || interactableID == "janitor")
             {
                 string inkHasC4 = DialogueManager.Instance.GetVariableState("HasC4");
                 string inkHasDetonator = DialogueManager.Instance.GetVariableState("HasDetonator");
