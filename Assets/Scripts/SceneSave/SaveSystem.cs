@@ -111,7 +111,6 @@ public class SaveSystem
         public bool isSinkOpen;
         public bool isSinkFilled;
         public float sinkWaterLevel;
-
     }
 
     public static string KeypadFullCode = "";
@@ -186,7 +185,8 @@ public class SaveSystem
             _savedata.InventoryKeyIds = KeyInventory.Instance.GetSavedKeyIds();
             _savedata.historicalKeyIds = KeyInventory.Instance.GetHistoricalKeyIds();
         }
-        Stopwatch stopwatch = GameObject.FindFirstObjectByType<Stopwatch>();
+
+        Stopwatch stopwatch = UnityEngine.Object.FindFirstObjectByType<Stopwatch>(FindObjectsInactive.Include);
         if (stopwatch != null)
             _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
 
@@ -352,6 +352,12 @@ public class SaveSystem
             IsSinkOpen = _savedata.isSinkOpen;
             IsSinkFilled = _savedata.isSinkFilled;
             SinkWaterLevel = _savedata.sinkWaterLevel == 0 ? 0.1f : _savedata.sinkWaterLevel;
+
+            Stopwatch stopwatch = UnityEngine.Object.FindFirstObjectByType<Stopwatch>(FindObjectsInactive.Include);
+            if (stopwatch != null)
+            {
+                stopwatch.SetTime(_savedata.savedElapsedTime);
+            }
 
             if (UiManager.Instance != null) UiManager.Instance.RefreshAllUI();
 

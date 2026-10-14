@@ -23,7 +23,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 157263908864
-    m_Localized: 'Game {0}: {1}'
+    m_Localized: Game {0} - {1}
     m_Metadata:
       m_Items: []
   references:

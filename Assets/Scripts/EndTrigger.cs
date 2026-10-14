@@ -8,6 +8,7 @@ public class EndTrigger : MonoBehaviour
 {
     [Header("UI Elements")]
     public GameObject endingCanvas;
+    public GameObject[] canvasestohide;
     public Image blackScreen;
     public TextMeshProUGUI subtitleText;
     public Image nextRoomPhoto;
@@ -40,6 +41,17 @@ public class EndTrigger : MonoBehaviour
         OwnMovement movement = player.GetComponent<OwnMovement>();
         if (movement != null) movement.enabled = false;
 
+        if (canvasestohide != null)
+        {
+            foreach (GameObject canvases in canvasestohide)
+            {
+                if (canvases != null)
+                {
+                    canvases.SetActive(false);
+                }
+            }
+        }
+
         endingCanvas.SetActive(true);
         subtitleText.text = "";
 
@@ -51,14 +63,10 @@ public class EndTrigger : MonoBehaviour
         for (int i = 0; i < 6; i++)
         {
             blackScreen.color = new Color(0, 0, 0, Random.Range(0.7f, 1f));
-
             subtitleText.text = Random.value > 0.5f ? "<color=red>Error 404</color>" : "11111101010...";
-
             yield return new WaitForSeconds(Random.Range(0.05f, 0.15f));
-
             blackScreen.color = new Color(0, 0, 0, 0);
             subtitleText.text = "";
-
             yield return new WaitForSeconds(Random.Range(0.02f, 0.08f));
         }
 
@@ -90,7 +98,7 @@ public class EndTrigger : MonoBehaviour
 
         yield return new WaitForSeconds(timeBeforeReset);
 
-        subtitleText.text = ""; 
+        subtitleText.text = "";
 
         if (audioSource != null && glitchSound != null)
         {
@@ -103,16 +111,17 @@ public class EndTrigger : MonoBehaviour
             {
                 nextRoomPhoto.color = new Color(1, 1, 1, Random.Range(0.5f, 1f));
                 yield return new WaitForSeconds(Random.Range(0.05f, 0.15f));
-
                 nextRoomPhoto.color = new Color(1, 1, 1, 0);
                 yield return new WaitForSeconds(Random.Range(0.02f, 0.08f));
             }
-
             nextRoomPhoto.color = new Color(1, 1, 1, 1);
             yield return new WaitForSeconds(3.0f);
         }
 
         SaveSystem.ResetAllData();
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         SceneManager.LoadScene(0);
     }

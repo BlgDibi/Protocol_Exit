@@ -46,14 +46,16 @@ public class TimeMenu : MonoBehaviour
     {
         int gameCount = PlayerPrefs.GetInt("GameCount", 0);
         string finalList = "";
+
         int startIndex = Mathf.Max(0, gameCount - 5);
 
-       
         string linePattern = gameLineFormat.GetLocalizedString();
 
         for (int i = startIndex; i < gameCount; i++)
         {
             float savedTime = PlayerPrefs.GetFloat("SavedTime" + i, 0f);
+
+            string savedDate = PlayerPrefs.GetString("SavedDate" + i, "Unknown date");
 
             int minutes = Mathf.FloorToInt(savedTime / 60);
             int seconds = Mathf.FloorToInt(savedTime % 60);
@@ -61,8 +63,7 @@ public class TimeMenu : MonoBehaviour
 
             string timeString = $"{minutes:00}:{seconds:00}:{milliseconds:00}";
 
-          
-            finalList += string.Format(linePattern, i + 1, timeString) + "\n";
+            finalList += string.Format(linePattern, savedDate, timeString) + "\n";
         }
 
         savedTimeText.text = finalList;

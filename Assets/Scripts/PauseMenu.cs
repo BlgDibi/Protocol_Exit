@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
+using TMPro;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -12,6 +14,10 @@ public class PauseMenu : MonoBehaviour
     public GameObject buttonsPanel;
     public GameObject savePanel;
     public GameObject loadPanel;
+
+    [Header("Slot Texts")]
+    public TextMeshProUGUI[] saveSlotTexts;
+    public TextMeshProUGUI[] loadSlotTexts;
 
     [Header("Others")]
     public GameObject crosshair;
@@ -29,7 +35,11 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (savePanel.activeSelf || loadPanel.activeSelf)
+            if (savePanel.activeSelf)
+            {
+                BackToPause();
+            }
+            else if (loadPanel.activeSelf)
             {
                 BackToPause();
             }
@@ -48,7 +58,11 @@ public class PauseMenu : MonoBehaviour
     {
         UiManager.isMenuOpen = false;
 
-        if (background != null) background.SetActive(false);
+        if (background != null)
+        {
+            background.SetActive(false);
+        }
+
         pauseMenuParent.SetActive(false);
         savePanel.SetActive(false);
         loadPanel.SetActive(false);
@@ -73,10 +87,18 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
-        if (DialogueManager.Instance != null && DialogueManager.Instance.isDialoguePlaying)
+        if (DialogueManager.Instance != null)
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            if (DialogueManager.Instance.isDialoguePlaying)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
         }
         else
         {
@@ -90,11 +112,17 @@ public class PauseMenu : MonoBehaviour
         UiManager.isMenuOpen = true;
 
         pauseMenuParent.SetActive(true);
-        if (background != null) background.SetActive(true);
         buttonsPanel.SetActive(true);
-
         savePanel.SetActive(false);
         loadPanel.SetActive(false);
+
+        if (background != null)
+        {
+            background.SetActive(true);
+        }
+
+        RefreshSlotTexts(saveSlotTexts);
+        RefreshSlotTexts(loadSlotTexts);
 
         Time.timeScale = 0f;
         GameIsPaused = true;
@@ -110,6 +138,7 @@ public class PauseMenu : MonoBehaviour
         Cursor.visible = true;
 
         previousCanvasStates = new bool[canvasesToHide.Length];
+
         for (int i = 0; i < canvasesToHide.Length; i++)
         {
             if (canvasesToHide[i] != null)
@@ -123,12 +152,14 @@ public class PauseMenu : MonoBehaviour
     public void OpenSaveMenu()
     {
         buttonsPanel.SetActive(false);
+        RefreshSlotTexts(saveSlotTexts);
         savePanel.SetActive(true);
     }
 
     public void OpenLoadMenu()
     {
         buttonsPanel.SetActive(false);
+        RefreshSlotTexts(loadSlotTexts);
         loadPanel.SetActive(true);
     }
 
@@ -144,13 +175,11 @@ public class PauseMenu : MonoBehaviour
     public void SaveSlot(int slotIndex)
     {
         SaveSystem.Save(slotIndex);
-        Debug.Log("Saved: " + slotIndex);
+        RefreshSlotTexts(saveSlotTexts);
     }
 
     public void LoadSlot(int slotIndex)
     {
-        Debug.Log("Load From Pause Menu, slot: " + slotIndex);
-
         Time.timeScale = 1f;
         GameIsPaused = false;
 
@@ -176,9 +205,39 @@ public class PauseMenu : MonoBehaviour
 
     private void ToggleScripts(bool state)
     {
-        foreach (MonoBehaviour script in scriptsToDisable)
+        for (int i = 0; i < scriptsToDisable.Length; i++)
         {
-            if (script != null) script.enabled = state;
+            if (scriptsToDisable[i] != null)
+            {
+                scriptsToDisable[i].enabled = state;
+            }
+        }
+    }
+
+    private void RefreshSlotTexts(TextMeshProUGUI[] slots)
+    {
+        if (slots == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] != null)
+            {
+                int slotNum = i + 1;
+                string path = SaveSystem.SaveFileName(slotNum);
+
+                if (File.Exists(path))
+                {
+                    System.DateTime date = File.GetLastWriteTime(path);
+                    slots[i].text = "SLOT " + slotNum + "\n<size=60%>" + date.ToString("yyyy.MM.dd HH:mm") + "</size>";
+                }
+                else
+                {
+                    slots[i].text = "SLOT " + slotNum + "\n<size=60%>Empty</size>";
+                }
+            }
         }
     }
 }

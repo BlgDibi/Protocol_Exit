@@ -23,7 +23,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 157263908864
-    m_Localized: "J\xE1t\xE9k {0}: {1}"
+    m_Localized: "J\xE1t\xE9k {0} - {1}"
     m_Metadata:
       m_Items: []
   references:

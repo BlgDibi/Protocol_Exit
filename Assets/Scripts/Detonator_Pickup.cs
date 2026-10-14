@@ -9,6 +9,12 @@ public class Detonator_Pickup : MonoBehaviour, InterfaceInteractable
     [Header("Detonator Settings")]
     public GameObject detonatorOnFloor;
 
+    [Tooltip("Detonator mesh render")]
+    public MeshRenderer detonatorRenderer;
+
+    [Tooltip("Flashlight controller")]
+    public FlashlightController flashlightController;
+
     [Header("Settings")]
     [SerializeField] private Image crosshair;
 
@@ -16,11 +22,52 @@ public class Detonator_Pickup : MonoBehaviour, InterfaceInteractable
     public LocalizedString interactionPrompt;
     [SerializeField] private KeyCode interactkey = KeyCode.E;
 
+    private Color uvColor;
+    private Color normalColor = Color.black;
+
     void Start()
     {
         if (HasDetonator == true && detonatorOnFloor != null)
         {
             detonatorOnFloor.SetActive(false);
+        }
+
+        if (flashlightController == null)
+        {
+            flashlightController = FindObjectOfType<FlashlightController>();
+        }
+
+        if (detonatorRenderer != null)
+        {
+            ColorUtility.TryParseHtmlString("#00FF33", out uvColor);
+            uvColor = uvColor * 2.5f;
+
+            detonatorRenderer.material.EnableKeyword("_EMISSION");
+            detonatorRenderer.material.SetColor("_EmissionColor", normalColor);
+        }
+    }
+
+    private bool IsUVLightActive()
+    {
+        if (flashlightController == null) return false;
+
+        bool isHoldingFlashlight = flashlightController.flashlightInHand != null && flashlightController.flashlightInHand.activeSelf;
+        bool isLightOn = flashlightController.flashlightLightComponent != null && flashlightController.flashlightLightComponent.enabled;
+
+        return isHoldingFlashlight && isLightOn && flashlightController.isUVMode;
+    }
+
+    void Update()
+    {
+        if (detonatorRenderer == null) return;
+
+        if (IsUVLightActive())
+        {
+            detonatorRenderer.material.SetColor("_EmissionColor", uvColor);
+        }
+        else
+        {
+            detonatorRenderer.material.SetColor("_EmissionColor", normalColor);
         }
     }
 

@@ -2371,7 +2371,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 657.00006, y: -2.999998}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &221162685
 MonoBehaviour:
@@ -4242,7 +4242,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 11.00013, y: -2.999998}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &385133449
 MonoBehaviour:
@@ -9893,6 +9893,14 @@ MonoBehaviour:
   buttonsPanel: {fileID: 500056244}
   savePanel: {fileID: 819852411}
   loadPanel: {fileID: 180550007}
+  saveSlotTexts:
+  - {fileID: 2106835948}
+  - {fileID: 102477732}
+  - {fileID: 1824046872}
+  loadSlotTexts:
+  - {fileID: 121287391}
+  - {fileID: 1850186114}
+  - {fileID: 142264289}
   crosshair: {fileID: 1601288710}
   canvasesToHide:
   - {fileID: 23851397}
@@ -10706,6 +10714,7 @@ MonoBehaviour:
   buttonClickSound: {fileID: 8300000, guid: 8df927c105c5466419c59aa1bb63100a, type: 3}
   grantedSound: {fileID: 8300000, guid: 54ccf978c7886364c980d9f84ff32bd3, type: 3}
   deniedSound: {fileID: 8300000, guid: 6badc82930e38c34891f46e1f01f63d3, type: 3}
+  currentInput: 
 --- !u!82 &1029477598
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12770,7 +12779,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 11.00013, y: -315.00015}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1373666468
 MonoBehaviour:
@@ -13210,7 +13219,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 7.9999886, y: -2.999998}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1417315966
 MonoBehaviour:
@@ -14528,7 +14537,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -638, y: -3}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1478221935
 MonoBehaviour:
@@ -17978,6 +17987,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OwnMovement
   controller: {fileID: 171428632}
   animator: {fileID: 1700655008}
+  playerHP: {fileID: 0}
   mainCamera: {fileID: 1311821350}
   cameraRoot: {fileID: 1541984998}
   mouseSensitivity: 2
@@ -17986,6 +17996,8 @@ MonoBehaviour:
   jumpHeight: 1.2
   turnSmoothTime: 0.15
   gravity: -9.81
+  safeFallSpeed: -12
+  fallDamageMultiplier: 1.5
   pushPoint: {fileID: 0}
   pushForce: 1500
   pushDistance: 1.5
@@ -18641,7 +18653,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 7.9999886, y: -315}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1797730969
 MonoBehaviour:
@@ -18938,7 +18950,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -641, y: -3}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1811736495
 MonoBehaviour:
@@ -20272,8 +20284,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 654, y: -2.999998}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 654, y: -3}
+  m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1907161785
 MonoBehaviour:

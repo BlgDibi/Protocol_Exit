@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.Localization;
-using System.Collections;
 
 public class Stopwatch : MonoBehaviour
 {
@@ -12,19 +11,17 @@ public class Stopwatch : MonoBehaviour
     private bool isRunning = false;
     private string cachedPattern;
 
-    IEnumerator Start()
+    void Start()
     {
         cachedPattern = timeFormat.GetLocalizedString();
         timeFormat.StringChanged += UpdatePattern;
 
-        bool isLoaded = SaveSystem.IsGameJustLoaded;
-        yield return null;
-
-        if (isLoaded)
+        if (SaveSystem.IsGameJustLoaded)
         {
             elapsedTime = SaveSystem.GetSavedTime();
         }
 
+        UpdateStopwatchUI();
         StartStopwatch();
     }
 
@@ -74,12 +71,22 @@ public class Stopwatch : MonoBehaviour
 
     public float GetElapsedTime() => elapsedTime;
 
+    public void SetTime(float time)
+    {
+        elapsedTime = time;
+        UpdateStopwatchUI();
+    }
+
     public void SaveTimeOnMainMenu()
     {
         int gameCount = PlayerPrefs.GetInt("GameCount", 0);
         PlayerPrefs.SetFloat("SavedTime" + gameCount, elapsedTime);
+
+        string currentDate = System.DateTime.Now.ToString("yyyy.MM.dd HH:mm");
+        PlayerPrefs.SetString("SavedDate" + gameCount, currentDate);
+
         PlayerPrefs.SetInt("GameCount", gameCount + 1);
         PlayerPrefs.Save();
-        Debug.Log("Time saved to PlayerPrefs for Menu");
+        Debug.Log("Time and Date saved to PlayerPrefs for Menu");
     }
 }

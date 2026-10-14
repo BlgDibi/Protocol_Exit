@@ -253,7 +253,9 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
 
     private void CalculateScaleState()
     {
-    
+
+        if (isSolved) return;
+
         float deltaWeight = rightWeight - leftWeight;
         targetAngle = Mathf.Clamp(deltaWeight * -10f, -60f, 60f);
 

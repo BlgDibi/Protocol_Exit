@@ -2014,6 +2014,10 @@ MonoBehaviour:
   mainCharacter: {fileID: 637681592}
   dummyCharacter: {fileID: 1216446408}
   warningText: {fileID: 477834690}
+  loadSlotTexts:
+  - {fileID: 7351397}
+  - {fileID: 696623493}
+  - {fileID: 1395078606}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
     [Header("Lock Settings")]
     public bool isLocked = false;
 
-    [Tooltip("Required Conditions (e.g. Lock1_Done, Lock2_Done)")]
+    [Tooltip("Required Conditions ")]
     public List<string> requiredConditions = new List<string>();
 
     [Header("Sounds")]
@@ -42,6 +42,8 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
 
     private bool isDoorOpen = false;
     private bool isAnimating = false;
+
+    private bool hasSavedTime = false;
 
     private Quaternion targetRotationLeft;
     private Quaternion targetRotationRight;
@@ -177,6 +179,17 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
 
         isAnimating = true;
         PlaySound(isDoorOpen ? openSound : closeSound);
+
+        if (isDoorOpen && !hasSavedTime)
+        {
+            Stopwatch stopwatch = FindFirstObjectByType<Stopwatch>();
+            if (stopwatch != null)
+            {
+                stopwatch.StopStopwatch();
+                stopwatch.SaveTimeOnMainMenu();
+            }
+            hasSavedTime = true;
+        }
     }
 
     private void PlaySound(AudioClip clip)
