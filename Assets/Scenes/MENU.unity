@@ -2497,7 +2497,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -181.017, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -100.3, y: -35.1}
+  m_AnchoredPosition: {x: -100.3, y: 21.7}
   m_SizeDelta: {x: 100, y: 49.58632}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &435428101
@@ -6531,7 +6531,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1270298754}
   m_LocalRotation: {x: -0, y: 0.0062593296, z: -0, w: 0.99998045}
-  m_LocalPosition: {x: 0, y: 0, z: 7}
+  m_LocalPosition: {x: 0, y: 0, z: 2.0008368}
   m_LocalScale: {x: 0.40115637, y: 0.20728841, z: 2.6896021}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6539,7 +6539,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 181.734, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -155.59998, y: 19.699995}
+  m_AnchoredPosition: {x: -84.49994, y: -9.699982}
   m_SizeDelta: {x: 51, y: -70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1270298756
@@ -6668,7 +6668,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 425.93137, y: 9.445135, z: -175.03537, w: -63.413834}
+  m_margin: {x: 425.93137, y: 9.445135, z: -168.05261, w: -63.413834}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -6905,7 +6905,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1354135211}
   m_LocalRotation: {x: -0, y: 0.0062593296, z: -0, w: 0.99998045}
-  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 0.40115637, y: 0.20728841, z: 2.6896021}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6913,7 +6913,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 181.734, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -37.300003, y: 19.7}
+  m_AnchoredPosition: {x: 3, y: -10.1}
   m_SizeDelta: {x: 51, y: -70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1354135213
@@ -7026,7 +7026,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -43.63636, y: 9.445135, z: -38.68457, w: -63.413834}
+  m_margin: {x: -43.63636, y: 9.445135, z: 200.71437, w: -63.413834}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

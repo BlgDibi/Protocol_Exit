@@ -36,7 +36,7 @@ public class C4_Plant : MonoBehaviour
     private bool canExplode = false;
     private bool isExploding = false;
 
-    void Awake()
+    private IEnumerator Start()
     {
         if (c4WorldModel != null) c4WorldModel.SetActive(false);
         if (detonatorInHand != null) detonatorInHand.SetActive(false);
@@ -44,13 +44,8 @@ public class C4_Plant : MonoBehaviour
 
         if (explosionEffect != null) explosionEffect.gameObject.SetActive(false);
 
-        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("BarricadeDestroyed"))
-        {
-            foreach (GameObject obj in objectsToDestroy)
-            {
-                if (obj != null) Destroy(obj);
-            }
-        }
+        yield return new WaitForSeconds(0.1f);
+
         CheckAndDestroyBarricade();
     }
 
@@ -63,6 +58,8 @@ public class C4_Plant : MonoBehaviour
                 if (obj != null) Destroy(obj);
             }
             Detonator_Pickup.HasDetonator = false;
+
+            this.enabled = false;
         }
     }
 

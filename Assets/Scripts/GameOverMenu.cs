@@ -15,6 +15,7 @@ public class GameOverMenu : MonoBehaviour
     private CanvasGroup youDiedCanvasGroup;
     private CanvasGroup buttonPanelCanvasGroup;
 
+    public static float timeToRestore = 0f;
     private void Start()
     {
         if (youDiedText != null) youDiedText.SetActive(true);
@@ -38,6 +39,8 @@ public class GameOverMenu : MonoBehaviour
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+
+        Time.timeScale = 0f;
 
         StartCoroutine(GameOverSequence());
     }
@@ -103,20 +106,13 @@ public class GameOverMenu : MonoBehaviour
         if (youDiedCanvasGroup != null) youDiedCanvasGroup.alpha = 0f;
         if (buttonPanelCanvasGroup != null) buttonPanelCanvasGroup.alpha = 0f;
 
-        if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            HP hp = player.GetComponent<HP>();
-            if (hp != null) hp.Hp = 100;
-            player.transform.position = Vector3.zero;
-            player.transform.rotation = Quaternion.identity;
-        }
-
         if (crosshair != null) crosshair.SetActive(true);
-        SaveSystem.ResetAllData();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+      
+        SaveSystem.Load(SaveSystem.CurrentSlot);
+
+       
+        SceneManager.LoadScene(SaveSystem.CurrentSceneIndex);
     }
 
     public void MainMenu()

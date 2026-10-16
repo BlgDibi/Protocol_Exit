@@ -38,6 +38,8 @@ public class ClassroomPuzzleManager : MonoBehaviour
 
     private Coroutine eraseCoroutine;
 
+    private bool isResetting = false;
+
     private void Start()
     {
         if (chairTransform != null)
@@ -144,6 +146,8 @@ public class ClassroomPuzzleManager : MonoBehaviour
 
     public bool InteractWithDoor(bool isOpening)
     {
+        if (isResetting) return true;
+
         if (!hasReadRiddle) return true;
 
         if (currentStep >= 4) return true;
@@ -155,9 +159,9 @@ public class ClassroomPuzzleManager : MonoBehaviour
                 FailPuzzle();
                 return false;
             }
-            return true; 
+            return true;
         }
-        else 
+        else
         {
             if (currentStep >= 3) return true;
 
@@ -217,6 +221,9 @@ public class ClassroomPuzzleManager : MonoBehaviour
 
     private void FailPuzzle()
     {
+        if (isResetting) return;
+        isResetting = true;
+
         mainAudioSource.PlayOneShot(failBuzzerSound);
 
         if (sinkScript != null)
@@ -264,5 +271,7 @@ public class ClassroomPuzzleManager : MonoBehaviour
         }
 
         currentStep = 0;
+
+        isResetting = false;
     }
 }

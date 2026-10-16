@@ -111,6 +111,10 @@ public class SaveSystem
         public bool isSinkOpen;
         public bool isSinkFilled;
         public float sinkWaterLevel;
+
+        public bool isScaleSolved;
+        public bool isDiningSolved;
+        public bool isC4Spawned;
     }
 
     public static string KeypadFullCode = "";
@@ -226,6 +230,10 @@ public class SaveSystem
             _savedata.isValvePlaced = ConditionManager.Instance.CheckCondition("ValvePlaced");
             _savedata.isBedroomClueSeen = ConditionManager.Instance.CheckCondition("SawBedroomClue");
             _savedata.isMirrorClueSeen = ConditionManager.Instance.CheckCondition("SawMirrorClue");
+
+            _savedata.isScaleSolved = ConditionManager.Instance.CheckCondition("ScaleSolved");
+            _savedata.isDiningSolved = ConditionManager.Instance.CheckCondition("DiningSolved");
+            _savedata.isC4Spawned = ConditionManager.Instance.CheckCondition("C4Spawned");
         }
 
         _savedata.savedDiningItems = new List<string>(DiningItemsPickup.CollectedDiningItems);
@@ -312,6 +320,10 @@ public class SaveSystem
                     dict[_savedata.inkMemoryKeys[i]] = _savedata.inkMemoryValues[i];
                 DialogueManager.SetInkMemory(dict);
             }
+            else
+            {
+                DialogueManager.SetInkMemory(new Dictionary<string, string>());
+            }
 
             Flashlightpickup.HasFlashlight = _savedata.hasFlashlight;
             FlashlightController.currentBattery = _savedata.savedBatteryLevel;
@@ -331,6 +343,14 @@ public class SaveSystem
                 ConditionManager.Instance.SetCondition("ValvePlaced", _savedata.isValvePlaced);
                 ConditionManager.Instance.SetCondition("SawBedroomClue", _savedata.isBedroomClueSeen);
                 ConditionManager.Instance.SetCondition("SawMirrorClue", _savedata.isMirrorClueSeen);
+
+                ConditionManager.Instance.SetCondition("ScaleSolved", _savedata.isScaleSolved);
+                ConditionManager.Instance.SetCondition("DiningSolved", _savedata.isDiningSolved);
+                ConditionManager.Instance.SetCondition("C4Spawned", _savedata.isC4Spawned);
+
+                ConditionManager.Instance.SetCondition("HasC4", _savedata.hasC4);
+                ConditionManager.Instance.SetCondition("HasDetonator", _savedata.hasDetonator);
+                ConditionManager.Instance.SetCondition("HasValve", _savedata.hasValve);
             }
 
             if (_savedata.isBarricadeDestroyed) Detonator_Pickup.HasDetonator = false;
@@ -437,9 +457,31 @@ public class SaveSystem
         _tempPriedPlanks.Clear();
         _tempSavedTransforms.Clear();
         _tempSolvedPuzzles.Clear();
+
         DiningItemsPickup.CollectedDiningItems.Clear();
+
+        _savedata.PlacedBoxes?.Clear();
+        _savedata.savedDiningItems?.Clear();
+
         InitializeData();
         IsGameJustLoaded = false;
+
+        DialogueManager.SetInkMemory(new Dictionary<string, string>());
+
+        if (ConditionManager.Instance != null)
+        {
+            ConditionManager.Instance.SetCondition("BarricadeDestroyed", false);
+            ConditionManager.Instance.SetCondition("GasCompleted", false);
+            ConditionManager.Instance.SetCondition("ValvePlaced", false);
+            ConditionManager.Instance.SetCondition("SawBedroomClue", false);
+            ConditionManager.Instance.SetCondition("SawMirrorClue", false);
+            ConditionManager.Instance.SetCondition("ScaleSolved", false);
+            ConditionManager.Instance.SetCondition("DiningSolved", false);
+            ConditionManager.Instance.SetCondition("C4Spawned", false);
+            ConditionManager.Instance.SetCondition("HasC4", false);
+            ConditionManager.Instance.SetCondition("HasDetonator", false);
+            ConditionManager.Instance.SetCondition("HasValve", false);
+        }
 
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
         FlashlightController.currentBattery = 100f;
@@ -509,5 +551,6 @@ public class SaveSystem
         if (string.IsNullOrEmpty(puzzleID)) return;
         if (!_tempSolvedPuzzles.Contains(puzzleID)) _tempSolvedPuzzles.Add(puzzleID);
     }
-    public static bool IsPuzzleSolved(string puzzleID) => _savedata.solvedPuzzles != null && _savedata.solvedPuzzles.Contains(puzzleID);
+
+    public static bool IsPuzzleSolved(string puzzleID) => _tempSolvedPuzzles.Contains(puzzleID);
 }

@@ -7,7 +7,7 @@ public class OwnMovement : MonoBehaviour
     public Animator animator;
 
     [Header("Health reference")]
-    public HP playerHP; 
+    public HP playerHP;
 
     [Header("Camera settings")]
     public Transform mainCamera;
@@ -29,8 +29,12 @@ public class OwnMovement : MonoBehaviour
     public float safeFallSpeed = -12f;
     public float fallDamageMultiplier = 1.5f;
 
+    [Tooltip("Minimum air time for damage")]
+    public float minAirTimeForFallDamage = 0.25f;
+
     private bool wasGrounded = true;
     private float highestFallSpeed = 0f;
+    private float airTime = 0f;
 
     [Header("Push Settings")]
     public Transform pushPoint;
@@ -184,33 +188,35 @@ public class OwnMovement : MonoBehaviour
             controller.Move(fallVelocity * Time.fixedDeltaTime);
         }
 
-
-        if (wasGrounded == false)
-        {
-            if (controller.isGrounded == true)
-            {
-
-                if (highestFallSpeed < safeFallSpeed)
-                {
-                    float damage = (safeFallSpeed - highestFallSpeed) * fallDamageMultiplier;
-
-                    if (playerHP != null)
-                    {
-                        playerHP.TakeDamage(damage);
-                    }
-                    
-                }
-
-                highestFallSpeed = 0f;
-            }
-        }
-
         if (controller.isGrounded == false)
         {
+            airTime += Time.fixedDeltaTime;
+
             if (fallVelocity.y < highestFallSpeed)
             {
                 highestFallSpeed = fallVelocity.y;
             }
+        }
+        else
+        {
+            if (wasGrounded == false)
+            {
+                if (airTime >= minAirTimeForFallDamage)
+                {
+                    if (highestFallSpeed < safeFallSpeed)
+                    {
+                        float damage = (safeFallSpeed - highestFallSpeed) * fallDamageMultiplier;
+
+                        if (playerHP != null)
+                        {
+                            playerHP.TakeDamage(damage);
+                        }
+                    }
+                }
+            }
+
+            highestFallSpeed = 0f;
+            airTime = 0f;
         }
 
         wasGrounded = controller.isGrounded;

@@ -87,8 +87,7 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
 
                     if (isSolved)
                     {
-                        Destroy(pickupScript);
-                       
+                        pickupScript.enabled = false;
 
                         if (rb != null)
                         {
@@ -325,7 +324,6 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
             }
         }
 
-        SaveSystem.Save(SaveSystem.CurrentSlot);
 
         yield return new WaitForSeconds(2.0f);
         ClosePuzzle();

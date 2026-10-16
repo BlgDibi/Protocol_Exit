@@ -6,6 +6,10 @@ public class PersistentItem : MonoBehaviour
     [SerializeField] private string itemID = "green_key_spawned";
     [SerializeField] private int keyIDInInventory = 1;
 
+    [Header("Extra Security")]
+    [Tooltip("DisableCondition")]
+    [SerializeField] private string disableCondition = "GreenLockSolved";
+
     private void Awake()
     {
         SetVisibility(false);
@@ -15,7 +19,7 @@ public class PersistentItem : MonoBehaviour
     {
         yield return new WaitForSeconds(0.3f);
 
-        if (IsKeyAlreadyInInventory())
+        if (IsKeyAlreadyInHistory() || IsPuzzleAlreadySolved())
         {
             gameObject.SetActive(false);
             yield break;
@@ -34,8 +38,8 @@ public class PersistentItem : MonoBehaviour
     public void RevealItem()
     {
         SaveSystem.SaveNPCMet(itemID);
-        SetVisibility(true);  
-        SaveSystem.Save(SaveSystem.CurrentSlot); 
+        SetVisibility(true);
+        SaveSystem.Save(SaveSystem.CurrentSlot);
     }
 
     public void SetVisibility(bool visible)
@@ -53,9 +57,17 @@ public class PersistentItem : MonoBehaviour
         }
     }
 
-    private bool IsKeyAlreadyInInventory()
+    private bool IsKeyAlreadyInHistory()
     {
         if (KeyInventory.Instance == null) return false;
-        return KeyInventory.Instance.GetSavedKeyIds().Contains(keyIDInInventory);
+        return KeyInventory.Instance.GetHistoricalKeyIds().Contains(keyIDInInventory);
+    }
+
+    private bool IsPuzzleAlreadySolved()
+    {
+        if (string.IsNullOrEmpty(disableCondition)) return false;
+        if (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition(disableCondition)) return true;
+        if (SaveSystem.IsPuzzleSolved(disableCondition)) return true;
+        return false;
     }
 }

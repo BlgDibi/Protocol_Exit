@@ -9096,6 +9096,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  currentStopwatch: {fileID: 576901922}
   references:
     version: 2
     RefIds: []
@@ -13917,7 +13918,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1451647346
 Transform:
   m_ObjectHideFlags: 0

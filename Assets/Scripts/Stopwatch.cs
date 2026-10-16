@@ -16,13 +16,29 @@ public class Stopwatch : MonoBehaviour
         cachedPattern = timeFormat.GetLocalizedString();
         timeFormat.StringChanged += UpdatePattern;
 
-        if (SaveSystem.IsGameJustLoaded)
+        float timeFromMemory = SaveSystem.GetSavedTime();
+
+        if (A1_Door.isTransitioning)
         {
-            elapsedTime = SaveSystem.GetSavedTime();
+            elapsedTime = A1_Door.transitionTime;
+            A1_Door.isTransitioning = false;
+
+            StartCoroutine(AutoSaveNextFrame());
+        }
+        else if (timeFromMemory > 0f)
+        {
+            elapsedTime = timeFromMemory;
         }
 
         UpdateStopwatchUI();
         StartStopwatch();
+    }
+
+    private System.Collections.IEnumerator AutoSaveNextFrame()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        SaveSystem.Save(SaveSystem.CurrentSlot);
     }
 
     void OnDestroy()

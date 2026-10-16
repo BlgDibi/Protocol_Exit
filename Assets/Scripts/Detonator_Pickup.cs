@@ -12,9 +12,6 @@ public class Detonator_Pickup : MonoBehaviour, InterfaceInteractable
     [Tooltip("Detonator mesh render")]
     public MeshRenderer detonatorRenderer;
 
-    [Tooltip("Flashlight controller")]
-    public FlashlightController flashlightController;
-
     [Header("Settings")]
     [SerializeField] private Image crosshair;
 
@@ -22,48 +19,42 @@ public class Detonator_Pickup : MonoBehaviour, InterfaceInteractable
     public LocalizedString interactionPrompt;
     [SerializeField] private KeyCode interactkey = KeyCode.E;
 
-    private Color uvColor;
+    private Color highlightColor;
     private Color normalColor = Color.black;
+
+    private bool isHovered = false;
 
     void Start()
     {
-        if (HasDetonator == true && detonatorOnFloor != null)
+        bool isBarricadeDestroyed = false;
+        if (ConditionManager.Instance != null)
         {
-            detonatorOnFloor.SetActive(false);
+            isBarricadeDestroyed = ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
         }
 
-        if (flashlightController == null)
+        if ((HasDetonator == true || isBarricadeDestroyed == true) && detonatorOnFloor != null)
         {
-            flashlightController = FindObjectOfType<FlashlightController>();
+            detonatorOnFloor.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         if (detonatorRenderer != null)
         {
-            ColorUtility.TryParseHtmlString("#00FF33", out uvColor);
-            uvColor = uvColor * 2.5f;
+            ColorUtility.TryParseHtmlString("#32A645", out highlightColor);
+            highlightColor = highlightColor * 1.5f;
 
             detonatorRenderer.material.EnableKeyword("_EMISSION");
             detonatorRenderer.material.SetColor("_EmissionColor", normalColor);
         }
     }
 
-    private bool IsUVLightActive()
-    {
-        if (flashlightController == null) return false;
-
-        bool isHoldingFlashlight = flashlightController.flashlightInHand != null && flashlightController.flashlightInHand.activeSelf;
-        bool isLightOn = flashlightController.flashlightLightComponent != null && flashlightController.flashlightLightComponent.enabled;
-
-        return isHoldingFlashlight && isLightOn && flashlightController.isUVMode;
-    }
-
     void Update()
     {
         if (detonatorRenderer == null) return;
 
-        if (IsUVLightActive())
+        if (isHovered)
         {
-            detonatorRenderer.material.SetColor("_EmissionColor", uvColor);
+            detonatorRenderer.material.SetColor("_EmissionColor", highlightColor);
         }
         else
         {
@@ -110,13 +101,19 @@ public class Detonator_Pickup : MonoBehaviour, InterfaceInteractable
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") == true)
+        {
+            isHovered = true;
             HighlightCrosshair(true);
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player") == true)
+        {
+            isHovered = false;
             HighlightCrosshair(false);
+        }
     }
 
     void HighlightCrosshair(bool on)

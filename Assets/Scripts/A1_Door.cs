@@ -28,6 +28,8 @@ public class A1_Door : MonoBehaviour
     [Header("Localization")]
     public LocalizedString lockedMessageKey;
 
+    [Header("Time System")]
+    public Stopwatch currentStopwatch;
     void Start()
     {
         if (messagePanel != null) messagePanel.SetActive(false);
@@ -66,6 +68,9 @@ public class A1_Door : MonoBehaviour
         }
     }
 
+    public static bool isTransitioning = false;
+    public static float transitionTime = 0f;
+
     void StartTransition()
     {
         playerInZone = false;
@@ -74,6 +79,12 @@ public class A1_Door : MonoBehaviour
             GetComponent<BoxCollider>().enabled = false;
 
         if (messagePanel != null) messagePanel.SetActive(false);
+
+        if (currentStopwatch != null)
+        {
+            transitionTime = currentStopwatch.GetElapsedTime();
+            isTransitioning = true;
+        }
 
         StartCoroutine(TransitionRoutine());
     }

@@ -16,6 +16,9 @@ public class UVTargetCube : MonoBehaviour
     [ColorUsage(true, true)]
     public Color uvGlowColor = new Color(0f, 1f, 0.2f, 1f);
 
+    [Header("Puzzle Requirement")]
+    public Projector_ShadowPuzzle requiredProjector;
+
     private float currentAlpha = 0f;
     private FlashlightController flashlightController;
 
@@ -33,8 +36,14 @@ public class UVTargetCube : MonoBehaviour
     {
         if (flashlightTransform == null || targetText == null || flashlightController == null) return;
 
-        bool isHit = false;
+        
+        if (requiredProjector != null && !requiredProjector.isTurnedOn)
+        {
+            FadeOutText();
+            return;
+        }
 
+        bool isHit = false;
         bool isFlashlightOn = flashlightController.flashlightInHand != null && flashlightController.flashlightInHand.activeSelf;
         bool isUVModeActive = flashlightController.isUVMode;
 
@@ -55,9 +64,13 @@ public class UVTargetCube : MonoBehaviour
         }
 
         float targetAlpha = isHit ? 1f : 0f;
-
         currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, Time.deltaTime * fadeSpeed);
+        targetText.color = new Color(uvGlowColor.r, uvGlowColor.g, uvGlowColor.b, currentAlpha);
+    }
 
+    private void FadeOutText()
+    {
+        currentAlpha = Mathf.Lerp(currentAlpha, 0f, Time.deltaTime * fadeSpeed);
         targetText.color = new Color(uvGlowColor.r, uvGlowColor.g, uvGlowColor.b, currentAlpha);
     }
 }

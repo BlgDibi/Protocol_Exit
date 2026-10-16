@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 public class KeyInventory : MonoBehaviour
 {
     [SerializeField] private List<int> keyIds = new List<int>();
-
     [SerializeField] private List<int> historicalKeyIds = new List<int>();
 
     [Header("Database for loading")]
@@ -41,9 +40,10 @@ public class KeyInventory : MonoBehaviour
     {
         StartCoroutine(CheckLoadStatus());
     }
+
     IEnumerator CheckLoadStatus()
     {
-        yield return null;
+        yield return new WaitForSeconds(0.1f);
 
         bool isLoaded = SaveSystem.IsGameJustLoaded;
 
@@ -51,18 +51,26 @@ public class KeyInventory : MonoBehaviour
         {
             LoadKeysFromSave();
         }
+        else
+        {
+           
+            RefreshUI();
+        }
     }
+
     private void LoadKeysFromSave()
     {
         List<int> loadedIds = SaveSystem.GetInventoryKeys();
-
         List<int> loadedHistorical = SaveSystem.GetHistoricalKeys();
+
+        historicalKeyIds.Clear();
         if (loadedHistorical != null) historicalKeyIds = new List<int>(loadedHistorical);
+
+        keyIds.Clear();
+        if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
 
         if (loadedIds != null && loadedIds.Count > 0)
         {
-            keyIds.Clear();
-
             foreach (int id in loadedIds)
             {
                 Key foundKey = allAvailableKeys.Find(k => k.id == id);
@@ -71,6 +79,18 @@ public class KeyInventory : MonoBehaviour
                     keyIds.Add(foundKey.id);
                     if (UiManager.Instance != null) UiManager.Instance.AddKeyToUI(foundKey);
                 }
+            }
+        }
+    }
+
+    public void RefreshUI()
+    {
+        if (UiManager.Instance != null)
+        {
+            foreach (int id in keyIds)
+            {
+                Key foundKey = allAvailableKeys.Find(k => k.id == id);
+                if (foundKey != null) UiManager.Instance.AddKeyToUI(foundKey);
             }
         }
     }
@@ -108,8 +128,4 @@ public class KeyInventory : MonoBehaviour
         historicalKeyIds.Clear();
         if (UiManager.Instance != null) UiManager.Instance.ClearAllKeysFromUI();
     }
-
-
-
-
 }

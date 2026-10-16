@@ -138,7 +138,13 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
                 bool hasDetonator = Detonator_Pickup.HasDetonator || (inkHasDetonator != null && inkHasDetonator.ToLower() == "true");
                 bool hasC4 = C4_Pickup.HasC4 || (inkHasC4 != null && inkHasC4.ToLower() == "true") || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
 
-                if (hasC4)
+                bool isBarricadeDestroyed = ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("BarricadeDestroyed");
+
+                if (isBarricadeDestroyed)
+                {
+                    currentKnot = "mechanic_leave_me";
+                }
+                else if (hasC4)
                 {
                     currentKnot = "mechanic_leave_me";
                 }

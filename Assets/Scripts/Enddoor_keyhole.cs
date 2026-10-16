@@ -38,11 +38,22 @@ public class Enddoor_keyhole : MonoBehaviour, InterfaceInteractable
         if (insertedKeyVisual != null) insertedKeyVisual.SetActive(false);
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
 
-        
-        if (!string.IsNullOrEmpty(conditionToSet) && ConditionManager.Instance.CheckCondition(conditionToSet))
+        if (!string.IsNullOrEmpty(conditionToSet))
         {
-            isSolved = true;
-            if (insertedKeyVisual != null) insertedKeyVisual.SetActive(true);
+            bool isSolvedInSaveOrMemory = SaveSystem.IsPuzzleSolved(conditionToSet) || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition(conditionToSet));
+
+            if (isSolvedInSaveOrMemory)
+            {
+                isSolved = true;
+                if (insertedKeyVisual != null) insertedKeyVisual.SetActive(true);
+                if (ConditionManager.Instance != null) ConditionManager.Instance.SetCondition(conditionToSet, true);
+            }
+            else
+            {
+                isSolved = false;
+                if (insertedKeyVisual != null) insertedKeyVisual.SetActive(false);
+                if (ConditionManager.Instance != null) ConditionManager.Instance.SetCondition(conditionToSet, false);
+            }
         }
     }
 
@@ -62,6 +73,7 @@ public class Enddoor_keyhole : MonoBehaviour, InterfaceInteractable
             if (!string.IsNullOrEmpty(conditionToSet))
             {
                 ConditionManager.Instance.SetCondition(conditionToSet, true);
+                SaveSystem.SavePuzzleSolved(conditionToSet);
             }
 
             if (messagePanel != null) messagePanel.SetActive(false);
@@ -69,7 +81,6 @@ public class Enddoor_keyhole : MonoBehaviour, InterfaceInteractable
         else
         {
             if (audioSource != null && errorSound != null) audioSource.PlayOneShot(errorSound);
-
             ShowTemporaryMessage(missingKeyMessage.IsEmpty ? "I need a specific key for this lock." : missingKeyMessage.GetLocalizedString());
         }
     }
