@@ -351,6 +351,10 @@ public class SaveSystem
                 ConditionManager.Instance.SetCondition("HasC4", _savedata.hasC4);
                 ConditionManager.Instance.SetCondition("HasDetonator", _savedata.hasDetonator);
                 ConditionManager.Instance.SetCondition("HasValve", _savedata.hasValve);
+
+                ConditionManager.Instance.SetCondition("GreenLockSolved", _tempSolvedPuzzles.Contains("GreenLockSolved"));
+                ConditionManager.Instance.SetCondition("BlueLockSolved", _tempSolvedPuzzles.Contains("BlueLockSolved"));
+                ConditionManager.Instance.SetCondition("RedLockSolved", _tempSolvedPuzzles.Contains("RedLockSolved"));
             }
 
             if (_savedata.isBarricadeDestroyed) Detonator_Pickup.HasDetonator = false;
@@ -481,6 +485,11 @@ public class SaveSystem
             ConditionManager.Instance.SetCondition("HasC4", false);
             ConditionManager.Instance.SetCondition("HasDetonator", false);
             ConditionManager.Instance.SetCondition("HasValve", false);
+
+            ConditionManager.Instance.SetCondition("GreenLockSolved", false);
+            ConditionManager.Instance.SetCondition("BlueLockSolved", false);
+            ConditionManager.Instance.SetCondition("RedLockSolved", false);
+
         }
 
         if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
