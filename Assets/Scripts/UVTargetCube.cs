@@ -63,7 +63,16 @@ public class UVTargetCube : MonoBehaviour
             }
         }
 
-        float targetAlpha = isHit ? 1f : 0f;
+        float targetAlpha;
+
+        if (isHit == true)
+        {
+            targetAlpha = 1f;
+        }
+        else
+        {
+            targetAlpha = 0f;
+        }
         currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, Time.deltaTime * fadeSpeed);
         targetText.color = new Color(uvGlowColor.r, uvGlowColor.g, uvGlowColor.b, currentAlpha);
     }

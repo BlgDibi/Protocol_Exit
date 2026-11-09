@@ -97,15 +97,30 @@ public class Interaction : MonoBehaviour
     {
         if (crosshair != null)
         {
-            if (on && interactCrosshairSprite != null)
+            if (on == true && interactCrosshairSprite != null)
+            {
                 crosshair.sprite = interactCrosshairSprite;
-            else if (!on && defaultCrosshairSprite != null)
+            }
+            else if (on == false && defaultCrosshairSprite != null)
+            {
                 crosshair.sprite = defaultCrosshairSprite;
+            }
 
-            if (changeColorAsWell)
-                crosshair.color = on ? Color.red : Color.white;
+            if (changeColorAsWell == true)
+            {
+                if (on == true)
+                {
+                    crosshair.color = Color.red;
+                }
+                else
+                {
+                    crosshair.color = Color.white;
+                }
+            }
             else
-                crosshair.color = Color.white; 
+            {
+                crosshair.color = Color.white;
+            }
         }
     }
 

@@ -20,14 +20,23 @@ public class AsyncLoader : MonoBehaviour
 
     IEnumerator LoadLevelAsync()
     {
-        int sceneToLoad = (TargetSceneIndex != -1) ? TargetSceneIndex : 0;
+        int sceneToLoad;
+
+        if (TargetSceneIndex != -1)
+        {
+            sceneToLoad = TargetSceneIndex;
+        }
+        else
+        {
+            sceneToLoad = 0;
+        }
 
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneToLoad);
         operation.allowSceneActivation = false;
 
         float visualProgress = 0f;
 
-        while (!operation.isDone)
+        while (operation.isDone == false)
         {
             float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
             visualProgress = Mathf.MoveTowards(visualProgress, targetProgress, Time.deltaTime * 0.7f);
@@ -44,15 +53,22 @@ public class AsyncLoader : MonoBehaviour
 
             if (visualProgress >= 0.99f && operation.progress >= 0.9f)
             {
-                if (loadingBar != null) loadingBar.value = 1f;
-                if (progressText != null) progressText.text = "Loading... 100%";
+                if (loadingBar != null)
+                {
+                    loadingBar.value = 1f;
+                }
+
+                if (progressText != null)
+                {
+                    progressText.text = "Loading... 100%";
+                }
+
                 yield return new WaitForSeconds(0.3f);
 
-              
-                if (IsLoadingFromSave)
+                if (IsLoadingFromSave == true)
                 {
-                    SaveSystem.IsGameJustLoaded = true; 
-                    IsLoadingFromSave = false; 
+                    SaveSystem.IsGameJustLoaded = true;
+                    IsLoadingFromSave = false;
                 }
 
                 operation.allowSceneActivation = true;

@@ -47,7 +47,8 @@ public class GameOverMenu : MonoBehaviour
 
     private IEnumerator GameOverSequence()
     {
-        if (youDiedText != null) youDiedText.SetActive(true);
+        if (youDiedText != null) 
+            youDiedText.SetActive(true);
         yield return new WaitForSecondsRealtime(1f);
 
         if (youDiedCanvasGroup != null)
@@ -58,7 +59,8 @@ public class GameOverMenu : MonoBehaviour
         if (youDiedCanvasGroup != null)
             yield return StartCoroutine(FadeOutCanvasGroup(youDiedCanvasGroup));
 
-        if (youDiedText != null) youDiedText.SetActive(false);
+        if (youDiedText != null) 
+            youDiedText.SetActive(false);
 
         if (buttonPanel != null)
         {

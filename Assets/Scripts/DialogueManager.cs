@@ -45,8 +45,14 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) { Instance = this; }
-        else { Destroy(gameObject); }
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public static void SetInkMemory(Dictionary<string, string> loadedMemory)
@@ -62,12 +68,19 @@ public class DialogueManager : MonoBehaviour
     private void Start()
     {
         isDialoguePlaying = false;
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (!isDialoguePlaying) return;
+        if (isDialoguePlaying == false)
+        {
+            return;
+        }
 
         if (currentStory.currentChoices.Count == 0)
         {
@@ -80,7 +93,10 @@ public class DialogueManager : MonoBehaviour
 
     public void EnterDialogueMode(TextAsset specificInkFile, string knotName = "", Talk npc = null)
     {
-        if (isDialoguePlaying) return;
+        if (isDialoguePlaying == true)
+        {
+            return;
+        }
 
         UiManager.isMenuOpen = true;
 
@@ -91,17 +107,25 @@ public class DialogueManager : MonoBehaviour
         currentStory.BindExternalFunction("is_scale_solved", () =>
         {
             if (ConditionManager.Instance != null)
+            {
                 return ConditionManager.Instance.CheckCondition("ScaleSolved");
-
-            return false;
+            }
+            else
+            {
+                return false;
+            }
         });
 
         currentStory.BindExternalFunction("check_condition", (string conditionName) =>
         {
             if (ConditionManager.Instance != null)
+            {
                 return ConditionManager.Instance.CheckCondition(conditionName);
-
-            return false;
+            }
+            else
+            {
+                return false;
+            }
         });
 
         if (inkMemory.ContainsKey(specificInkFile.name))
@@ -125,8 +149,15 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(true);
         SetPlayerEnabled(false);
 
-        if (playerInteraction != null) playerInteraction.enabled = false;
-        if (talkPromptUI != null) talkPromptUI.SetActive(false);
+        if (playerInteraction != null)
+        {
+            playerInteraction.enabled = false;
+        }
+
+        if (talkPromptUI != null)
+        {
+            talkPromptUI.SetActive(false);
+        }
 
         ContinueStory();
     }
@@ -135,7 +166,10 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentStory.canContinue)
         {
-            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+            if (typingCoroutine != null)
+            {
+                StopCoroutine(typingCoroutine);
+            }
 
             string nextLine = currentStory.Continue();
             HandleTags(currentStory.currentTags);
@@ -166,7 +200,10 @@ public class DialogueManager : MonoBehaviour
             if (tag == "move_book")
             {
                 SecretRevealer revealer = FindFirstObjectByType<SecretRevealer>();
-                if (revealer != null) revealer.ActivateSecret();
+                if (revealer != null)
+                {
+                    revealer.ActivateSecret();
+                }
             }
             else if (tag == "spawn_green_key")
             {
@@ -206,17 +243,27 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             DialogueTrigger trigger = currentNPC.GetComponent<DialogueTrigger>();
-            if (trigger != null) trigger.DialogueEnded();
+            if (trigger != null)
+            {
+                trigger.DialogueEnded();
+            }
         }
 
         isDialoguePlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
-        foreach (Transform child in choicesContainer) Destroy(child.gameObject);
+
+        foreach (Transform child in choicesContainer)
+        {
+            Destroy(child.gameObject);
+        }
 
         SetPlayerEnabled(true);
 
-        if (playerInteraction != null) playerInteraction.enabled = true;
+        if (playerInteraction != null)
+        {
+            playerInteraction.enabled = true;
+        }
 
         if (currentNPC != null)
         {
@@ -231,16 +278,24 @@ public class DialogueManager : MonoBehaviour
             try
             {
                 var value = currentStory.variablesState[variableName];
-                if (value != null) return value.ToString();
+                if (value != null)
+                {
+                    return value.ToString();
+                }
             }
-            catch { }
+            catch
+            {
+            }
         }
         return "";
     }
 
     private void DisplayChoices()
     {
-        foreach (Transform child in choicesContainer) Destroy(child.gameObject);
+        foreach (Transform child in choicesContainer)
+        {
+            Destroy(child.gameObject);
+        }
 
         foreach (Choice choice in currentStory.currentChoices)
         {
@@ -248,10 +303,14 @@ public class DialogueManager : MonoBehaviour
             choiceButton.transform.localScale = Vector3.one;
 
             TextMeshProUGUI text = choiceButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null) text.text = choice.text;
+            if (text != null)
+            {
+                text.text = choice.text;
+            }
 
             choiceButton.GetComponent<Button>().onClick.AddListener(() => MakeChoice(choice.index));
         }
+
         Canvas.ForceUpdateCanvases();
     }
 
@@ -268,14 +327,26 @@ public class DialogueManager : MonoBehaviour
             playerController.enabled = enabled;
         }
 
-        Cursor.visible = !enabled;
-        Cursor.lockState = enabled ? CursorLockMode.Locked : CursorLockMode.None;
+        if (enabled == true)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
 
     private IEnumerator TypeText(string text)
     {
         dialogueText.text = "";
-        foreach (Transform child in choicesContainer) child.gameObject.SetActive(false);
+
+        foreach (Transform child in choicesContainer)
+        {
+            child.gameObject.SetActive(false);
+        }
 
         foreach (char letter in text.ToCharArray())
         {
@@ -335,6 +406,7 @@ public class DialogueManager : MonoBehaviour
     private IEnumerator ShowC4RewardWithDelay(GameObject c4Obj, float delay)
     {
         yield return new WaitForSeconds(delay);
+
         if (c4Obj != null)
         {
             c4Obj.SetActive(true);

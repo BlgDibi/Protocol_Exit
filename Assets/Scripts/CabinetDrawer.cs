@@ -26,12 +26,21 @@ public class CabinetDrawer : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        if (!HasCabinetAccess)
-            return lockedPrompt.GetLocalizedString();
-
-        if (isOpened)
+        if (HasCabinetAccess == false)
         {
-            return closePrompt != null && !closePrompt.IsEmpty ? closePrompt.GetLocalizedString() : "Close";
+            return lockedPrompt.GetLocalizedString();
+        }
+
+        if (isOpened == true)
+        {
+            if (closePrompt != null && closePrompt.IsEmpty == false)
+            {
+                return closePrompt.GetLocalizedString();
+            }
+            else
+            {
+                return "Close";
+            }
         }
         else
         {

@@ -5,7 +5,6 @@ public class ConditionManager : MonoBehaviour
 {
     public static ConditionManager Instance;
 
-    // Ez a lista tarolja az allapotokat.
     private Dictionary<string, bool> conditions = new Dictionary<string, bool>();
 
     private void Awake()
@@ -13,7 +12,7 @@ public class ConditionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Palyavaltasnal is megmarad
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {
@@ -21,7 +20,6 @@ public class ConditionManager : MonoBehaviour
         }
     }
 
-    // Ezzel teljesitunk 1-1 feladatot
     public void SetCondition(string conditionName, bool value)
     {
         if (conditions.ContainsKey(conditionName))
@@ -29,15 +27,13 @@ public class ConditionManager : MonoBehaviour
         else
             conditions.Add(conditionName, value);
 
-        Debug.Log($"LOGIKA FRISSITVE: {conditionName} = {value}");
     }
 
-    //Feladat lekerdezese
     public bool CheckCondition(string conditionName)
     {
         if (conditions.ContainsKey(conditionName))
             return conditions[conditionName];
 
-        return false; // Ha nincs a listaban, akkor meg nem tortent meg
+        return false; 
     }
 }

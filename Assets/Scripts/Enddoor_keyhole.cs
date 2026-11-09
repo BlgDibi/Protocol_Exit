@@ -59,36 +59,74 @@ public class Enddoor_keyhole : MonoBehaviour, InterfaceInteractable
 
     public void Interact()
     {
-        if (isSolved) return;
+        if (isSolved == true)
+        {
+            return;
+        }
 
-        if (requiredKey != null && KeyInventory.Instance.HasKey(requiredKey))
+        if (requiredKey != null && KeyInventory.Instance.HasKey(requiredKey) == true)
         {
             KeyInventory.Instance.RemoveKey(requiredKey);
 
-            if (insertedKeyVisual != null) insertedKeyVisual.SetActive(true);
+            if (insertedKeyVisual != null)
+            {
+                insertedKeyVisual.SetActive(true);
+            }
+
             isSolved = true;
 
-            if (audioSource != null && insertSound != null) audioSource.PlayOneShot(insertSound);
+            if (audioSource != null && insertSound != null)
+            {
+                audioSource.PlayOneShot(insertSound);
+            }
 
-            if (!string.IsNullOrEmpty(conditionToSet))
+            if (string.IsNullOrEmpty(conditionToSet) == false)
             {
                 ConditionManager.Instance.SetCondition(conditionToSet, true);
                 SaveSystem.SavePuzzleSolved(conditionToSet);
             }
 
-            if (messagePanel != null) messagePanel.SetActive(false);
+            if (messagePanel != null)
+            {
+                messagePanel.SetActive(false);
+            }
         }
         else
         {
-            if (audioSource != null && errorSound != null) audioSource.PlayOneShot(errorSound);
-            ShowTemporaryMessage(missingKeyMessage.IsEmpty ? "I need a specific key for this lock." : missingKeyMessage.GetLocalizedString());
+            if (audioSource != null && errorSound != null)
+            {
+                audioSource.PlayOneShot(errorSound);
+            }
+
+            string messageToShow;
+            if (missingKeyMessage.IsEmpty == true)
+            {
+                messageToShow = "I need a specific key for this lock.";
+            }
+            else
+            {
+                messageToShow = missingKeyMessage.GetLocalizedString();
+            }
+
+            ShowTemporaryMessage(messageToShow);
         }
     }
 
     public string GetInteractText()
     {
-        if (isSolved) return "";
-        return interactPrompt.IsEmpty ? "Insert Key" : interactPrompt.GetLocalizedString();
+        if (isSolved == true)
+        {
+            return "";
+        }
+
+        if (interactPrompt.IsEmpty == true)
+        {
+            return "Insert Key";
+        }
+        else
+        {
+            return interactPrompt.GetLocalizedString();
+        }
     }
 
     public KeyCode GetInteractKey()

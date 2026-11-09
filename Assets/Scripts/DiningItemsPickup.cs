@@ -61,7 +61,14 @@ public class DiningItemsPickup : MonoBehaviour, InterfaceInteractable
     {
         if (crosshair != null)
         {
-            crosshair.color = on ? Color.red : Color.white;
+            if (on == true)
+            {
+                crosshair.color = Color.red;
+            }
+            else
+            {
+                crosshair.color = Color.white;
+            }
         }
     }
 }

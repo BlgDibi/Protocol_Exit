@@ -18,8 +18,7 @@ public class ClassroomDocument : MonoBehaviour, InterfaceInteractable
 
     private bool isReading = false;
 
-    private string noteText = "<b>Protocol:Exit - The four acts</b>\n\n Subject: Test Subject #42\r\nSupervisor: The Professor\n\nTo leave this room, you must undo the lessons it taught you. Do not break the chain, or the room will forget your progress.\n\nI. Let the dry metal weep.\r\nII. Turn the green field into a void.\r\nIII. Leave the outside world behind.\r\nIV. Close the master's place.";
-
+    private string noteText = "<b>Protocol:Exit - The four steps</b>\n\nSubject: Test Subject #42\nSupervisor: The Professor\n\nTo leave this room, you must complete four tasks in exact order. Do not break the chain, or you must start again.\n\nI. Make the dry metal cry.\nII. Wipe the green board clean.\nIII. Shut out the outside world.\nIV. Return the master's seat.";
     public void Interact()
     {
         if (isReading) return;

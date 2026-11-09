@@ -9,6 +9,9 @@ using TMPro;
 public class SaveSystem
 {
     public static int SelectedSkinIndex = 0;
+    public static string PlayerName = "Player";
+    public static float PlayerHeight = 1.0f;
+    public static float PlayerWidth = 1.0f;
     public static int SlotToSaveAfterLoad = -1;
 
     private static SaveData _savedata = new SaveData();
@@ -30,20 +33,75 @@ public class SaveSystem
 
     private static void InitializeData()
     {
-        if (_savedata.unlockedDoors == null) _savedata.unlockedDoors = new List<string>();
-        if (_savedata.openDoors == null) _savedata.openDoors = new List<string>();
-        if (_savedata.metNPCs == null) _savedata.metNPCs = new List<string>();
-        if (_savedata.activatedSecrets == null) _savedata.activatedSecrets = new List<string>();
-        if (_savedata.InventoryBoxnames == null) _savedata.InventoryBoxnames = new List<string>();
-        if (_savedata.PlacedBoxes == null) _savedata.PlacedBoxes = new List<PlacedBoxData>();
-        if (_savedata.InventoryKeyIds == null) _savedata.InventoryKeyIds = new List<int>();
-        if (_savedata.historicalKeyIds == null) _savedata.historicalKeyIds = new List<int>();
-        if (_savedata.inkMemoryKeys == null) _savedata.inkMemoryKeys = new List<string>();
-        if (_savedata.inkMemoryValues == null) _savedata.inkMemoryValues = new List<string>();
-        if (_savedata.priedPlanks == null) _savedata.priedPlanks = new List<string>();
-        if (_savedata.savedTransforms == null) _savedata.savedTransforms = new List<Savedobjectpos_save>();
-        if (_savedata.solvedPuzzles == null) _savedata.solvedPuzzles = new List<string>();
-        if (_savedata.savedDiningItems == null) _savedata.savedDiningItems = new List<string>();
+        if (_savedata.unlockedDoors == null)
+        {
+            _savedata.unlockedDoors = new List<string>();
+        }
+
+        if (_savedata.openDoors == null)
+        {
+            _savedata.openDoors = new List<string>();
+        }
+
+        if (_savedata.metNPCs == null)
+        {
+            _savedata.metNPCs = new List<string>();
+        }
+
+        if (_savedata.activatedSecrets == null)
+        {
+            _savedata.activatedSecrets = new List<string>();
+        }
+
+        if (_savedata.InventoryBoxnames == null)
+        {
+            _savedata.InventoryBoxnames = new List<string>();
+        }
+
+        if (_savedata.PlacedBoxes == null)
+        {
+            _savedata.PlacedBoxes = new List<PlacedBoxData>();
+        }
+
+        if (_savedata.InventoryKeyIds == null)
+        {
+            _savedata.InventoryKeyIds = new List<int>();
+        }
+
+        if (_savedata.historicalKeyIds == null)
+        {
+            _savedata.historicalKeyIds = new List<int>();
+        }
+
+        if (_savedata.inkMemoryKeys == null)
+        {
+            _savedata.inkMemoryKeys = new List<string>();
+        }
+
+        if (_savedata.inkMemoryValues == null)
+        {
+            _savedata.inkMemoryValues = new List<string>();
+        }
+
+        if (_savedata.priedPlanks == null)
+        {
+            _savedata.priedPlanks = new List<string>();
+        }
+
+        if (_savedata.savedTransforms == null)
+        {
+            _savedata.savedTransforms = new List<Savedobjectpos_save>();
+        }
+
+        if (_savedata.solvedPuzzles == null)
+        {
+            _savedata.solvedPuzzles = new List<string>();
+        }
+
+        if (_savedata.savedDiningItems == null)
+        {
+            _savedata.savedDiningItems = new List<string>();
+        }
     }
 
     [System.Serializable]
@@ -96,6 +154,9 @@ public class SaveSystem
         public List<string> openDoors;
         public List<string> metNPCs;
         public int savedSkinIndex;
+        public string savedPlayerName;
+        public float savedPlayerHeight;
+        public float savedPlayerWidth;
         public string savedKeypadFullCode;
         public string savedKeypadClue;
         public string savedDocumentText;
@@ -131,7 +192,10 @@ public class SaveSystem
     public static bool IsSinkFilled = false;
     public static float SinkWaterLevel = 0.1f;
 
-    public static string SaveFileName(int slot = 1) => Application.persistentDataPath + "/save_" + slot + ".json";
+    public static string SaveFileName(int slot = 1)
+    {
+        return Application.persistentDataPath + "/save_" + slot + ".json";
+    }
 
     public static void Save(int slot = 1)
     {
@@ -145,7 +209,6 @@ public class SaveSystem
 
         string json = JsonUtility.ToJson(_savedata, true);
         File.WriteAllText(SaveFileName(slot), json);
-        Debug.Log("<color=green>Successful save!</color>");
     }
 
     private static void HandleSaveData()
@@ -153,16 +216,24 @@ public class SaveSystem
         _savedata.sceneIndex = SceneManager.GetActiveScene().buildIndex;
         CurrentSceneIndex = _savedata.sceneIndex;
         PlayerSave playerScript = GameObject.FindFirstObjectByType<PlayerSave>();
-        if (playerScript != null) playerScript.Save(ref _savedata.playerdata);
 
-        if (BoxInventory.Instance != null) _savedata.InventoryBoxnames = BoxInventory.Instance.GetSavedBoxNames();
+        if (playerScript != null)
+        {
+            playerScript.Save(ref _savedata.playerdata);
+        }
+
+        if (BoxInventory.Instance != null)
+        {
+            _savedata.InventoryBoxnames = BoxInventory.Instance.GetSavedBoxNames();
+        }
 
         _savedata.PlacedBoxes = new List<PlacedBoxData>();
         GameObject[] boxesInWorld = GameObject.FindGameObjectsWithTag("Boxes");
+
         foreach (GameObject box in boxesInWorld)
         {
             Boxpickup bp = box.GetComponent<Boxpickup>();
-            if (bp != null && (bp.isPlaced || box.name.Contains("_Placed")))
+            if (bp != null && (bp.isPlaced == true || box.name.Contains("_Placed") == true))
             {
                 string cleanName = box.name.Replace("(Clone)", "").Replace("_Placed", "").Trim();
                 _savedata.PlacedBoxes.Add(new PlacedBoxData { boxname = cleanName, position = box.transform.position, rotation = box.transform.rotation });
@@ -171,9 +242,10 @@ public class SaveSystem
 
         _tempSavedTransforms.Clear();
         ItemSave[] saveableObjects = GameObject.FindObjectsByType<ItemSave>(FindObjectsSortMode.None);
+
         foreach (var obj in saveableObjects)
         {
-            if (!string.IsNullOrEmpty(obj.itemID))
+            if (string.IsNullOrEmpty(obj.itemID) == false)
             {
                 _tempSavedTransforms.Add(new Savedobjectpos_save
                 {
@@ -192,19 +264,25 @@ public class SaveSystem
 
         Stopwatch stopwatch = UnityEngine.Object.FindFirstObjectByType<Stopwatch>(FindObjectsInactive.Include);
         if (stopwatch != null)
+        {
             _savedata.savedElapsedTime = stopwatch.GetElapsedTime();
+        }
 
         _savedata.activatedSecrets = new List<string>();
         SecretRevealer[] secrets = GameObject.FindObjectsByType<SecretRevealer>(FindObjectsSortMode.None);
+
         foreach (var secret in secrets)
         {
-            if (secret.isMoved && !string.IsNullOrEmpty(secret.secretID))
+            if (secret.isMoved == true && string.IsNullOrEmpty(secret.secretID) == false)
+            {
                 _savedata.activatedSecrets.Add(secret.secretID);
+            }
         }
 
         _savedata.inkMemoryKeys = new List<string>();
         _savedata.inkMemoryValues = new List<string>();
         var mem = DialogueManager.GetInkMemory();
+
         if (mem != null)
         {
             foreach (var kvp in mem)
@@ -239,6 +317,9 @@ public class SaveSystem
         _savedata.savedDiningItems = new List<string>(DiningItemsPickup.CollectedDiningItems);
 
         _savedata.savedSkinIndex = SelectedSkinIndex;
+        _savedata.savedPlayerName = PlayerName;
+        _savedata.savedPlayerHeight = PlayerHeight;
+        _savedata.savedPlayerWidth = PlayerWidth;
         _savedata.savedKeypadFullCode = KeypadFullCode;
         _savedata.savedKeypadClue = KeypadClue;
         _savedata.savedDocumentText = CurrentDocumentText;
@@ -262,7 +343,11 @@ public class SaveSystem
     {
         pos = Vector3.zero;
         rot = Quaternion.identity;
-        if (_savedata.savedTransforms == null) return false;
+
+        if (_savedata.savedTransforms == null)
+        {
+            return false;
+        }
 
         foreach (var t in _savedata.savedTransforms)
         {
@@ -279,21 +364,34 @@ public class SaveSystem
     public static void Load(int slot = 1)
     {
         string path = SaveFileName(slot);
-        if (!File.Exists(path)) return;
+
+        if (File.Exists(path) == false)
+        {
+            return;
+        }
+
         try
         {
             string json = File.ReadAllText(path);
             SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
-            if (string.IsNullOrEmpty(json))
+
+            if (string.IsNullOrEmpty(json) == true)
+            {
                 throw new Exception("Empty save!");
+            }
+
             CurrentSlot = slot;
 
             ResetAllData();
 
             IsGameJustLoaded = true;
 
-            if (KeyInventory.Instance != null) KeyInventory.Instance.ResetKeys();
-            if (!json.Contains("savedBatteryLevel"))
+            if (KeyInventory.Instance != null)
+            {
+                KeyInventory.Instance.ResetKeys();
+            }
+
+            if (json.Contains("savedBatteryLevel") == false)
             {
                 loadedData.savedBatteryLevel = 100f;
             }
@@ -302,22 +400,52 @@ public class SaveSystem
             InitializeData();
 
             _tempUnlockedDoors = new List<string>(_savedata.unlockedDoors);
-            _tempOpenDoors = new List<string>(_savedata.openDoors ?? new List<string>());
+
+            if (_savedata.openDoors != null)
+            {
+                _tempOpenDoors = new List<string>(_savedata.openDoors);
+            }
+            else
+            {
+                _tempOpenDoors = new List<string>();
+            }
+
             _tempMetNPCs = new List<string>(_savedata.metNPCs);
 
-            if (_savedata.priedPlanks != null) _tempPriedPlanks = new List<string>(_savedata.priedPlanks);
-            else _tempPriedPlanks = new List<string>();
+            if (_savedata.priedPlanks != null)
+            {
+                _tempPriedPlanks = new List<string>(_savedata.priedPlanks);
+            }
+            else
+            {
+                _tempPriedPlanks = new List<string>();
+            }
 
-            _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms ?? new List<Savedobjectpos_save>());
+            if (_savedata.savedTransforms != null)
+            {
+                _tempSavedTransforms = new List<Savedobjectpos_save>(_savedata.savedTransforms);
+            }
+            else
+            {
+                _tempSavedTransforms = new List<Savedobjectpos_save>();
+            }
 
-            if (_savedata.solvedPuzzles != null) _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles);
-            else _tempSolvedPuzzles = new List<string>();
+            if (_savedata.solvedPuzzles != null)
+            {
+                _tempSolvedPuzzles = new List<string>(_savedata.solvedPuzzles);
+            }
+            else
+            {
+                _tempSolvedPuzzles = new List<string>();
+            }
 
             if (_savedata.inkMemoryKeys != null && _savedata.inkMemoryKeys.Count > 0)
             {
                 Dictionary<string, string> dict = new Dictionary<string, string>();
                 for (int i = 0; i < _savedata.inkMemoryKeys.Count; i++)
+                {
                     dict[_savedata.inkMemoryKeys[i]] = _savedata.inkMemoryValues[i];
+                }
                 DialogueManager.SetInkMemory(dict);
             }
             else
@@ -333,8 +461,14 @@ public class SaveSystem
             ValvePickup.HasValve = _savedata.hasValve;
             CabinetDrawer.HasCabinetAccess = _savedata.hasCabinetAccess;
 
-            if (_savedata.savedDiningItems != null) DiningItemsPickup.CollectedDiningItems = new List<string>(_savedata.savedDiningItems);
-            else DiningItemsPickup.CollectedDiningItems.Clear();
+            if (_savedata.savedDiningItems != null)
+            {
+                DiningItemsPickup.CollectedDiningItems = new List<string>(_savedata.savedDiningItems);
+            }
+            else
+            {
+                DiningItemsPickup.CollectedDiningItems.Clear();
+            }
 
             if (ConditionManager.Instance != null)
             {
@@ -357,9 +491,33 @@ public class SaveSystem
                 ConditionManager.Instance.SetCondition("RedLockSolved", _tempSolvedPuzzles.Contains("RedLockSolved"));
             }
 
-            if (_savedata.isBarricadeDestroyed) Detonator_Pickup.HasDetonator = false;
+            if (_savedata.isBarricadeDestroyed == true)
+            {
+                Detonator_Pickup.HasDetonator = false;
+            }
 
             SelectedSkinIndex = _savedata.savedSkinIndex;
+
+            if (string.IsNullOrEmpty(_savedata.savedPlayerName) == true)
+            {
+                PlayerName = "Player";
+            }
+            else
+            {
+                PlayerName = _savedata.savedPlayerName;
+            }
+
+            if (_savedata.savedPlayerHeight == 0f)
+            {
+                PlayerHeight = 1.0f;
+                PlayerWidth = 1.0f;
+            }
+            else
+            {
+                PlayerHeight = _savedata.savedPlayerHeight;
+                PlayerWidth = _savedata.savedPlayerWidth;
+            }
+
             CurrentSceneIndex = _savedata.sceneIndex;
 
             KeypadFullCode = _savedata.savedKeypadFullCode;
@@ -375,7 +533,15 @@ public class SaveSystem
 
             IsSinkOpen = _savedata.isSinkOpen;
             IsSinkFilled = _savedata.isSinkFilled;
-            SinkWaterLevel = _savedata.sinkWaterLevel == 0 ? 0.1f : _savedata.sinkWaterLevel;
+
+            if (_savedata.sinkWaterLevel == 0)
+            {
+                SinkWaterLevel = 0.1f;
+            }
+            else
+            {
+                SinkWaterLevel = _savedata.sinkWaterLevel;
+            }
 
             Stopwatch stopwatch = UnityEngine.Object.FindFirstObjectByType<Stopwatch>(FindObjectsInactive.Include);
             if (stopwatch != null)
@@ -383,7 +549,10 @@ public class SaveSystem
                 stopwatch.SetTime(_savedata.savedElapsedTime);
             }
 
-            if (UiManager.Instance != null) UiManager.Instance.RefreshAllUI();
+            if (UiManager.Instance != null)
+            {
+                UiManager.Instance.RefreshAllUI();
+            }
 
             UiManager.isMenuOpen = false;
             Time.timeScale = 1f;
@@ -400,7 +569,10 @@ public class SaveSystem
     {
         for (int i = 1; i <= maxSlots; i++)
         {
-            if (!File.Exists(SaveFileName(i))) return i;
+            if (File.Exists(SaveFileName(i)) == false)
+            {
+                return i;
+            }
         }
         return -1;
     }
@@ -409,7 +581,11 @@ public class SaveSystem
     {
         string folder = Application.persistentDataPath;
         string[] files = Directory.GetFiles(folder, "save_*.json");
-        if (files.Length == 0) return null;
+
+        if (files.Length == 0)
+        {
+            return null;
+        }
 
         string oldestFile = files[0];
         System.DateTime oldestTime = File.GetLastWriteTime(oldestFile);
@@ -423,6 +599,7 @@ public class SaveSystem
                 oldestFile = files[i];
             }
         }
+
         return Path.GetFileName(oldestFile);
     }
 
@@ -464,8 +641,15 @@ public class SaveSystem
 
         DiningItemsPickup.CollectedDiningItems.Clear();
 
-        _savedata.PlacedBoxes?.Clear();
-        _savedata.savedDiningItems?.Clear();
+        if (_savedata.PlacedBoxes != null)
+        {
+            _savedata.PlacedBoxes.Clear();
+        }
+
+        if (_savedata.savedDiningItems != null)
+        {
+            _savedata.savedDiningItems.Clear();
+        }
 
         InitializeData();
         IsGameJustLoaded = false;
@@ -489,15 +673,35 @@ public class SaveSystem
             ConditionManager.Instance.SetCondition("GreenLockSolved", false);
             ConditionManager.Instance.SetCondition("BlueLockSolved", false);
             ConditionManager.Instance.SetCondition("RedLockSolved", false);
-
         }
 
-        if (Flashlightpickup.HasFlashlight) Flashlightpickup.HasFlashlight = false;
+        if (Flashlightpickup.HasFlashlight == true)
+        {
+            Flashlightpickup.HasFlashlight = false;
+        }
+
         FlashlightController.currentBattery = 100f;
-        if (CrowbarPickup.HasCrowbar) CrowbarPickup.HasCrowbar = false;
-        if (Detonator_Pickup.HasDetonator) Detonator_Pickup.HasDetonator = false;
-        if (C4_Pickup.HasC4) C4_Pickup.HasC4 = false;
-        if (ValvePickup.HasValve) ValvePickup.HasValve = false;
+
+        if (CrowbarPickup.HasCrowbar == true)
+        {
+            CrowbarPickup.HasCrowbar = false;
+        }
+
+        if (Detonator_Pickup.HasDetonator == true)
+        {
+            Detonator_Pickup.HasDetonator = false;
+        }
+
+        if (C4_Pickup.HasC4 == true)
+        {
+            C4_Pickup.HasC4 = false;
+        }
+
+        if (ValvePickup.HasValve == true)
+        {
+            ValvePickup.HasValve = false;
+        }
+
         CabinetDrawer.HasCabinetAccess = false;
 
         KeypadFullCode = "";
@@ -518,48 +722,165 @@ public class SaveSystem
 
     public static void SaveNPCMet(string npcID)
     {
-        if (string.IsNullOrEmpty(npcID)) return;
-        if (!_tempMetNPCs.Contains(npcID)) _tempMetNPCs.Add(npcID);
+        if (string.IsNullOrEmpty(npcID) == true)
+        {
+            return;
+        }
+
+        if (_tempMetNPCs.Contains(npcID) == false)
+        {
+            _tempMetNPCs.Add(npcID);
+        }
     }
-    public static bool WasNPCMet(string npcID) => _tempMetNPCs.Contains(npcID);
+
+    public static bool WasNPCMet(string npcID)
+    {
+        return _tempMetNPCs.Contains(npcID);
+    }
 
     public static void SaveDoorUnlocked(string doorID)
     {
-        if (string.IsNullOrEmpty(doorID)) return;
-        if (!_tempUnlockedDoors.Contains(doorID)) _tempUnlockedDoors.Add(doorID);
+        if (string.IsNullOrEmpty(doorID) == true)
+        {
+            return;
+        }
+
+        if (_tempUnlockedDoors.Contains(doorID) == false)
+        {
+            _tempUnlockedDoors.Add(doorID);
+        }
     }
-    public static bool IsDoorUnlocked(string doorID) => _tempUnlockedDoors.Contains(doorID);
+
+    public static bool IsDoorUnlocked(string doorID)
+    {
+        return _tempUnlockedDoors.Contains(doorID);
+    }
 
     public static void SaveDoorOpenState(string doorID, bool isOpen)
     {
-        if (string.IsNullOrEmpty(doorID)) return;
-        if (isOpen && !_tempOpenDoors.Contains(doorID))
+        if (string.IsNullOrEmpty(doorID) == true)
+        {
+            return;
+        }
+
+        if (isOpen == true && _tempOpenDoors.Contains(doorID) == false)
+        {
             _tempOpenDoors.Add(doorID);
-        else if (!isOpen && _tempOpenDoors.Contains(doorID))
+        }
+        else if (isOpen == false && _tempOpenDoors.Contains(doorID) == true)
+        {
             _tempOpenDoors.Remove(doorID);
+        }
     }
-    public static bool IsDoorOpen(string doorID) => _tempOpenDoors.Contains(doorID);
+
+    public static bool IsDoorOpen(string doorID)
+    {
+        return _tempOpenDoors.Contains(doorID);
+    }
 
     public static void SavePlankPried(string plankID)
     {
-        if (string.IsNullOrEmpty(plankID)) return;
-        if (!_tempPriedPlanks.Contains(plankID)) _tempPriedPlanks.Add(plankID);
-    }
-    public static bool IsPlankPried(string plankID) => _tempPriedPlanks.Contains(plankID);
+        if (string.IsNullOrEmpty(plankID) == true)
+        {
+            return;
+        }
 
-    public static PlayerSaveData GetPlayerData() => _savedata.playerdata;
-    public static List<string> GetInventoryBoxes() => _savedata.InventoryBoxnames ?? new List<string>();
-    public static List<PlacedBoxData> GetSavedPlacedBoxes() => _savedata.PlacedBoxes ?? new List<PlacedBoxData>();
-    public static List<int> GetInventoryKeys() => _savedata.InventoryKeyIds ?? new List<int>();
-    public static List<int> GetHistoricalKeys() => _savedata.historicalKeyIds ?? new List<int>();
-    public static float GetSavedTime() => _savedata.savedElapsedTime;
-    public static bool IsSecretActivated(string secretID) => _savedata.activatedSecrets != null && _savedata.activatedSecrets.Contains(secretID);
+        if (_tempPriedPlanks.Contains(plankID) == false)
+        {
+            _tempPriedPlanks.Add(plankID);
+        }
+    }
+
+    public static bool IsPlankPried(string plankID)
+    {
+        return _tempPriedPlanks.Contains(plankID);
+    }
+
+    public static PlayerSaveData GetPlayerData()
+    {
+        return _savedata.playerdata;
+    }
+
+    public static List<string> GetInventoryBoxes()
+    {
+        if (_savedata.InventoryBoxnames != null)
+        {
+            return _savedata.InventoryBoxnames;
+        }
+        else
+        {
+            return new List<string>();
+        }
+    }
+
+    public static List<PlacedBoxData> GetSavedPlacedBoxes()
+    {
+        if (_savedata.PlacedBoxes != null)
+        {
+            return _savedata.PlacedBoxes;
+        }
+        else
+        {
+            return new List<PlacedBoxData>();
+        }
+    }
+
+    public static List<int> GetInventoryKeys()
+    {
+        if (_savedata.InventoryKeyIds != null)
+        {
+            return _savedata.InventoryKeyIds;
+        }
+        else
+        {
+            return new List<int>();
+        }
+    }
+
+    public static List<int> GetHistoricalKeys()
+    {
+        if (_savedata.historicalKeyIds != null)
+        {
+            return _savedata.historicalKeyIds;
+        }
+        else
+        {
+            return new List<int>();
+        }
+    }
+
+    public static float GetSavedTime()
+    {
+        return _savedata.savedElapsedTime;
+    }
+
+    public static bool IsSecretActivated(string secretID)
+    {
+        if (_savedata.activatedSecrets != null && _savedata.activatedSecrets.Contains(secretID) == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public static void SavePuzzleSolved(string puzzleID)
     {
-        if (string.IsNullOrEmpty(puzzleID)) return;
-        if (!_tempSolvedPuzzles.Contains(puzzleID)) _tempSolvedPuzzles.Add(puzzleID);
+        if (string.IsNullOrEmpty(puzzleID) == true)
+        {
+            return;
+        }
+
+        if (_tempSolvedPuzzles.Contains(puzzleID) == false)
+        {
+            _tempSolvedPuzzles.Add(puzzleID);
+        }
     }
 
-    public static bool IsPuzzleSolved(string puzzleID) => _tempSolvedPuzzles.Contains(puzzleID);
+    public static bool IsPuzzleSolved(string puzzleID)
+    {
+        return _tempSolvedPuzzles.Contains(puzzleID);
+    }
 }

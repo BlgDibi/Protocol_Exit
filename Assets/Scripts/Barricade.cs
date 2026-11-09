@@ -27,18 +27,27 @@ public class Barricade : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        if (C4_Pickup.HasC4)
+        if (C4_Pickup.HasC4 == true)
+        {
             return interactionPrompt.GetLocalizedString();
-        return "";
+        }
+        else
+        {
+            return "";
+        }
     }
 
-    public KeyCode GetInteractKey() => interactkey;
+    public KeyCode GetInteractKey()
+    {
+        return interactkey;
+    }
 
     public void Interact()
     {
-        if (C4_Pickup.HasC4)
+        if (C4_Pickup.HasC4 == true)
         {
-            C4_Plant plantManager = FindObjectOfType<C4_Plant>();
+            C4_Plant plantManager = FindFirstObjectByType<C4_Plant>();
+
             if (plantManager != null)
             {
                 plantManager.PlantC4AtSpot(c4PlantPoint);
@@ -46,7 +55,10 @@ public class Barricade : MonoBehaviour, InterfaceInteractable
                 this.enabled = false;
 
                 Collider col = GetComponent<Collider>();
-                if (col != null) col.enabled = false;
+                if (col != null)
+                {
+                    col.enabled = false;
+                }
             }
         }
     }

@@ -117,7 +117,14 @@ public class FlashlightController : MonoBehaviour
         isUVMode = !isUVMode;
         if (flashlightLightComponent != null)
         {
-            flashlightLightComponent.color = isUVMode ? uvLightColor : normalLightColor;
+            if (isUVMode == true)
+            {
+                flashlightLightComponent.color = uvLightColor;
+            }
+            else
+            {
+                flashlightLightComponent.color = normalLightColor;
+            }
         }
         if (audioSource != null && clickSound != null) audioSource.PlayOneShot(clickSound);
     }

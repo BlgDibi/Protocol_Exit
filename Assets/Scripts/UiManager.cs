@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; 
 using System.Collections;
 using System.Collections.Generic;
 
@@ -25,6 +26,9 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Sprite woodenSpoonSprite;
     [SerializeField] private Sprite chippedGlassSprite;
     [SerializeField] private Sprite porcelainPlateSprite;
+
+    [Header("Player Name UI")]
+    public TMP_Text playerNameTextDisplay;
 
     private Dictionary<SulyDobozData, GameObject> boxImages = new Dictionary<SulyDobozData, GameObject>();
     private Dictionary<Key, GameObject> keyImages = new Dictionary<Key, GameObject>();
@@ -56,6 +60,20 @@ public class UiManager : MonoBehaviour
 
     public void RefreshAllUI()
     {
+        if (playerNameTextDisplay == null)
+        {
+            LoadCharachterOutfit outfitScript = GameObject.FindFirstObjectByType<LoadCharachterOutfit>();
+            if (outfitScript != null && outfitScript.playerNameText != null)
+            {
+                playerNameTextDisplay = outfitScript.playerNameText;
+            }
+        }
+
+        if (playerNameTextDisplay != null)
+        {
+            playerNameTextDisplay.text = SaveSystem.PlayerName;
+        }
+
         if (keyPanel == null) return;
 
         foreach (Transform child in keyPanel)

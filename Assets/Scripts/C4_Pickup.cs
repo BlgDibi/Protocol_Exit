@@ -43,7 +43,6 @@ public class C4_Pickup : MonoBehaviour, InterfaceInteractable
             if (ConditionManager.Instance.CheckCondition("C4Spawned"))
             {
                 itemCollider.size = expandedColliderSize;
-                Debug.Log("<color=cyan>[C4_Pickup] A C4 Collider megnagyobbítva a könnyebb felvételért!</color>");
             }
         }
     }
@@ -89,7 +88,6 @@ public class C4_Pickup : MonoBehaviour, InterfaceInteractable
             UiManager.Instance.AddC4ToUI();
         }
 
-        Debug.Log("<color=yellow>C4 taken from mechanic's hand!</color>");
     }
 
     void OnTriggerEnter(Collider other)

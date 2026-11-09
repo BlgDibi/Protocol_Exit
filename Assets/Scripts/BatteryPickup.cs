@@ -37,6 +37,14 @@ public class BatteryPickup : MonoBehaviour, InterfaceInteractable
 
     void HighlightCrosshair(bool on)
     {
-        if (crosshair != null) crosshair.color = on ? Color.red : Color.white;
+        if (crosshair != null)
+            if (on == true)
+            {
+                crosshair.color = Color.red;
+            }
+            else
+            {
+                crosshair.color = Color.white;
+            }
     }
 }

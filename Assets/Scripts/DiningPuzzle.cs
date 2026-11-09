@@ -72,11 +72,11 @@ public class DiningPuzzle : MonoBehaviour
                 if (playerHPReference != null)
                 {
                     playerHPReference.TakeDamage(damageOnFail);
-                    Debug.Log("<color=red>Büntetés: " + damageOnFail + " HP levonva!</color>");
+                    Debug.Log("<color=red>Punishment: " + damageOnFail + " HP lost!</color>");
                 }
                 else
                 {
-                    Debug.LogError("Nincs behúzva a Player a DiningPuzzle scriptbe!");
+                    Debug.LogError("There is no Player in DiningPuzzle script!");
                 }
             }
         }

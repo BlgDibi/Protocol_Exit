@@ -42,13 +42,11 @@ public class BoxInventory : MonoBehaviour
 
     private System.Collections.IEnumerator RefreshAfterLoad()
     {
-       
         bool isLoadEvent = SaveSystem.IsGameJustLoaded;
 
-     
         yield return new WaitForSeconds(0.2f);
 
-        if (isLoadEvent)
+        if (isLoadEvent == true)
         {
             LoadInventoryFromSave();
             SaveSystem.IsGameJustLoaded = false;
@@ -61,10 +59,9 @@ public class BoxInventory : MonoBehaviour
 
     private void LoadInventoryFromSave()
     {
-        
         if (UiManager.Instance != null)
         {
-            foreach (var regiDoboz in Boxesamount)
+            foreach (SulyDobozData regiDoboz in Boxesamount)
             {
                 UiManager.Instance.RemoveBoxFromUI(regiDoboz);
             }
@@ -77,10 +74,13 @@ public class BoxInventory : MonoBehaviour
         {
             foreach (string nev in mentettNevek)
             {
-                SulyDobozData megtalaltDoboz = Allavailableboxes.Find(x => x.boxname == nev);
-                if (megtalaltDoboz != null)
+                foreach (SulyDobozData adatbazisDoboz in Allavailableboxes)
                 {
-                    Boxesamount.Add(megtalaltDoboz);
+                    if (adatbazisDoboz.boxname == nev)
+                    {
+                        Boxesamount.Add(adatbazisDoboz);
+                        break; 
+                    }
                 }
             }
         }
@@ -92,7 +92,7 @@ public class BoxInventory : MonoBehaviour
     {
         if (UiManager.Instance != null)
         {
-            foreach (var doboz in Boxesamount)
+            foreach (SulyDobozData doboz in Boxesamount)
             {
                 UiManager.Instance.AddBoxToUI(doboz);
             }
@@ -101,44 +101,73 @@ public class BoxInventory : MonoBehaviour
 
     public void AddBox(SulyDobozData doboz)
     {
-        if (!Boxesamount.Contains(doboz))
+        if (Boxesamount.Contains(doboz) == false)
         {
             Boxesamount.Add(doboz);
-            if (UiManager.Instance != null) UiManager.Instance.AddBoxToUI(doboz);
+            if (UiManager.Instance != null)
+            {
+                UiManager.Instance.AddBoxToUI(doboz);
+            }
         }
     }
 
     public void RemoveBox(SulyDobozData doboz)
     {
-        if (Boxesamount.Contains(doboz))
+        if (Boxesamount.Contains(doboz) == true)
         {
             Boxesamount.Remove(doboz);
-            if (UiManager.Instance != null) UiManager.Instance.RemoveBoxFromUI(doboz);
+            if (UiManager.Instance != null)
+            {
+                UiManager.Instance.RemoveBoxFromUI(doboz);
+            }
         }
     }
 
-    public bool HasAnyBox() => Boxesamount.Count > 0;
+    public bool HasAnyBox()
+    {
+        if (Boxesamount.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
+    // Egyszerű if-else a kérdőjel (?) helyett
     public SulyDobozData GetFirstBox()
     {
-        return HasAnyBox() ? Boxesamount[0] : null;
+        if (HasAnyBox() == true)
+        {
+            return Boxesamount[0];
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public List<string> GetSavedBoxNames()
     {
-        List<string> name = new List<string>();
-        foreach (var box in Boxesamount)
+        List<string> nevekLista = new List<string>();
+
+        foreach (SulyDobozData doboz in Boxesamount)
         {
-            if (box != null) name.Add(box.boxname);
+            if (doboz != null)
+            {
+                nevekLista.Add(doboz.boxname);
+            }
         }
-        return name;
+
+        return nevekLista;
     }
 
     public void ClearInventory()
     {
         if (UiManager.Instance != null)
         {
-            foreach (var doboz in Boxesamount)
+            foreach (SulyDobozData doboz in Boxesamount)
             {
                 UiManager.Instance.RemoveBoxFromUI(doboz);
             }
@@ -146,5 +175,4 @@ public class BoxInventory : MonoBehaviour
 
         Boxesamount.Clear();
     }
-
 }

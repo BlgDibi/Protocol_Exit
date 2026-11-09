@@ -4,14 +4,14 @@ using UnityEngine.UI;
 public class HPBar : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] Image greenbar; 
-    [SerializeField] Image redbar; 
+    [SerializeField] Image greenbar;
+    [SerializeField] Image redbar;
 
     [Header("Player")]
     [SerializeField] HP playerHP;
 
     [Header("Animation")]
-    [Tooltip("Red bar speed after gren bar")]
+    [Tooltip("Red bar speed after green bar")]
     [SerializeField] float ghostSpeed = 3f;
 
     float maxhp;
@@ -22,8 +22,15 @@ public class HPBar : MonoBehaviour
         {
             maxhp = playerHP.Hp;
 
-            if (greenbar != null) greenbar.fillAmount = 1f;
-            if (redbar != null) redbar.fillAmount = 1f;
+            if (greenbar != null)
+            {
+                greenbar.fillAmount = 1f;
+            }
+
+            if (redbar != null)
+            {
+                redbar.fillAmount = 1f;
+            }
         }
     }
 
@@ -31,7 +38,16 @@ public class HPBar : MonoBehaviour
     {
         if (playerHP != null && maxhp > 0)
         {
-            float targetFill = playerHP.isDead ? 0f : (playerHP.Hp / maxhp);
+            float targetFill;
+
+            if (playerHP.isDead == true)
+            {
+                targetFill = 0f;
+            }
+            else
+            {
+                targetFill = playerHP.Hp / maxhp;
+            }
 
             greenbar.fillAmount = targetFill;
 

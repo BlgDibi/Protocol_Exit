@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections; // EZ SZÜKSÉGES A KORUTINHOZ
+using System.Collections;
 
 public class GameEvents : MonoBehaviour
 {
@@ -14,13 +14,11 @@ public class GameEvents : MonoBehaviour
 
     IEnumerator DelayedSave()
     {
-        // Várunk egy kicsit, hogy minden objektum (Player, Boxok, stb.) biztosan betöltõdjön
         yield return new WaitForSeconds(0.5f);
 
-        Debug.Log("Mentés folyamatban a " + SaveSystem.SlotToSaveAfterLoad + " slotba...");
+        Debug.Log("Save in progress " + SaveSystem.SlotToSaveAfterLoad + " slot...");
         SaveSystem.Save(SaveSystem.SlotToSaveAfterLoad);
 
-        // Alaphelyzetbe állítás
         SaveSystem.SlotToSaveAfterLoad = -1;
     }
 

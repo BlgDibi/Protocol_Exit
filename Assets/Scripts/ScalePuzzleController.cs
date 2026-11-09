@@ -122,7 +122,17 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public string GetInteractText() => isSolved ? "The scale is balanced." : "Examine Scale";
+    public string GetInteractText()
+    {
+        if (isSolved == true)
+        {
+            return "The scale is balanced.";
+        }
+        else
+        {
+            return "Examine Scale";
+        }
+    }
     public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()
@@ -209,15 +219,26 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
 
     public void PlaceBox(bool isLeft)
     {
-        if (!BoxInventory.Instance.HasAnyBox()) return;
+        if (BoxInventory.Instance.HasAnyBox() == false)
+        {
+            return;
+        }
 
         SulyDobozData data = BoxInventory.Instance.GetFirstBox();
+
         if (data != null && data.boxprefab != null)
         {
             BoxInventory.Instance.RemoveBox(data);
 
-            Transform targetPan = isLeft ? leftPan : rightPan;
-
+            Transform targetPan;
+            if (isLeft == true)
+            {
+                targetPan = leftPan;
+            }
+            else
+            {
+                targetPan = rightPan;
+            }
 
             float randomX = Random.Range(-0.35f, 0.35f);
             float randomZ = Random.Range(-0.35f, 0.35f);
@@ -233,18 +254,32 @@ public class ScalePuzzleController : MonoBehaviour, InterfaceInteractable
             box.tag = "Boxes";
 
             Boxpickup pickupScript = box.GetComponent<Boxpickup>();
-            if (pickupScript != null) pickupScript.isPlaced = true;
+
+            if (pickupScript != null)
+            {
+                pickupScript.isPlaced = true;
+            }
 
             Rigidbody rb = box.GetComponent<Rigidbody>();
-            if (rb == null) rb = box.AddComponent<Rigidbody>();
-            rb.mass = data.weight;
 
+            if (rb == null)
+            {
+                rb = box.AddComponent<Rigidbody>();
+            }
+
+            rb.mass = data.weight;
 
             spawnedBoxes.Add(box);
             spawnedBoxesData.Add(data);
 
-            if (isLeft) leftWeight += data.weight;
-            else rightWeight += data.weight;
+            if (isLeft == true)
+            {
+                leftWeight += data.weight;
+            }
+            else
+            {
+                rightWeight += data.weight;
+            }
 
             CalculateScaleState();
         }

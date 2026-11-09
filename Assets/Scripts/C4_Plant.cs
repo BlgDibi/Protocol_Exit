@@ -133,21 +133,35 @@ public class C4_Plant : MonoBehaviour
     void TriggerExplosion()
     {
         if (useDetonatorPrompt != null)
+        {
             useDetonatorPrompt.SetActive(false);
+        }
+
+        Vector3 explosionCenter;
+
+        if (c4WorldModel != null)
+        {
+            explosionCenter = c4WorldModel.transform.position;
+        }
+        else
+        {
+            explosionCenter = transform.position;
+        }
 
         if (explosionSound != null)
         {
-            AudioSource.PlayClipAtPoint(explosionSound, c4WorldModel != null ? c4WorldModel.transform.position : transform.position);
+            AudioSource.PlayClipAtPoint(explosionSound, explosionCenter);
         }
 
-        Vector3 explosionCenter = c4WorldModel != null ? c4WorldModel.transform.position : transform.position;
         Collider[] hitColliders = Physics.OverlapSphere(explosionCenter, explosionRadius);
+
         foreach (Collider hit in hitColliders)
         {
-            if (hit.CompareTag("Player"))
+            if (hit.CompareTag("Player") == true)
             {
                 HP playerHP = hit.GetComponent<HP>();
-                if (playerHP != null && !playerHP.isDead)
+
+                if (playerHP != null && playerHP.isDead == false)
                 {
                     playerHP.TakeDamage(explosionDamage);
                 }
@@ -162,14 +176,27 @@ public class C4_Plant : MonoBehaviour
             StartCoroutine(DisableExplosionRoutine());
         }
 
-        if (c4WorldModel != null) c4WorldModel.SetActive(false);
-        if (detonatorInHand != null) detonatorInHand.SetActive(false);
+        if (c4WorldModel != null)
+        {
+            c4WorldModel.SetActive(false);
+        }
 
-        if (UiManager.Instance != null) UiManager.Instance.RemoveDetonatorFromUI();
+        if (detonatorInHand != null)
+        {
+            detonatorInHand.SetActive(false);
+        }
+
+        if (UiManager.Instance != null)
+        {
+            UiManager.Instance.RemoveDetonatorFromUI();
+        }
 
         foreach (GameObject obj in objectsToDestroy)
         {
-            if (obj != null) Destroy(obj);
+            if (obj != null)
+            {
+                Destroy(obj);
+            }
         }
 
         if (ConditionManager.Instance != null)

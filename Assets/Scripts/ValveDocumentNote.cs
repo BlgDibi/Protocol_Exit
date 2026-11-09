@@ -52,6 +52,13 @@ public class ValveDocumentNote : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        return isReading ? "" : "Read memo";
+        if (isReading == true)
+        {
+            return "";
+        }
+        else
+        {
+            return "Read the memo";
+        }
     }
 }

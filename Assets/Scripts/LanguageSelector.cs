@@ -12,13 +12,10 @@ public class LanguageSelector : MonoBehaviour
 
     IEnumerator Start()
     {
-        // Megvárjuk a rendszer betöltését
         yield return LocalizationSettings.InitializationOperation;
 
-        // Felépítjük a listát elõször
         UpdateDropdownList();
 
-        // Ha a játékos nyelvet vált, építsük újra a listát a megfelelõ nyelven
         LocalizationSettings.SelectedLocaleChanged += OnSelectedLocaleChanged;
 
         dropdown.onValueChanged.AddListener(OnDropdownValueChanged);
@@ -36,9 +33,8 @@ public class LanguageSelector : MonoBehaviour
 
     public void OnDropdownValueChanged(int index)
     {
-        if (isUpdating) return; // Ha épp frissítünk, ne fusson le újra
+        if (isUpdating) return;
 
-        // Átállítjuk a nyelvet
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[index];
     }
 
@@ -78,7 +74,6 @@ public class LanguageSelector : MonoBehaviour
 
             options.Add(displayName);
 
-            // Megjegyezzük, melyik a mostani, hogy azt jelöljük ki
             if (currentLocale == locale)
             {
                 selectedIndex = i;

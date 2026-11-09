@@ -59,7 +59,7 @@ public class PlayerSave : MonoBehaviour
             }
         }
 
-        Debug.Log("PlayerSave: Player TP-d here: " + data.Position + " HP: " + data.Health);
+        Debug.Log("Player TP-d here: " + data.Position + " HP: " + data.Health);
 
         if (controller != null) controller.enabled = true;
     }

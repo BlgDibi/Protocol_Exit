@@ -52,6 +52,13 @@ public class IncidentDocument : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        return isReading ? "" : "Read note";
+        if (isReading == true)
+        {
+            return "";
+        }
+        else
+        {
+            return "Read the note";
+        }
     }
 }

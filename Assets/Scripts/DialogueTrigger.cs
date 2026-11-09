@@ -61,8 +61,16 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         yield return new WaitForSeconds(0.5f);
 
         bool metInSaveList = SaveSystem.WasNPCMet(interactableID);
-        string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState(questVariableToWatch) : "false";
+        string rewardState;
 
+        if (DialogueManager.Instance != null)
+        {
+            rewardState = DialogueManager.Instance.GetVariableState(questVariableToWatch);
+        }
+        else
+        {
+            rewardState = "false";
+        }
         bool hasC4Already = C4_Pickup.HasC4 || (ConditionManager.Instance != null && ConditionManager.Instance.CheckCondition("HasC4"));
 
         if (metInSaveList || rewardState.ToLower() == "true" || hasC4Already)
@@ -251,7 +259,10 @@ public class DialogueTrigger : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public KeyCode GetInteractKey() => interactionKey;
+    public KeyCode GetInteractKey()
+    {
+        return interactionKey;
+    }
     public string GetInteractText()
     {
         if (isMovingToPoint)

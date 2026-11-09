@@ -18,13 +18,13 @@ public class BookClueGenerator : MonoBehaviour
     public Color uvGlowColor = new Color(0f, 1f, 0.2f, 1f); 
 
     private float currentAlpha = 0f;
-    private FlashlightController flashlightController; 
+    private FlashlightController flashlightController;
 
     private void Start()
     {
         flashlightController = FindFirstObjectByType<FlashlightController>();
 
-        if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode))
+        if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode) || string.IsNullOrEmpty(SaveSystem.CurrentDocumentText))
         {
             GenerateCode();
         }
@@ -32,7 +32,6 @@ public class BookClueGenerator : MonoBehaviour
         if (clueTextDisplay != null)
         {
             clueTextDisplay.text = SaveSystem.KeypadClue;
-
             clueTextDisplay.color = new Color(uvGlowColor.r, uvGlowColor.g, uvGlowColor.b, 0f);
         }
     }
@@ -62,7 +61,16 @@ public class BookClueGenerator : MonoBehaviour
             }
         }
 
-        float targetAlpha = isHit ? 1f : 0f;
+        float targetAlpha;
+
+        if (isHit == true)
+        {
+            targetAlpha = 1f;
+        }
+        else
+        {
+            targetAlpha = 0f;
+        }
 
         currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, Time.deltaTime * fadeSpeed);
 

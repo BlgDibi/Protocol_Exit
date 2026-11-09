@@ -28,7 +28,17 @@ public class SecretRevealer : MonoBehaviour
 
     void Update()
     {
-        Vector3 destination = isMoved ? targetPosition : startPosition;
+        Vector3 destination;
+
+        if (isMoved == true)
+        {
+            destination = targetPosition;
+        }
+        else
+        {
+            destination = startPosition;
+        }
+
         transform.position = Vector3.Lerp(transform.position, destination, Time.deltaTime * moveSpeed);
     }
 

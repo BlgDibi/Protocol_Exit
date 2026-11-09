@@ -22,7 +22,7 @@ public class EndTrigger : MonoBehaviour
     public float timeBeforeReset = 4f;
 
     [TextArea(3, 8)]
-    public string finalMessage = "PROTOCOL: EXIT.\n\nPhase 1 - Complete.\n Result: Acceptable.\n\nInitializing phase 2...\n\n\n Made by: Dávid Balog";
+    public string finalMessage = "PROTOCOL: EXIT\n\nPhase 1 - Complete.\n Result: Acceptable\n\nInitializing phase 2...\n\n\n Made by: Dávid Balog";
     private bool isEndingTriggered = false;
 
     private void OnTriggerEnter(Collider other)

@@ -52,7 +52,16 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
         if (messagePanel != null) messagePanel.SetActive(false);
 
-        string rewardState = DialogueManager.Instance != null ? DialogueManager.Instance.GetVariableState("got_reward") : "";
+        string rewardState;
+
+        if (DialogueManager.Instance != null)
+        {
+            rewardState = DialogueManager.Instance.GetVariableState("got_reward");
+        }
+        else
+        {
+            rewardState = "";
+        }
         bool wasUnlockedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorUnlocked(doorID);
         bool wasOpenedBySave = !string.IsNullOrEmpty(doorID) && SaveSystem.IsDoorOpen(doorID);
         bool planksCleared = ProtectingPlanksRemoved();
@@ -221,9 +230,23 @@ public class UniversalDoor : MonoBehaviour, InterfaceInteractable
     {
         PlaySound(lockedSound);
 
-        string msg = "";
-        if (isKeyMissing) msg = "Locked! I need a key.";
-        else msg = lockedMessageKey.IsEmpty ? "Locked." : lockedMessageKey.GetLocalizedString();
+        string msg;
+
+        if (isKeyMissing == true)
+        {
+            msg = "Locked! I need a key.";
+        }
+        else
+        {
+            if (lockedMessageKey.IsEmpty == true)
+            {
+                msg = "Locked.";
+            }
+            else
+            {
+                msg = lockedMessageKey.GetLocalizedString();
+            }
+        }
 
         ShowTemporaryMessage(msg);
     }

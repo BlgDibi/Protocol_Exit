@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Localization;
 
-
 public class KeyPadTrigger : MonoBehaviour, InterfaceInteractable
 {
     public static bool IsPlayerInZone = false;
@@ -15,6 +14,14 @@ public class KeyPadTrigger : MonoBehaviour, InterfaceInteractable
     public LocalizedString interactionPrompt;
 
     [SerializeField] private KeyCode interactkey = KeyCode.F;
+
+    private void Start()
+    {
+        if (uiKeypad != null)
+        {
+            uiKeypad.InitializeUVNumbers();
+        }
+    }
 
     public string GetInteractText()
     {
@@ -34,7 +41,6 @@ public class KeyPadTrigger : MonoBehaviour, InterfaceInteractable
             uiKeypad.ShowKeypad();
         }
     }
-
 
     void OnTriggerEnter(Collider other)
     {
@@ -57,6 +63,16 @@ public class KeyPadTrigger : MonoBehaviour, InterfaceInteractable
 
     void HighlightCrosshair(bool on)
     {
-        if (crosshair != null) crosshair.color = on ? Color.red : Color.white;
+        if (crosshair != null)
+        {
+            if (on == true)
+            {
+                crosshair.color = Color.red;
+            }
+            else
+            {
+                crosshair.color = Color.white;
+            }
+        }
     }
 }

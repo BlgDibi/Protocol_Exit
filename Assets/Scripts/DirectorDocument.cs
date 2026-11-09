@@ -52,6 +52,13 @@ public class DirectorDocument : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        return isReading ? "" : "Read the schedule";
+        if (isReading == true)
+        {
+            return "";
+        }
+        else
+        {
+            return "Read the schedule";
+        }
     }
 }

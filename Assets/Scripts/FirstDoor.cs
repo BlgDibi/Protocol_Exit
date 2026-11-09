@@ -74,8 +74,6 @@ public class FirstDoor : MonoBehaviour
         if (!isUnlocked)
         {
             isUnlocked = true;
-
-          
         }
     }
 

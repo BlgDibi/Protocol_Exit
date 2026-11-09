@@ -6,7 +6,7 @@ public class PushInteractable : MonoBehaviour, InterfaceInteractable
     public string promptText = "Push";
     public KeyCode interactKey = KeyCode.V;
 
-    [Header("Puzzle Link")]
+    [Header("Classroom Puzzle Link")]
     public ClassroomPuzzleManager puzzleManager;
 
     private Rigidbody rb;

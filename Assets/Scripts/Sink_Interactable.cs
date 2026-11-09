@@ -36,7 +36,16 @@ public class Sink_Interactable : MonoBehaviour, InterfaceInteractable
         isOpen = SaveSystem.IsSinkOpen;
         isFilled = SaveSystem.IsSinkFilled;
 
-        float startHeight = SaveSystem.SinkWaterLevel > 0 ? SaveSystem.SinkWaterLevel : minWaterHeight;
+        float startHeight;
+
+        if (SaveSystem.SinkWaterLevel > 0)
+        {
+            startHeight = SaveSystem.SinkWaterLevel;
+        }
+        else
+        {
+            startHeight = minWaterHeight;
+        }
 
         if (isFilled)
         {
@@ -80,10 +89,24 @@ public class Sink_Interactable : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        if (puzzleManager != null && !puzzleManager.hasReadRiddle) return "";
+        if (puzzleManager != null && puzzleManager.hasReadRiddle == false)
+        {
+            return "";
+        }
 
-        if (isFilled) return "";
-        return isOpen ? "Close Tap" : "Turn On Water";
+        if (isFilled == true)
+        {
+            return "";
+        }
+
+        if (isOpen == true)
+        {
+            return "Close Tap";
+        }
+        else
+        {
+            return "Turn On Water";
+        }
     }
 
     public KeyCode GetInteractKey()
@@ -108,11 +131,30 @@ public class Sink_Interactable : MonoBehaviour, InterfaceInteractable
     private IEnumerator AnimateTapRoutine()
     {
         isAnimating = true;
-        isOpen = !isOpen;
+
+        if (isOpen == true)
+        {
+            isOpen = false;
+        }
+        else
+        {
+            isOpen = true;
+        }
+
         SaveSystem.IsSinkOpen = isOpen;
 
         Quaternion startRot = handle.localRotation;
-        Quaternion endRot = Quaternion.Euler(isOpen ? openRotation : closedRotation);
+        Quaternion endRot;
+
+        if (isOpen == true)
+        {
+            endRot = Quaternion.Euler(openRotation);
+        }
+        else
+        {
+            endRot = Quaternion.Euler(closedRotation);
+        }
+
         float time = 0;
 
         while (time < 1)
@@ -121,23 +163,54 @@ public class Sink_Interactable : MonoBehaviour, InterfaceInteractable
             handle.localRotation = Quaternion.Lerp(startRot, endRot, time);
             yield return null;
         }
+
         handle.localRotation = endRot;
 
-        if (isOpen)
+        if (isOpen == true)
         {
-            if (waterParticles != null) waterParticles.Play();
-            if (waterAudio != null) waterAudio.Play();
+            if (waterParticles != null)
+            {
+                waterParticles.Play();
+            }
 
-            if (fillWaterCoroutine != null) StopCoroutine(fillWaterCoroutine);
-            float currentY = waterLevelObject != null ? waterLevelObject.localPosition.y : minWaterHeight;
+            if (waterAudio != null)
+            {
+                waterAudio.Play();
+            }
+
+            if (fillWaterCoroutine != null)
+            {
+                StopCoroutine(fillWaterCoroutine);
+            }
+
+            float currentY;
+            if (waterLevelObject != null)
+            {
+                currentY = waterLevelObject.localPosition.y;
+            }
+            else
+            {
+                currentY = minWaterHeight;
+            }
+
             fillWaterCoroutine = StartCoroutine(FillWaterRoutine(currentY));
         }
         else
         {
-            if (waterParticles != null) waterParticles.Stop();
-            if (waterAudio != null) waterAudio.Stop();
+            if (waterParticles != null)
+            {
+                waterParticles.Stop();
+            }
 
-            if (fillWaterCoroutine != null) StopCoroutine(fillWaterCoroutine);
+            if (waterAudio != null)
+            {
+                waterAudio.Stop();
+            }
+
+            if (fillWaterCoroutine != null)
+            {
+                StopCoroutine(fillWaterCoroutine);
+            }
         }
 
         isAnimating = false;

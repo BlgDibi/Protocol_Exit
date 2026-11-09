@@ -150,7 +150,17 @@ public class PowerBoxPuzzle : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public string GetInteractText() => isSolved ? "System Overloaded" : "Open Power Box";
+    public string GetInteractText()
+    {
+        if (isSolved == true)
+        {
+            return "System Overloaded";
+        }
+        else
+        {
+            return "Open Power Box";
+        }
+    }
     public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()

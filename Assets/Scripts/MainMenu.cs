@@ -44,16 +44,16 @@ public class MainMenu : MonoBehaviour
 
     public void StartNewGame()
     {
-        Debug.Log("StartNewGame elindult! Fõmenü kikapcsolása...");
+        Debug.Log("StartNewGame started! Main menu deactivate...");
 
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(false);
-            Debug.Log("Fõmenü panel kikapcsolva!");
+            Debug.Log("Main Menu deactivated!");
         }
         else
         {
-            Debug.LogError("HIBA: A Main Menu Panel nincs behúzva az Inspectorban!");
+            Debug.LogError("Error: There is no main menu in inspector!");
         }
 
         if (mainCharacter != null)
@@ -128,6 +128,8 @@ public class MainMenu : MonoBehaviour
 
     public void OpenCustomizer()
     {
+        SaveSystem.ResetAllData();
+
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (confirmationPanel != null) confirmationPanel.SetActive(false);
         if (mainCharacter != null) mainCharacter.SetActive(false);
@@ -145,7 +147,6 @@ public class MainMenu : MonoBehaviour
 
     public void ExecuteFreshStart()
     {
-        SaveSystem.ResetAllData();
 
         if (KeyInventory.Instance != null)
         {

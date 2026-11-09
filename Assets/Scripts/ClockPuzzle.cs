@@ -105,7 +105,17 @@ public class ClockPuzzle : MonoBehaviour, InterfaceInteractable
         }
     }
 
-    public string GetInteractText() => isSolved ? "The clock is working." : "Examine the clock";
+    public string GetInteractText()
+    {
+        if (isSolved == true)
+        {
+            return "The clock is working.";
+        }
+        else
+        {
+            return "Examine the clock";
+        }
+    }
     public KeyCode GetInteractKey() => KeyCode.F;
 
     public void Interact()

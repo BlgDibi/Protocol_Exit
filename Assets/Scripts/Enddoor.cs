@@ -53,13 +53,20 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
         targetRotationLeft = Quaternion.Euler(0f, closeAngle, 0f);
         targetRotationRight = Quaternion.Euler(0f, closeAngle, 0f);
 
-        if (audioSource == null) audioSource = GetComponent<AudioSource>();
-        if (messagePanel != null) messagePanel.SetActive(false);
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        if (messagePanel != null)
+        {
+            messagePanel.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (isAnimating)
+        if (isAnimating == true)
         {
             bool leftDone = true;
             bool rightDone = true;
@@ -67,26 +74,41 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
             if (leftDoorPivot != null)
             {
                 leftDoorPivot.localRotation = Quaternion.Lerp(leftDoorPivot.localRotation, targetRotationLeft, Time.deltaTime * rotationSpeed);
+
                 if (Quaternion.Angle(leftDoorPivot.localRotation, targetRotationLeft) < 0.1f)
+                {
                     leftDoorPivot.localRotation = targetRotationLeft;
-                else leftDone = false;
+                }
+                else
+                {
+                    leftDone = false;
+                }
             }
 
             if (rightDoorPivot != null)
             {
                 rightDoorPivot.localRotation = Quaternion.Lerp(rightDoorPivot.localRotation, targetRotationRight, Time.deltaTime * rotationSpeed);
+
                 if (Quaternion.Angle(rightDoorPivot.localRotation, targetRotationRight) < 0.1f)
+                {
                     rightDoorPivot.localRotation = targetRotationRight;
-                else rightDone = false;
+                }
+                else
+                {
+                    rightDone = false;
+                }
             }
 
-            if (leftDone && rightDone) isAnimating = false;
+            if (leftDone == true && rightDone == true)
+            {
+                isAnimating = false;
+            }
         }
     }
 
     public void Interact()
     {
-        if (!isLocked)
+        if (isLocked == false)
         {
             ToggleDoor();
             return;
@@ -98,7 +120,7 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
         {
             foreach (string cond in requiredConditions)
             {
-                if (!string.IsNullOrEmpty(cond) && !ConditionManager.Instance.CheckCondition(cond))
+                if (string.IsNullOrEmpty(cond) == false && ConditionManager.Instance.CheckCondition(cond) == false)
                 {
                     canOpen = false;
                     break;
@@ -106,10 +128,14 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
             }
         }
 
-        if (canOpen)
+        if (canOpen == true)
         {
             UnlockAndOpen();
-            if (messagePanel != null) messagePanel.SetActive(false);
+
+            if (messagePanel != null)
+            {
+                messagePanel.SetActive(false);
+            }
         }
         else
         {
@@ -119,16 +145,26 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
 
     public string GetInteractText()
     {
-        if (isDoorOpen) return textCloseDoor.GetLocalizedString();
-        else return textOpenDoor.GetLocalizedString();
+        if (isDoorOpen == true)
+        {
+            return textCloseDoor.GetLocalizedString();
+        }
+        else
+        {
+            return textOpenDoor.GetLocalizedString();
+        }
     }
 
     public void KeypadSuccess()
     {
-        if (isLocked)
+        if (isLocked == true)
         {
             isLocked = false;
-            if (messagePanel != null) messagePanel.SetActive(false);
+
+            if (messagePanel != null)
+            {
+                messagePanel.SetActive(false);
+            }
         }
     }
 
@@ -136,7 +172,7 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
     {
         PlaySound(lockedSound);
 
-        if (!lockedMessageKey.IsEmpty)
+        if (lockedMessageKey.IsEmpty == false)
         {
             ShowTemporaryMessage(lockedMessageKey.GetLocalizedString());
         }
@@ -155,13 +191,21 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
             StopAllCoroutines();
             StartCoroutine(HideMessageAfterDelay());
         }
-        if (messageText != null) messageText.gameObject.SetActive(true);
+
+        if (messageText != null)
+        {
+            messageText.gameObject.SetActive(true);
+        }
     }
 
     private IEnumerator HideMessageAfterDelay()
     {
         yield return new WaitForSeconds(messageDuration);
-        if (messagePanel != null) messagePanel.SetActive(false);
+
+        if (messagePanel != null)
+        {
+            messagePanel.SetActive(false);
+        }
     }
 
     private void UnlockAndOpen()
@@ -172,29 +216,63 @@ public class Enddoor : MonoBehaviour, InterfaceInteractable
 
     private void ToggleDoor()
     {
-        isDoorOpen = !isDoorOpen;
+        if (isDoorOpen == true)
+        {
+            isDoorOpen = false;
+        }
+        else
+        {
+            isDoorOpen = true;
+        }
 
-        targetRotationLeft = Quaternion.Euler(0f, isDoorOpen ? leftOpenAngle : closeAngle, 0f);
-        targetRotationRight = Quaternion.Euler(0f, isDoorOpen ? rightOpenAngle : closeAngle, 0f);
+        if (isDoorOpen == true)
+        {
+            targetRotationLeft = Quaternion.Euler(0f, leftOpenAngle, 0f);
+            targetRotationRight = Quaternion.Euler(0f, rightOpenAngle, 0f);
+            PlaySound(openSound);
+        }
+        else
+        {
+            targetRotationLeft = Quaternion.Euler(0f, closeAngle, 0f);
+            targetRotationRight = Quaternion.Euler(0f, closeAngle, 0f);
+            PlaySound(closeSound);
+        }
 
         isAnimating = true;
-        PlaySound(isDoorOpen ? openSound : closeSound);
 
-        if (isDoorOpen && !hasSavedTime)
+        if (isDoorOpen == true && hasSavedTime == false)
         {
             Stopwatch stopwatch = FindFirstObjectByType<Stopwatch>();
+
             if (stopwatch != null)
             {
                 stopwatch.StopStopwatch();
                 stopwatch.SaveTimeOnMainMenu();
+
+                int currentGameIndex = PlayerPrefs.GetInt("GameCount", 1) - 1;
+                PlayerPrefs.SetInt("GameCompleted" + currentGameIndex, 1);
+                PlayerPrefs.Save();
+
+                float currentTime = stopwatch.GetElapsedTime();
+                float bestTime = PlayerPrefs.GetFloat("BestEscapeTime", float.MaxValue);
+
+                if (currentTime < bestTime)
+                {
+                    PlayerPrefs.SetFloat("BestEscapeTime", currentTime);
+                    PlayerPrefs.Save();
+                }
             }
+
             hasSavedTime = true;
         }
     }
 
     private void PlaySound(AudioClip clip)
     {
-        if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 
     public KeyCode GetInteractKey()

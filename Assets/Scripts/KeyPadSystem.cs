@@ -1,14 +1,18 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class KeyPadSystem : MonoBehaviour
 {
     [Header("Code Settings")]
-    [Tooltip("Generated Code")]
+    [Tooltip("Generated code")]
     public bool useGeneratedCode = false;
 
     [Tooltip("Custom Code")]
     public string customCode = "1234";
+
+    [Header("UV Target Cubes")]
+    public List<TextMeshPro> uvNumberTexts = new List<TextMeshPro>();
 
     [Header("UI Settings")]
     public GameObject keypadCanvas;
@@ -23,7 +27,6 @@ public class KeyPadSystem : MonoBehaviour
     public Color errorColor = Color.red;
 
     [Header("Player Reference")]
-    [Tooltip("OwnMovement script")]
     public OwnMovement playerController;
 
     [Header("Animation Settings")]
@@ -51,15 +54,42 @@ public class KeyPadSystem : MonoBehaviour
 
     private void Start()
     {
-        if (keypadCanvas != null)
-        {
-            keypadCanvas.SetActive(false);
-        }
-
         if (playerAnimator == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null) playerAnimator = player.GetComponentInChildren<Animator>();
+        }
+
+        InitializeUVNumbers();
+
+        if (keypadCanvas != null)
+        {
+            keypadCanvas.SetActive(false);
+        }
+    }
+
+    public void InitializeUVNumbers()
+    {
+        if (useGeneratedCode && uvNumberTexts != null && uvNumberTexts.Count > 0)
+        {
+            if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode) || SaveSystem.KeypadFullCode.Length != 4)
+            {
+                string newCode = "";
+                for (int i = 0; i < 4; i++)
+                {
+                    newCode += UnityEngine.Random.Range(1, 10).ToString();
+                }
+                SaveSystem.KeypadFullCode = newCode;
+            }
+
+            string targetCode = SaveSystem.KeypadFullCode;
+            for (int i = 0; i < uvNumberTexts.Count; i++)
+            {
+                if (uvNumberTexts[i] != null && i < targetCode.Length)
+                {
+                    uvNumberTexts[i].text = targetCode[i].ToString();
+                }
+            }
         }
     }
 
@@ -116,16 +146,9 @@ public class KeyPadSystem : MonoBehaviour
         isProcessing = true;
         string targetCode = "";
 
-        if (useGeneratedCode == true)
+        if (useGeneratedCode)
         {
-            if (string.IsNullOrEmpty(SaveSystem.KeypadFullCode) == true)
-            {
-                targetCode = "0000";
-            }
-            else
-            {
-                targetCode = SaveSystem.KeypadFullCode;
-            }
+            targetCode = string.IsNullOrEmpty(SaveSystem.KeypadFullCode) ? "0000" : SaveSystem.KeypadFullCode;
         }
         else
         {
@@ -139,11 +162,8 @@ public class KeyPadSystem : MonoBehaviour
             display.color = successColor;
 
             Invoke(nameof(HideUIForAnimation), 0.5f);
-
             Invoke(nameof(PlayTypingAnimation), 0.0f);
-
             Invoke(nameof(OpenLinkedDoors), 0.5f + typeAnimLength);
-
             Invoke(nameof(EnablePlayerMovement), 0.5f + typeAnimLength);
         }
         else
@@ -183,15 +203,8 @@ public class KeyPadSystem : MonoBehaviour
 
     private void OpenLinkedDoors()
     {
-        if (doorToOpen_Old != null)
-        {
-            doorToOpen_Old.Unlock();
-        }
-
-        if (doorToOpen_New != null)
-        {
-            doorToOpen_New.UnlockAndOpen();
-        }
+        if (doorToOpen_Old != null) doorToOpen_Old.Unlock();
+        if (doorToOpen_New != null) doorToOpen_New.UnlockAndOpen();
     }
 
     private void ResetAfterError()
