@@ -216,10 +216,7 @@ public class PauseMenu : MonoBehaviour
 
     private void RefreshSlotTexts(TextMeshProUGUI[] slots)
     {
-        if (slots == null)
-        {
-            return;
-        }
+        if (slots == null) return;
 
         for (int i = 0; i < slots.Length; i++)
         {
@@ -231,11 +228,21 @@ public class PauseMenu : MonoBehaviour
                 if (File.Exists(path))
                 {
                     System.DateTime date = File.GetLastWriteTime(path);
-                    slots[i].text = "SLOT " + slotNum + "\n<size=60%>" + date.ToString("yyyy.MM.dd HH:mm") + "</size>";
+
+                    string json = System.IO.File.ReadAllText(path);
+                    SaveSystem.SaveData slotData = JsonUtility.FromJson<SaveSystem.SaveData>(json);
+
+                    string pName = slotData.savedPlayerName;
+                    if (string.IsNullOrEmpty(pName))
+                    {
+                        pName = "Unknown";
+                    }
+
+                    slots[i].text = pName + "\n<size=60%>" + date.ToString("yyyy.MM.dd HH:mm") + "</size>";
                 }
                 else
                 {
-                    slots[i].text = "SLOT " + slotNum + "\n<size=60%>Empty</size>";
+                    slots[i].text = "Empty\n<size=60%>-</size>";
                 }
             }
         }
